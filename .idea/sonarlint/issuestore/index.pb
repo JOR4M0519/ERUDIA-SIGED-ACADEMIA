@@ -85,3 +85,6 @@ K
 config-service/build.gradle,8\9\897bbd6396225a219326c38f922b61d623bbf902
 K
 eureka-service/build.gradle,f\5\f577d3d7f021f1c298b811498be119c381b2ca43
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
