@@ -1,0 +1,77 @@
+# Java general ignores
+*.class
+*.log
+*.war
+*.ear
+*.jar
+
+# Gradle specific ignores
+.gradle/
+build/
+gradle-app.setting
+.gradle/
+gradle/
+out/
+!gradle/wrapper/gradle-wrapper.jar
+!gradlew
+!gradlew.bat
+
+# IntelliJ IDEA project files
+.idea/
+*.iml
+
+# Eclipse/STS project files
+.classpath
+.project
+.settings/
+
+# Mac OS specific ignores
+.DS_Store
+
+# Linux specific ignores
+*~
+
+# Windows specific ignores
+Thumbs.db
+desktop.ini
+
+# Ignore other services
+auth-service2/
+
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Logs and reports
+logs/
+*.log
+*.out
+*.pid
+*.gz
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Build directories
+target/
+build/
+
+# Generated files
+*.o
+*.pyc
+*.pyo
+*.min.js
+*.map
+
+# JetBrains Rider specific ignores
+.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries
+.idea/**/shelf
+
+# Git ignore itself
+.gitignore
