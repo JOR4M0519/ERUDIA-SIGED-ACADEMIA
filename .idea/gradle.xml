@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleMigrationSettings" migrationVersion="1" />
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/academy-service" />
+            <option value="$PROJECT_DIR$/auth-service" />
+            <option value="$PROJECT_DIR$/auth-service2" />
+            <option value="$PROJECT_DIR$/config-service" />
+            <option value="$PROJECT_DIR$/eureka-service" />
+            <option value="$PROJECT_DIR$/gateway-service" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>

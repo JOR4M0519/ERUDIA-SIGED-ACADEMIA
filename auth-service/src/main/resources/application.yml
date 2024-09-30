@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: auth-service
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.SQLServerDialect
+  datasource:
+    url: jdbc:sqlserver://sigef-glm-db-server.database.windows.net:1433;database=sigef-db;user=adminglm@sigef-glm-db-server;password={your_password_here};encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+    username: adminglm
+    password: 698.75k5241A*
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: google
+            client-id: 588970608440-bbttodji7lobfr9ef1bhfafu4dmro9pt.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
