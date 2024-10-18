@@ -1,21 +1,17 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "id_type")
 public class IdType {
     @Id
@@ -29,6 +25,6 @@ public class IdType {
     private String name;
 
     @OneToMany(mappedBy = "idType")
-    private Set<UserDetail> userDetails = new LinkedHashSet<>();
+    private Set<co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity.UserDetail_copy> userDetails = new LinkedHashSet<>();
 
 }

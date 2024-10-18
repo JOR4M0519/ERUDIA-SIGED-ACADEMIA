@@ -1,19 +1,15 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "recovery_period")
 public class RecoveryPeriod {
     @Id

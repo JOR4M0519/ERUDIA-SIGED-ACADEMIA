@@ -1,18 +1,14 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice;
 
+import co.edu.gimnasiolorismalaguzzi.authservice.entity.Role;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "role_perm")
 public class RolePerm {
     @Id

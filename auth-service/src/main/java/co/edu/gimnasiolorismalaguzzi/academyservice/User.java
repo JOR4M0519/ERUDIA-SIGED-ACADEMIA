@@ -1,18 +1,18 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
-@Data
+
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -71,7 +71,7 @@ public class User {
     private Set<SubjectProfessor> subjectProfessors = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserDetail> userDetails = new LinkedHashSet<>();
+    private Set<co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity.UserDetail_copy> userDetails = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
     private Set<UserRole> userRoles = new LinkedHashSet<>();
