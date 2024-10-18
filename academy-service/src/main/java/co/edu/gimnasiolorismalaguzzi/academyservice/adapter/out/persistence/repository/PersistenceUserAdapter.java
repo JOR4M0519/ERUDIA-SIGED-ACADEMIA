@@ -7,6 +7,5 @@ import java.util.List;
 
 
 public interface PersistenceUserAdapter extends PersistenceAdapter<UserDomain, Integer> {
-
     // Aquí puedes agregar métodos específicos para UserDomain si es necesario
 }

@@ -1,4 +1,4 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence;
+package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.mapper.IdTypeMapper;
@@ -7,16 +7,20 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.mapp
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.PersistenceUserAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.UserCrudRepository;
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.UserCrudRepository;
+import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.apache.http.HttpResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
-@Repository
+@PersistenceAdapter
 @Slf4j
 public class UserRepository implements PersistenceUserAdapter {
 
@@ -52,7 +56,16 @@ public class UserRepository implements PersistenceUserAdapter {
     }
 
     @Override
-    public void delete(Integer integer) {
-
+    public HttpStatus delete(Integer integer) {
+        try{
+            if (this.userCrudRepository.existsById(integer)) {
+                userCrudRepository.updateStatusById("D",integer);
+                return HttpStatus.OK;
+            } else {
+                throw new AppException("User ID doesnt exist", HttpStatus.NOT_FOUND);
+            }
+        }catch(Exception e){
+            throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

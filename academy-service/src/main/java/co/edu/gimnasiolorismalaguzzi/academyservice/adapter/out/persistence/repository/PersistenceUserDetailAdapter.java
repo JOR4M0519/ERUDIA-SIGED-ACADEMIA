@@ -10,4 +10,5 @@ import java.util.List;
 
 public interface PersistenceUserDetailAdapter extends PersistenceAdapter<UserDetailDomain, Integer> {
     UserDetailDomain saveDetailUser(Integer id,UserDetailDomain user); // Aquí puedes agregar métodos específicos para UserDetailDomain si es necesario
+
 }

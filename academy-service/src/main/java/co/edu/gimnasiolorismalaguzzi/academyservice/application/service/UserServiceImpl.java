@@ -2,13 +2,14 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.application.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.PersistenceUserAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.PersistenceUserDetailAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@UseCase
 public class UserServiceImpl implements UserService {
 
     private final PersistenceUserAdapter userRepository; // Cambiar a usar UserRepository

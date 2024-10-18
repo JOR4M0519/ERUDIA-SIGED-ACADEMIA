@@ -1,13 +1,14 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.repository.PersistenceUserDetailAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDetailDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
+@UseCase
 public class UserDetailServiceImpl implements UserDetailService {
 
     @Autowired

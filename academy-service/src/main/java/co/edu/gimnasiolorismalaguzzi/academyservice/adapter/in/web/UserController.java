@@ -1,12 +1,14 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.in.web;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.service.UserDetailService;
+import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDetailDomain;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@WebAdapter
 @RestController
 @RequestMapping("/api/academy/users")
 public class UserController {
