@@ -2,7 +2,10 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.ent
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -12,7 +15,7 @@ import java.util.Set;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "dimension")
+@Table(name = "dimensions")
 public class Dimension {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

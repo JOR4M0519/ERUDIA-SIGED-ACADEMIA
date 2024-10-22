@@ -2,9 +2,17 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.domain;
 
 import lombok.Data;
 
+import java.time.OffsetDateTime;
+import java.util.Set;
+
 @Data
 public class UserDomain {
-    private Integer id; // o el tipo correspondiente
-    private String username; // o cualquier otro atributo que necesites
-    // Agrega otros atributos según sea necesario
+    private Integer id;
+    private String username;
+    private String email;
+    private String password;
+    private OffsetDateTime createdAt;
+    private OffsetDateTime lastLogin;
+    private Integer attemptedFailedLogin;
+    private String status;
 }

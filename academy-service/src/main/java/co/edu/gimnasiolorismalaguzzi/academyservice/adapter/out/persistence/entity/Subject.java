@@ -43,9 +43,9 @@ public class Subject {
     private Set<SubjectKnowledge> subjectKnowledges = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "subject")
-    private Set<SubjectSchedule> subjectSchedules = new LinkedHashSet<>();
+    private Set<SubjectProfessor> subjectProfessors = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "subject")
-    private Set<SubjectTeacher> subjectTeachers = new LinkedHashSet<>();
+    private Set<SubjectSchedule> subjectSchedules = new LinkedHashSet<>();
 
 }

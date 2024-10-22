@@ -1,16 +1,15 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@Table(name = "tracking_student")
-public class TrackingStudent {
+@Table(name = "student_tracking")
+public class StudentTracking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -23,8 +22,8 @@ public class TrackingStudent {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "teacher", nullable = false)
-    private User teacher;
+    @JoinColumn(name = "professor", nullable = false)
+    private User professor;
 
     @NotNull
     @Column(name = "situation", nullable = false, length = Integer.MAX_VALUE)

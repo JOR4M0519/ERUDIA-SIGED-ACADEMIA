@@ -23,8 +23,8 @@ public class Knowledge {
     @Column(name = "name", length = 10)
     private String name;
 
-    @Column(name = "desciption", length = Integer.MAX_VALUE)
-    private String desciption;
+    @Column(name = "achievement", length = Integer.MAX_VALUE)
+    private String achievement;
 
     @Column(name = "status")
     private Boolean status;

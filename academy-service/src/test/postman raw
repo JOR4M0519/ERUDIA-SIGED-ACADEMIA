@@ -1,0 +1,35 @@
+-http://localhost:8090/api/academy/users/user/5
+raw:
+{
+    "firstName": "Charlie",
+    "middleName": "D.",
+    "lastName": "Clark",
+    "secondLastName": "Lewis",
+    "address": "789 Maple St",
+    "phoneNumber": "555-678-1234",
+    "dateOfBirth": "1993-08-12",
+    "dni": "123987654",
+    "idType":{
+        "id": 1,
+        "name": "ID Card"
+    },
+    "neighborhood": "Southside",
+    "city": "Metropolis",
+    "positionJob": "Student"
+}
+
+-http://localhost:8090/api/academy/users/11
+{
+    "firstName": "John",
+    "middleName": "Andrew",
+    "lastName": "Doe",
+    "secondLastName": "Smith",
+    "address": "123 Main St",
+    "phoneNumber": "123-456-7890",
+    "dateOfBirth": "1990-01-01",
+    "dni": "123456789",
+    "neighborhood": "Downtown",
+    "city": "Metropolis",
+    "positionJob": "Senior Teacher"
+}
+
