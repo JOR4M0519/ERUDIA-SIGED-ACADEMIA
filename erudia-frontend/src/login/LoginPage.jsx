@@ -1,25 +1,46 @@
+import { useState } from "react";
+import { Form } from "../components/custom/form/Form.jsx";
 import { Input } from "../components/custom/form/Input.jsx";
-import glmImg from './resources/img.png';
-import "./style.css";
+import logo from "../login/resources/img.png";
+import { Button } from "../components/custom/form/Button.jsx";
 
 const LoginPage = () => {
-    return (
-        <div className="box">
-            {/* Image Section */}
-            <div className="image">
-                <img className="img" alt="GLM" src={glmImg} />
-            </div>
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        // Aquí iría la lógica para el manejo del submit
+    };
 
-            {/* Login Form Section */}
-            <div className="login-frame">
-                <div className="input-group">
-                    <label htmlFor="usuario" className="text-wrapper">Usuario</label>
-                    <Input id="usuario" className="usuario-input" type="text" placeholder="Ingresa tu usuario" />
-                </div>
-                <div className="input-group">
-                    <label htmlFor="contrasena" className="text-wrapper">Contraseña</label>
-                    <Input id="contrasena" className="password-input" type="password" placeholder="Ingresa tu contraseña" />
-                </div>
+    return (
+        <div className="flex w-full h-screen">
+            {/* Columna izquierda para el formulario */}
+            <div className="bg-white flex items-center justify-center">
+                <Form onSubmit={handleSubmit}>
+                    <div className="flex flex-col items-center bg-amber-100 p-8 rounded-lg">
+                        <img src={logo} className="w-[125px] h-[250px]" alt="Logo"/>
+                        <div className="text-black font-bold font-['Montserrat'] mb-2">Usuario</div>
+                        <Input
+                            className="w-[501px] h-10 relative bg-white rounded-[10px] border-2 border-[#ffc100] mb-4"
+                            placeholder="Usuario"
+                        />
+                        <div className="text-black font-bold font-['Montserrat'] mb-2">Contraseña</div>
+                        <Input
+                            className="w-[501px] h-10 relative bg-white rounded-[10px] border-2  border-[#ffc100] mb-4"
+                            placeholder="Contraseña"
+                        />
+
+                        <div className="h-[65px]">
+                            <Button className="w-[268px] h-[51px] px-[90px] pt-3.5 pb-[13px] bg-[#646464] rounded-[15px] justify-center items-center inline-flex">
+                                <div className="text-white text-xl font-bold font-['Montserrat']">
+                                    Contraseña
+                                </div>
+                            </Button>
+                        </div>
+                    </div>
+                </Form>
+            </div>
+            {/* Columna derecha para la imagen */}
+            <div className="bg-red-900 w-1080">
+                aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
             </div>
         </div>
     );
