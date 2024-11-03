@@ -86,7 +86,7 @@ CREATE TABLE academic_period (
 CREATE TABLE educational_level (
                                    id int primary key generated always as identity,
                                    level_name VARCHAR(30) NOT NULL,
-                                   status BOOLEAN NOT NULL
+                                   status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
 
 -- Table: group_students
@@ -110,7 +110,7 @@ CREATE TABLE dimensions (
 CREATE TABLE subject (
                          id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                          subject_name VARCHAR(50) NOT NULL,
-                         status VARCHAR(1) DEFAULT 'A'
+                         status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.

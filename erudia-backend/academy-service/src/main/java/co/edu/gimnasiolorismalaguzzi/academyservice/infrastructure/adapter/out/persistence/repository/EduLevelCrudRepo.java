@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Subject;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.EducationalLevel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,12 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface SubjectCrudRepo extends JpaRepository<Subject, Integer> {
+public interface EduLevelCrudRepo extends JpaRepository<EducationalLevel, Integer> {
     @Transactional
     @Modifying
-    @Query("update Subject u set u.status = ?1 where u.id = ?2")
+    @Query("update EducationalLevel u set u.status = ?1 where u.id = ?2")
     int updateStatusById(String status, Integer id);
 
+
     @Override
-    Optional<Subject> findById(Integer integer);
+    Optional<EducationalLevel> findById(Integer integer);
 }
