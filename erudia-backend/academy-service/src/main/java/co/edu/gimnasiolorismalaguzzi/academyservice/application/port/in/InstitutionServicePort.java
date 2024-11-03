@@ -7,7 +7,7 @@ import java.util.List;
 public interface InstitutionServicePort {
     List<InstitutionDomain> getAllInstitutions();
     InstitutionDomain getInstitutionById(Integer id);
-    InstitutionDomain createInstitution(Integer id, InstitutionDomain institution);
+    InstitutionDomain createInstitution(InstitutionDomain institution);
     InstitutionDomain updateInstitution(Integer id, InstitutionDomain institution);
     void deleteInstitution(Integer id);
 }

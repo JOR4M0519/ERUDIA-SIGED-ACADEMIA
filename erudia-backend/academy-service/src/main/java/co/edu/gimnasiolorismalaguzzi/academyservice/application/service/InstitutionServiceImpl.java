@@ -25,8 +25,8 @@ public class InstitutionServiceImpl implements InstitutionServicePort {
     }
 
     @Override
-    public InstitutionDomain createInstitution(Integer id, InstitutionDomain institution) {
-        return institutionPort.saveInstitution(id,institution);
+    public InstitutionDomain createInstitution(InstitutionDomain institution) {
+        return institutionPort.save(institution);
     }
 
     @Override

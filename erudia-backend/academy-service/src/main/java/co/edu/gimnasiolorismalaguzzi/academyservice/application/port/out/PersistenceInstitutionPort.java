@@ -4,5 +4,4 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.Institut
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.InstitutionDomain;
 
 public interface PersistenceInstitutionPort extends PersistencePort<InstitutionDomain, Integer>{
-    InstitutionDomain saveInstitution(Integer id, InstitutionDomain institution);
 }
