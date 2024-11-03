@@ -6,7 +6,7 @@
 *.jar
 
 # Gradle specific ignores
-#.gradle/
+.gradle/
 # build/
 # gradle-app.setting
 # .gradle/
@@ -75,3 +75,6 @@ build/
 
 # Git ignore itself
 .gitignore
+
+# Config file for database (academy)
+erudia-backend/config-service/src/main/resources/configuration/academy-service.yml
