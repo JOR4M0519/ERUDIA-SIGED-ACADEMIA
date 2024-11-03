@@ -17,7 +17,7 @@ import java.util.Set;
 public class Subject {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private Integer id;
 
     @Size(max = 50)
@@ -26,8 +26,7 @@ public class Subject {
     private String subjectName;
 
     @Size(max = 1)
-    @NotNull
-    @Column(name = "status", nullable = false, length = 1)
+    @Column(name = "status",  nullable = false, length = 1)
     private String status;
 
     @OneToMany(mappedBy = "subject")

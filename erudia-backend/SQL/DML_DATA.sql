@@ -47,9 +47,9 @@ VALUES ('2024-01-01', '2024-06-30', '2024-1', 'A'),
 
 -- Inserts for educational_level
 INSERT INTO educational_level (level_name, status)
-VALUES ('Preschool', TRUE),
-       ('Primary', TRUE),
-       ('High School', TRUE);
+VALUES ('Preschool', 'A'),
+       ('Primary', 'A'),
+       ('High School', 'A');
 
 -- Inserts for group_students
 INSERT INTO group_students (level_id, group_code, group_name, professor_id, status)

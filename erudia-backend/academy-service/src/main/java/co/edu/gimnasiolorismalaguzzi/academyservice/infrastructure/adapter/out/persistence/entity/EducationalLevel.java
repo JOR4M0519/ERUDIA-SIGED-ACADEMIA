@@ -29,9 +29,8 @@ public class EducationalLevel {
     @Column(name = "level_name", nullable = false, length = 30)
     private String levelName;
 
-    @NotNull
-    @Column(name = "status", nullable = false)
-    private Boolean status = false;
+    @Column(name = "status", nullable = false, length = 1)
+    private String status;
 
     @OneToMany(mappedBy = "level")
     private Set<GroupStudent> groupStudents = new LinkedHashSet<>();

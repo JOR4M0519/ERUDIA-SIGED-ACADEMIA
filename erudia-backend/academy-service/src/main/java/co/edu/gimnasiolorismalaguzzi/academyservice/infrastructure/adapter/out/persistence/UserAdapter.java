@@ -40,7 +40,7 @@ public class UserAdapter implements PersistenceUserPort {
 
 
     @Override
-    public UserDomain save(Integer integer, UserDomain entity) {
+    public UserDomain save(UserDomain entity) {
         return null;
     }
 

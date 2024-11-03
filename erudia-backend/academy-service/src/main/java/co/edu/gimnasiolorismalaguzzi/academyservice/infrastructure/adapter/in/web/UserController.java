@@ -31,7 +31,7 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/user/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<UserDetailDomain> createUser(@PathVariable Integer id,@RequestBody UserDetailDomain userDetailDomain) {
         UserDetailDomain createdUser = userDetailServicePort.createUser(id,userDetailDomain);
         return ResponseEntity.ok(createdUser);
