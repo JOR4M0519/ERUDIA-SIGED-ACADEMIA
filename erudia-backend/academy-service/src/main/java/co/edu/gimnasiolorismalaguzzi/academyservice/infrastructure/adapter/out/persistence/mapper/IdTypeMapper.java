@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.adapter.out.persistence.entity.IdType;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.IdType;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.UserDetail;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.IdTypeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDetailDomain;

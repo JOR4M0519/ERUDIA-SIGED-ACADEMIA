@@ -108,9 +108,9 @@ CREATE TABLE dimensions (
 
 -- Table: subject
 CREATE TABLE subject (
-                         id int primary key generated always as identity,
+                         id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                          subject_name VARCHAR(50) NOT NULL,
-                         status varchar(1) NOT NULL
+                         status VARCHAR(1) DEFAULT 'A'
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.

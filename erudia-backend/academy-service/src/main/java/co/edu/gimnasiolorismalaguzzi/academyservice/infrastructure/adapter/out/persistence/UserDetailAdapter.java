@@ -48,7 +48,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     }
 
     @Override
-    public UserDetailDomain save(Integer integer, UserDetailDomain entity) {
+    public UserDetailDomain save(UserDetailDomain entity) {
         return null;
     }
 

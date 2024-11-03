@@ -29,8 +29,8 @@ public class UserServiceImpl implements UserServicePort {
     }
 
     @Override
-    public UserDomain createUser(Integer id, UserDomain UserDomain) { // Cambiar tipo de parámetro
-        return userRepository.save(id,UserDomain); // Cambiado para usar el método del repositorio
+    public UserDomain createUser(UserDomain UserDomain) { // Cambiar tipo de parámetro
+        return userRepository.save(UserDomain); // Cambiado para usar el método del repositorio
     }
 
     @Override

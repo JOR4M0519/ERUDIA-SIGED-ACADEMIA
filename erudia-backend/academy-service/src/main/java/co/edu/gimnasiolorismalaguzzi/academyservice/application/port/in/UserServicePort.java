@@ -7,7 +7,7 @@ import java.util.List;
 public interface UserServicePort {
     List<UserDomain> getAllUsers();
     UserDomain getUserById(Integer id);
-    UserDomain createUser(Integer id,UserDomain user);
+    UserDomain createUser(UserDomain user);
     UserDomain updateUser(Integer id, UserDomain user);
     void deleteUser(Integer id);
 }
