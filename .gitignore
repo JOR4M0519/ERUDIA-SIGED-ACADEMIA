@@ -6,15 +6,15 @@
 *.jar
 
 # Gradle specific ignores
-.gradle/
-build/
-gradle-app.setting
-.gradle/
-### gradle/ ###
-out/
-### !gradle/wrapper/gradle-wrapper.jar ###
-!gradlew
-!gradlew.bat
+#.gradle/
+# build/
+# gradle-app.setting
+# .gradle/
+# gradle/ 
+# out/
+# !gradle/wrapper/gradle-wrapper.jar 
+# !gradlew
+# !gradlew.bat
 
 # IntelliJ IDEA project files
 .idea/
