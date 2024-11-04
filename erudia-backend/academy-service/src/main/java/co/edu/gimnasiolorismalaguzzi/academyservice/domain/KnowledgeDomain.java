@@ -2,13 +2,10 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.domain;
 
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
-public class AcademicPeriodDomain {
+public class KnowledgeDomain {
     private Integer id;
-    private LocalDate startDate;
-    private LocalDate endDate;
     private String name;
+    private String achievement;
     private String status;
 }

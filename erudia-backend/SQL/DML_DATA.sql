@@ -87,8 +87,8 @@ VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), (SELECT id 
 
 -- Inserts for knowledge
 INSERT INTO knowledge (name, achievement, status)
-VALUES ('Math', 'Achieved basic skills', TRUE),
-       ('Science', 'Completed lab experiments', TRUE);
+VALUES ('Math', 'Achieved basic skills', 'A'),
+       ('Science', 'Completed lab experiments', 'A');
 
 -- Inserts for activity
 INSERT INTO activity (activity_name, description, subject, period_id, knowledge, status)

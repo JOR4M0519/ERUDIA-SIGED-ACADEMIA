@@ -152,7 +152,7 @@ CREATE TABLE knowledge (
                            id int primary key generated always as identity,
                            name varchar(10) default null,
                            achievement text,
-                           status boolean
+                           status varchar(1) DEFAULT 'A'
 );
 
 -- Table: activity

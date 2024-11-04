@@ -1,4 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out;
 
-public interface PersistenceAcademicPeriodPort {
+import co.edu.gimnasiolorismalaguzzi.academyservice.domain.AcademicPeriodDomain;
+
+public interface PersistenceAcademicPeriodPort extends PersistencePort<AcademicPeriodDomain, Integer>{
 }
