@@ -17,6 +17,6 @@ public class InstitutionDomain {
     private String country;
     private String postalCode;
     private String legalRepresentative; //representante legal
-    private LocalDate incorporationTime;
+    private LocalDate incorporationDate;
 
 }

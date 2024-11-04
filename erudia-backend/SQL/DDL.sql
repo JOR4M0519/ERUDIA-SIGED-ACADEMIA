@@ -96,7 +96,7 @@ CREATE TABLE group_students (
                                 group_code varchar(15),
                                 group_name VARCHAR(50) NOT NULL,
                                 professor_id INT NOT NULL REFERENCES users(id),
-                                status BOOLEAN NOT NULL
+                                status VARCHAR (1) NOT NULL DEFAULT 'A'
 );
 
 -- Table: dimensions

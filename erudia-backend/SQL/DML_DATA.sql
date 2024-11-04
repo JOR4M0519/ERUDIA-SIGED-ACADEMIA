@@ -1,4 +1,3 @@
-
 -- Inserts for id_type
 INSERT INTO id_type (name) VALUES ('ID Card');
 INSERT INTO id_type (name) VALUES ('Passport');
@@ -12,9 +11,9 @@ VALUES ('jdoe', 'jdoe@example.com', 'hashed_password1', 'A'),
 
 -- Inserts for user_detail
 INSERT INTO user_detail (user_id, first_name, middle_name, last_name, second_last_name, address, phone_number, date_of_birth, dni, id_type_id, neighborhood, city, position_job)
-VALUES (1, 'John', 'A.', 'Doe', 'Smith', '123 Main St', '123-456-7890', '1990-01-01', '123456789', 1, 'Downtown', 'Metropolis', 'Teacher'),
-       (2, 'Alice', NULL, 'Smith', 'Johnson', '456 Oak St', '987-654-3210', '1985-05-15', '987654321', 2, 'Westside', 'Metropolis', 'Admin'),
-       (3, 'Michael', 'B.', 'Brown', NULL, '789 Pine St', '555-123-4567', '1992-09-21', '543216789', 3, 'Eastside', 'Gotham', 'Professor');
+VALUES ((SELECT id FROM users WHERE username = 'jdoe'), 'John', 'A.', 'Doe', 'Smith', '123 Main St', '123-456-7890', '1990-01-01', '123456789', (SELECT id FROM id_type WHERE name = 'ID Card'), 'Downtown', 'Metropolis', 'Teacher'),
+       ((SELECT id FROM users WHERE username = 'asmith'), 'Alice', NULL, 'Smith', 'Johnson', '456 Oak St', '987-654-3210', '1985-05-15', '987654321', (SELECT id FROM id_type WHERE name = 'Passport'), 'Westside', 'Metropolis', 'Admin'),
+       ((SELECT id FROM users WHERE username = 'mbrown'), 'Michael', 'B.', 'Brown', NULL, '789 Pine St', '555-123-4567', '1992-09-21', '543216789', (SELECT id FROM id_type WHERE name = 'Driver License'), 'Eastside', 'Gotham', 'Professor');
 
 -- Inserts for role
 INSERT INTO role (role_name, status)
@@ -24,9 +23,9 @@ VALUES ('Admin', TRUE),
 
 -- Inserts for user_role
 INSERT INTO user_role (user_id, role_id)
-VALUES (1, 1), -- John Doe is Admin
-       (2, 2), -- Alice Smith is Professor
-       (3, 3); -- Michael Brown is Student
+VALUES ((SELECT id FROM users WHERE username = 'jdoe'), (SELECT id FROM role WHERE role_name = 'Admin')),
+       ((SELECT id FROM users WHERE username = 'asmith'), (SELECT id FROM role WHERE role_name = 'Professor')),
+       ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM role WHERE role_name = 'Student'));
 
 -- Inserts for permission
 INSERT INTO permission (permission, status)
@@ -36,9 +35,9 @@ VALUES ('View Grades', TRUE),
 
 -- Inserts for role_perm
 INSERT INTO role_perm (role_id, permission_id)
-VALUES (1, 3), -- Admin can Manage Users
-       (2, 2), -- Professor can Edit Grades
-       (3, 1); -- Student can View Grades
+VALUES ((SELECT id FROM role WHERE role_name = 'Admin'), (SELECT id FROM permission WHERE permission = 'Manage Users')),
+       ((SELECT id FROM role WHERE role_name = 'Professor'), (SELECT id FROM permission WHERE permission = 'Edit Grades')),
+       ((SELECT id FROM role WHERE role_name = 'Student'), (SELECT id FROM permission WHERE permission = 'View Grades'));
 
 -- Inserts for academic_period
 INSERT INTO academic_period (start_date, end_date, name, status)
@@ -53,8 +52,8 @@ VALUES ('Preschool', 'A'),
 
 -- Inserts for group_students
 INSERT INTO group_students (level_id, group_code, group_name, professor_id, status)
-VALUES (1, 'P001', 'Preschool A', 3, TRUE),
-       (2, 'P002', 'Primary B', 3, TRUE);
+VALUES ((SELECT id FROM educational_level WHERE level_name = 'Preschool'), 'P001', 'Preschool A', (SELECT id FROM users WHERE username = 'mbrown'), 'A'),
+       ((SELECT id FROM educational_level WHERE level_name = 'Primary'), 'P002', 'Primary B', (SELECT id FROM users WHERE username = 'mbrown'), 'I');
 
 -- Inserts for dimensions
 INSERT INTO dimensions (name, description)
@@ -68,23 +67,23 @@ VALUES ('Mathematics', 'A'),
 
 -- Inserts for subject_dimension
 INSERT INTO subject_dimension (dimension_id, subject_id)
-VALUES (1, 1), -- Cognitive dimension for Mathematics
-       (2, 2); -- Motor dimension for Science
+VALUES ((SELECT id FROM dimensions WHERE name = 'Cognitive'), (SELECT id FROM subject WHERE subject_name = 'Mathematics')),
+       ((SELECT id FROM dimensions WHERE name = 'Motor'), (SELECT id FROM subject WHERE subject_name = 'Science'));
 
 -- Inserts for subject_schedule
 INSERT INTO subject_schedule (subject_id, day_of_week, start_time, end_time, status)
-VALUES (1, 'Monday', '09:00', '11:00', TRUE),
-       (2, 'Wednesday', '10:00', '12:00', TRUE);
+VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), 'Monday', '09:00', '11:00', TRUE),
+       ((SELECT id FROM subject WHERE subject_name = 'Science'), 'Wednesday', '10:00', '12:00', TRUE);
 
 -- Inserts for attendance
 INSERT INTO attendance (student_id, schedule_id, attendance_date, status)
-VALUES (3, 1, '2024-01-08', 'PR'),
-       (3, 2, '2024-01-10', 'AU');
+VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM subject_schedule WHERE subject_id = (SELECT id FROM subject WHERE subject_name = 'Mathematics')), '2024-01-08', 'PR'),
+       ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM subject_schedule WHERE subject_id = (SELECT id FROM subject WHERE subject_name = 'Science')), '2024-01-10', 'AU');
 
 -- Inserts for subject_professors
 INSERT INTO subject_professors (subject_id, professor_id)
-VALUES (1, 2), -- Alice Smith teaches Mathematics
-       (2, 2); -- Alice Smith teaches Science
+VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), (SELECT id FROM users WHERE username = 'asmith')),
+       ((SELECT id FROM subject WHERE subject_name = 'Science'), (SELECT id FROM users WHERE username = 'asmith'));
 
 -- Inserts for knowledge
 INSERT INTO knowledge (name, achievement, status)
@@ -93,22 +92,22 @@ VALUES ('Math', 'Achieved basic skills', TRUE),
 
 -- Inserts for activity
 INSERT INTO activity (activity_name, description, subject, period_id, knowledge, status)
-VALUES ('Math Exam', 'Final exam covering algebra and geometry', 1, 1, 1, 'A'),
-       ('Science Project', 'Complete a model of the solar system', 2, 2, 2, 'A');
+VALUES ('Math Exam', 'Final exam covering algebra and geometry', (SELECT id FROM subject WHERE subject_name = 'Mathematics'), (SELECT id FROM academic_period WHERE name = '2024-1'), (SELECT id FROM knowledge WHERE name = 'Math'), 'A'),
+       ('Science Project', 'Complete a model of the solar system', (SELECT id FROM subject WHERE subject_name = 'Science'), (SELECT id FROM academic_period WHERE name = '2024-2'), (SELECT id FROM knowledge WHERE name = 'Science'), 'A');
 
 -- Inserts for activity_group
 INSERT INTO activity_group (activity_id, group_id, due)
-VALUES (1, 1, '2024-02-15'),
-       (2, 2, '2024-03-01');
+VALUES ((SELECT id FROM activity WHERE activity_name = 'Math Exam'), (SELECT id FROM group_students WHERE group_code = 'P001'), '2024-02-15'),
+       ((SELECT id FROM activity WHERE activity_name = 'Science Project'), (SELECT id FROM group_students WHERE group_code = 'P002'), '2024-03-01');
 
 -- Inserts for grades
 INSERT INTO activity_grade (student_id, activity_id, score, comment)
-VALUES (3, 1, 85.50, 'Good effort'),
-       (3, 2, 90.00, 'Excellent project');
+VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM activity_group WHERE activity_id = (SELECT id FROM activity WHERE activity_name = 'Math Exam')), 85.50, 'Good effort'),
+       ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM activity_group WHERE activity_id = (SELECT id FROM activity WHERE activity_name = 'Science Project')), 90.00, 'Excellent project');
 
 -- Inserts for recovery_period
 INSERT INTO recovery_period (student_id, subject_id, previous_score, new_score, period)
-VALUES (3, 1, 65.00, 80.00, 1);
+VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM subject WHERE subject_name = 'Mathematics'), 65.00, 80.00, (SELECT id FROM academic_period WHERE name = '2024-1'));
 
 -- Inserts for institution
 INSERT INTO institution (name, nit, address, phone_number, email, city, department, country, postal_code, legal_representative, incorporation_date)
@@ -116,8 +115,8 @@ VALUES ('ABC School', '123456789', '123 School Rd', '555-987-6543', 'contact@abc
 
 -- Inserts for student_tracking
 INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status)
-VALUES (3, 2, 'Disruptive behavior in class', 'Will attend extra tutoring', 'Improved behavior noticed', TRUE);
+VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM users WHERE username = 'asmith'), 'Disruptive behavior in class', 'Will attend extra tutoring', 'Improved behavior noticed', TRUE);
 
 -- Inserts for backup_history
 INSERT INTO backup_history (backup_name, description, file_path, created_by)
-VALUES ('backup_2024_01', 'Monthly backup', '/backups/backup_2024_01.sql', 1);
+VALUES ('backup_2024_01', 'Monthly backup', '/backups/backup_2024_01.sql', (SELECT id FROM users WHERE username = 'jdoe'));

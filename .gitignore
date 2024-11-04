@@ -6,10 +6,10 @@
 *.jar
 
 # Gradle specific ignores
- .gradle/
+.gradle/
 # build/
 # gradle-app.setting
- .gradle/
+.gradle/
 # gradle/ 
 # out/
 # !gradle/wrapper/gradle-wrapper.jar 
