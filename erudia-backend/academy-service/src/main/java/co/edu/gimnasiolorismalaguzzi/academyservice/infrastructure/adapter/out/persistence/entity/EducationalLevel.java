@@ -32,7 +32,7 @@ public class EducationalLevel {
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-    @OneToMany(mappedBy = "level")
-    private Set<GroupStudent> groupStudents = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "level")
+//    private Set<GroupStudent> groupStudents = new LinkedHashSet<>();
 
 }

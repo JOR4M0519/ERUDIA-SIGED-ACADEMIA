@@ -24,7 +24,7 @@ public class GroupStudent {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "level_id", nullable = false)
     private EducationalLevel level;
 
@@ -38,13 +38,13 @@ public class GroupStudent {
     private String groupName;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "professor_id", nullable = false)
     private User professor;
 
     @NotNull
     @Column(name = "status", nullable = false)
-    private Boolean status = false;
+    private String status;
 
     @OneToMany(mappedBy = "group")
     private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
