@@ -63,7 +63,6 @@ public class EducationalLevelAdapter implements PersistenceEducationalLevelPort 
         }catch (EntityNotFoundException e){
             throw new EntityNotFoundException("UserDetail with ID " + id + " not found");
         }
-
     }
 
     @Override
