@@ -46,9 +46,7 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
 
     @Override
     public AcademicPeriodDomain save(AcademicPeriodDomain entity) {
-        entity.setName(entity.getName());
         entity.setStatus("A");
-
         AcademicPeriod academicPeriod = academicPeriodMapper.toEntity(entity);
         AcademicPeriod savedAcademicPeriod = this.academicPeriodCrudRepo.save(academicPeriod);
         return academicPeriodMapper.toDomain(savedAcademicPeriod);

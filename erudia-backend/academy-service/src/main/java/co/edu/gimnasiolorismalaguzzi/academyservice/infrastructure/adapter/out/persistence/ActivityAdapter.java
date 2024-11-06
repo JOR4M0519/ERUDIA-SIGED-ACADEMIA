@@ -5,7 +5,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.Persist
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Activity;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.EducationalLevel;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.ActivityMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.ActivityCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,14 +18,14 @@ import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
-public class ActivityAdapater implements PersistenceActivityPort {
+public class ActivityAdapter implements PersistenceActivityPort {
 
     private final ActivityCrudRepo activityCrudRepo;
 
     @Autowired
     private final ActivityMapper activityMapper;
 
-    public ActivityAdapater(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper) {
+    public ActivityAdapter(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper) {
         this.activityCrudRepo = activityCrudRepo;
         this.activityMapper = activityMapper;
     }
@@ -44,9 +43,7 @@ public class ActivityAdapater implements PersistenceActivityPort {
 
     @Override
     public ActivityDomain save(ActivityDomain entity) {
-        entity.setActivityName(entity.getActivityName());
         entity.setStatus("A");
-
         Activity activity = activityMapper.toEntity(entity);
         Activity savedActivity = this.activityCrudRepo.save(activity);
 
