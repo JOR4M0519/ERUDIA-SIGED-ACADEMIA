@@ -56,7 +56,10 @@ public class EducationalLevelAdapter implements PersistenceEducationalLevelPort 
         try{
             Optional<EducationalLevel> existingEducationalLevel = EduLevelCrudRepo.findById(id);
 
-            if (existingEducationalLevel.get().getLevelName() != null) existingEducationalLevel.get().setLevelName(entity.getLevelName());
+            if(existingEducationalLevel.isPresent()){
+                existingEducationalLevel.get().setLevelName(entity.getLevelName());
+                existingEducationalLevel.get().setStatus(entity.getStatus());
+            }
 
             return EducationalLevelMapper.toDomain(EduLevelCrudRepo.save(existingEducationalLevel.get()));
 

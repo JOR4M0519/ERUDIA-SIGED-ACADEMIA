@@ -58,7 +58,14 @@ public class ActivityAdapater implements PersistenceActivityPort {
         try{
             Optional<Activity> existingActivity = activityCrudRepo.findById(integer);
 
-            if (existingActivity.isPresent()) existingActivity.get().setActivityName(entity.getActivityName());
+            if (existingActivity.isPresent()){
+                existingActivity.get().setActivityName(entity.getActivityName());
+                existingActivity.get().setDescription(entity.getDescription());
+                existingActivity.get().setSubject(entity.getSubject());
+                existingActivity.get().setPeriod(entity.getPeriod());
+                existingActivity.get().setKnowledge(entity.getKnowledge());
+                existingActivity.get().setStatus(entity.getStatus());
+            }
 
             return activityMapper.toDomain(activityCrudRepo.save(existingActivity.get()));
 

@@ -50,7 +50,11 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
     public KnowledgeDomain update(Integer integer, KnowledgeDomain entity) {
         try{
             Optional<Knowledge> existingKnowledge = knowledgeCrudRepo.findById(integer);
-            if(existingKnowledge.isPresent()) existingKnowledge.get().setName(entity.getName());
+            if(existingKnowledge.isPresent()) {
+                existingKnowledge.get().setName(entity.getName());
+                existingKnowledge.get().setAchievement(entity.getAchievement());
+                existingKnowledge.get().setStatus(entity.getStatus());
+            }
             return knowledgeMapper.toDomain(knowledgeCrudRepo.save(existingKnowledge.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Knowledge with ID " + integer + "not found!");

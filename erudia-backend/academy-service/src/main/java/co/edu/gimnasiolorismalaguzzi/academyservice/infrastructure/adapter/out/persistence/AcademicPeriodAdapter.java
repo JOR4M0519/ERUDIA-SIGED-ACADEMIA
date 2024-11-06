@@ -58,7 +58,12 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     public AcademicPeriodDomain update(Integer integer, AcademicPeriodDomain entity) {
         try {
             Optional<AcademicPeriod> existingPeriod = academicPeriodCrudRepo.findById(integer);
-            existingPeriod.ifPresent(academicPeriod -> academicPeriod.setName(entity.getName()));
+            if(existingPeriod.isPresent()){
+                existingPeriod.get().setStartDate(entity.getStartDate());
+                existingPeriod.get().setEndDate(entity.getEndDate());
+                existingPeriod.get().setName(entity.getName());
+                existingPeriod.get().setStatus(entity.getStatus());
+            }
             return academicPeriodMapper.toDomain(academicPeriodCrudRepo.save(existingPeriod.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Period with id " + integer + " not found");

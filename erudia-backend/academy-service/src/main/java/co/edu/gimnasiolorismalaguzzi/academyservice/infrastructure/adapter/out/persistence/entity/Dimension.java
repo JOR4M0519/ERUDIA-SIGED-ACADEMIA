@@ -29,7 +29,7 @@ public class Dimension {
     @Column(name = "description", length = Integer.MAX_VALUE)
     private String description;
 
-    @OneToMany(mappedBy = "dimension")
-    private Set<SubjectDimension> subjectDimensions = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "dimension")
+//    private Set<SubjectDimension> subjectDimensions = new LinkedHashSet<>();
 
 }
