@@ -234,5 +234,5 @@ CREATE TABLE student_tracking (
                                   situation TEXT NOT NULL, -- Behavior description
                                   compromise TEXT NOT NULL, -- Commitment
                                   follow_up TEXT NOT NULL, -- Follow-up
-                                  status BOOLEAN NOT NULL
+                                  status VARCHAR(1) NOT NULL
 );

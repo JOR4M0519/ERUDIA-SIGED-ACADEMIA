@@ -24,8 +24,6 @@ public class GroupStudentAdapter implements PersistenceGroupStudentPort {
 
     @Autowired
     private GroupStudentMapper groupStudentMapper;
-    @Autowired
-    private UserCrudRepo userCrudRepo;
 
     public GroupStudentAdapter(GroupStudentCrudRepo groupStudentCrudRepo) {
         this.groupStudentCrudRepo = groupStudentCrudRepo;

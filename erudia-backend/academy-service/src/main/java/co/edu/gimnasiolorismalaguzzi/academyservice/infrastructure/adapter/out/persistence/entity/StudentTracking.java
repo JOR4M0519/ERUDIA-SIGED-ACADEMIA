@@ -17,12 +17,12 @@ public class StudentTracking {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "student", nullable = false)
     private User student;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "professor", nullable = false)
     private User professor;
 
@@ -40,6 +40,6 @@ public class StudentTracking {
 
     @NotNull
     @Column(name = "status", nullable = false)
-    private Boolean status = false;
+    private String status;
 
 }
