@@ -56,7 +56,7 @@ public class DimensionAdapter implements PersistenceDimensionPort {
             }
             return dimensionMapper.toDomain(dimensionCrudRepo.save(existingDimension.get()));
         } catch (EntityNotFoundException e){
-            throw new EntityNotFoundException("Dimension with ID " + integer + "Not found!");
+            throw new EntityNotFoundException("Dimension with ID " + integer + " Not found!");
         }
     }
 

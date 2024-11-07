@@ -127,7 +127,7 @@ CREATE TABLE subject_schedule (
                                   day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
                                   start_time TIME NOT NULL,         -- E.g., '09:00'
                                   end_time TIME NOT NULL,           -- E.g., '11:00'
-                                  status BOOLEAN NOT NULL           -- To indicate if the schedule is active or not
+                                      status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
 );
 
 -- Table: attendance

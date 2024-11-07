@@ -22,7 +22,7 @@ public class SubjectSchedule {
     private Integer id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
@@ -41,9 +41,9 @@ public class SubjectSchedule {
 
     @NotNull
     @Column(name = "status", nullable = false)
-    private Boolean status = false;
+    private String status;
 
-    @OneToMany(mappedBy = "schedule")
-    private Set<Attendance> attendances = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "schedule")
+//    private Set<Attendance> attendances = new LinkedHashSet<>();
 
 }
