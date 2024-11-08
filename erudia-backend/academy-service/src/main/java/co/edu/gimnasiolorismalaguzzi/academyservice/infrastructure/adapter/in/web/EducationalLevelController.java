@@ -4,9 +4,11 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.Educatio
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.EducationalLevelDomain;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @WebAdapter
 @RestController
@@ -20,12 +22,14 @@ public class EducationalLevelController {
     }
 
     @GetMapping()
+    @PreAuthorize("hasRole('admin_client_role')")
     public ResponseEntity<List<EducationalLevelDomain>> getAllEducationalLevels() {
         List<EducationalLevelDomain> EducationalLevels = EducationalLevelServicePort.getAllEducationalLevels();
         return ResponseEntity.ok(EducationalLevels);
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('user_client_role') or hasRole('admin_client_role')")
     public ResponseEntity<EducationalLevelDomain> getEducationalLevelById(@PathVariable Integer id) {
         EducationalLevelDomain EducationalLevel = EducationalLevelServicePort.getEducationalLevelById(id);
         return ResponseEntity.ok(EducationalLevel);

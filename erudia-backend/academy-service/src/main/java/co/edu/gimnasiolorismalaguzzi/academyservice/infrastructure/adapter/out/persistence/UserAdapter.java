@@ -1,65 +1,128 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+//import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
+
+
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.util.KeycloakProvider;
+import jakarta.ws.rs.core.Response;
+import org.keycloak.OAuth2Constants;
+import org.keycloak.admin.client.resource.RealmResource;
+import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.CredentialRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+
 
 @PersistenceAdapter
 @Slf4j
 public class UserAdapter implements PersistenceUserPort {
 
-    private final UserCrudRepo userCrudRepo; // Repositorio JPA
-
-    @Autowired
-    private UserMapper userMapper;
-
-    public UserAdapter(UserCrudRepo userCrudRepo) {
-        this.userCrudRepo = userCrudRepo;
-    }
 
     @Override
-    public List<UserDomain> findAll() {
-        return this.userMapper.toDomains(this.userCrudRepo.findAll());
+    public List<UserRepresentation> findAll() {
+        return KeycloakProvider.getRealmResource()
+                .users()
+                .list();
     }
 
-    @Override
-    public UserDomain findById(Integer id) {
-        Optional<User> userOptional = this.userCrudRepo.findById(id);
-        return userOptional.map(userMapper::toDomain).orElse(null);
+    public List<UserRepresentation> searchUserByUsername(String username) {
+        return KeycloakProvider.getRealmResource()
+                .users()
+                .searchByUsername(username, true);
     }
 
 
     @Override
-    public UserDomain save(UserDomain entity) {
-        return null;
-    }
+    public String save(UserDomain userDomain) {
+        int status = 0;
+        UsersResource usersResource = KeycloakProvider.getUserResource();
 
-    @Override
-    public UserDomain update(Integer integer, UserDomain entity) {
-        return null;
-    }
+        UserRepresentation userRepresentation = new UserRepresentation();
+        userRepresentation.setFirstName(userDomain.getFirstName());
+        userRepresentation.setLastName(userDomain.getLastName());
+        userRepresentation.setEmail(userDomain.getEmail());
+        userRepresentation.setUsername(userDomain.getUsername());
+        userRepresentation.setEnabled(true);
+        userRepresentation.setEmailVerified(true);
 
-    @Override
-    public HttpStatus delete(Integer integer) {
-        try{
-            if (this.userCrudRepo.existsById(integer)) {
-                userCrudRepo.updateStatusById("D",integer);
-                return HttpStatus.OK;
+        Response response = usersResource.create(userRepresentation);
+
+        status = response.getStatus();
+
+        if (status == 201) {
+            String path = response.getLocation().getPath();
+            String userId = path.substring(path.lastIndexOf("/") + 1);
+
+            CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+            credentialRepresentation.setTemporary(false);
+            credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+            credentialRepresentation.setValue(userDomain.getPassword());
+
+            usersResource.get(userId).resetPassword(credentialRepresentation);
+
+            RealmResource realmResource = KeycloakProvider.getRealmResource();
+
+            List<RoleRepresentation> rolesRepresentation = null;
+
+            if (userDomain.getRoles() == null || userDomain.getRoles().isEmpty()) {
+                rolesRepresentation = List.of(realmResource.roles().get("user").toRepresentation());
             } else {
-                throw new AppException("User ID doesnt exist", HttpStatus.NOT_FOUND);
+                rolesRepresentation = realmResource.roles()
+                        .list()
+                        .stream()
+                        .filter(role -> userDomain.getRoles()
+                                .stream()
+                                .anyMatch(roleName -> roleName.equalsIgnoreCase(role.getName())))
+                        .toList();
             }
-        }catch(Exception e){
-            throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+
+            realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
+
+            return "User created successfully!!";
+
+        } else if (status == 409) {
+            log.error("User exist already!");
+            return "User exist already!";
+        } else {
+            log.error("Error creating user, please contact with the administrator.");
+            return "Error creating user, please contact with the administrator.";
         }
+    }
+
+    @Override
+    public void update(String userId, UserDomain userDomain) {
+        CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+        credentialRepresentation.setTemporary(false);
+        credentialRepresentation.setType(OAuth2Constants.PASSWORD);
+        credentialRepresentation.setValue(userDomain.getPassword());
+
+        UserRepresentation user = new UserRepresentation();
+        user.setUsername(userDomain.getUsername());
+        user.setFirstName(userDomain.getFirstName());
+        user.setLastName(userDomain.getLastName());
+        user.setEmail(userDomain.getEmail());
+        user.setEnabled(true);
+        user.setEmailVerified(true);
+        user.setCredentials(Collections.singletonList(credentialRepresentation));
+
+        UserResource usersResource = KeycloakProvider.getUserResource().get(userId);
+        usersResource.update(user);
+    }
+
+    @Override
+    public void delete(String userId) {
+        KeycloakProvider.getUserResource()
+                .get(userId)
+                .remove();
     }
 }

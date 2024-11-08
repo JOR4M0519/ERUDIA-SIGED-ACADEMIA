@@ -1,0 +1,8 @@
+server.port: 8080
+app.eureka-server: eureka-service
+eureka:
+  client:
+    register-with-eureka: true
+    serviceUrl.defaultZone: http://eureka-service:8761/eureka
+  # serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://keycloak:8080/realms/academy-glm-realm

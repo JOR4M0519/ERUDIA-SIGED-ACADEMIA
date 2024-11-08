@@ -20,17 +20,14 @@ import java.util.Optional;
 public class UserDetailAdapter implements PersistenceUserDetailPort {
 
 
-    private final UserDetailCrudRepo userDetailCrudRepo; // Repositorio JPA
+    private final UserDetailCrudRepo userDetailCrudRepo;
 
-
-    @Autowired
-    private UserAdapter userAdapter;
 
     @Autowired
     private UserDetailMapper userDetailMapper;
 
-    @Autowired// Mapper inyectado
-    private IdTypeMapper typeMapper; // M
+    @Autowired
+    private IdTypeMapper typeMapper;
 
 
     public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo) {
@@ -54,8 +51,8 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
 
     @Override
     public UserDetailDomain saveDetailUser(Integer id, UserDetailDomain userDetailDomain) {
-        userDetailDomain.setUser(userAdapter.findById(id));
-        userDetailDomain.setId(this.userDetailCrudRepo.findByUser_Id(id).getId());
+        //userDetailDomain.setUser(userAdapter.searchUserByUsername(id));
+        //userDetailDomain.setId(this.userDetailCrudRepo.findByUser_Id(id).getId());
         UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
         UserDetail savedUserDetail = this.userDetailCrudRepo.save(userDetail);
         return userDetailMapper.toDomain(savedUserDetail);

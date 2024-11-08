@@ -38,9 +38,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserDetailDomain> updateUser(@PathVariable Integer id, @RequestBody UserDetailDomain userDetailDomain) {
-        UserDetailDomain updatedUser = userDetailServicePort.updateUser(id, userDetailDomain);
-        return ResponseEntity.ok(updatedUser);
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @RequestBody UserDetailDomain userDetailDomain) {
+        userDetailServicePort.updateUser(id, userDetailDomain);
+        return ResponseEntity.ok("User updated successfully");
     }
 
     @DeleteMapping("/{id}")

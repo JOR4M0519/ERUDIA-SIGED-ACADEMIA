@@ -1,5 +1,7 @@
 spring:
   application:
-    name: academy-service
+    name: academy
   config:
     import: optional:configserver:http://localhost:8888
+jwt.auth.converter.resource-id: spring-cloud-client
+jwt.auth.converter.principle-attribute: preferred_username

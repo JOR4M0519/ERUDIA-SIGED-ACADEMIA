@@ -12,31 +12,31 @@ import java.util.List;
 public class UserDetailServiceImpl implements UserDetailServicePort {
 
     @Autowired
-    private PersistenceUserDetailPort userDetailPort; // Cambiar a usar UserRepository
+    private PersistenceUserDetailPort userDetailPort;
 
 
     @Override
     public List<UserDetailDomain> getAllUsers() {
-        return userDetailPort.findAll(); // Cambiado para usar el método del repositorio
+        return userDetailPort.findAll();
     }
 
     @Override
     public UserDetailDomain getUserById(Integer id) {
-        return userDetailPort.findById(id); // Cambiado para usar el método del repositorio
+        return userDetailPort.findById(id);
     }
 
     @Override
-    public UserDetailDomain createUser(Integer id, UserDetailDomain userDetailDomain) { // Cambiar tipo de parámetro
-        return userDetailPort.saveDetailUser(id,userDetailDomain); // Cambiado para usar el método del repositorio
+    public UserDetailDomain createUser(Integer id, UserDetailDomain userDetailDomain) {
+        return userDetailPort.saveDetailUser(id,userDetailDomain);
     }
 
     @Override
-    public UserDetailDomain updateUser(Integer id, UserDetailDomain userDetailDomain) { // Cambiar tipo de parámetro
-        return userDetailPort.update(id, userDetailDomain); // Cambiado para usar el método del repositorio
+    public UserDetailDomain updateUser(Integer id, UserDetailDomain userDetailDomain) {
+        return userDetailPort.update(id, userDetailDomain);
     }
 
     @Override
     public void deleteUser(Integer id) {
-        userDetailPort.delete(id); // Cambiado para usar el método del repositorio
+        userDetailPort.delete(id);
     }
 }

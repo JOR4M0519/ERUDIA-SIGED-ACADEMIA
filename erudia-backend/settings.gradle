@@ -1,8 +1,6 @@
 rootProject.name = 'erudia-backend'
 
 include 'academy-service'
-include 'auth-service'
-include 'auth-service2'
 include 'config-service'
 include 'eureka-service'
 include 'gateway-service'

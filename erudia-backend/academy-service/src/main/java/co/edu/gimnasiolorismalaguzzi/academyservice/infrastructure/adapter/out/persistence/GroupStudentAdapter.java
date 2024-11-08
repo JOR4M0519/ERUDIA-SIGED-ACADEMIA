@@ -7,7 +7,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.domain.GroupStudentDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.GroupStudent;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.GroupStudentMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.GroupStudentCrudRepo;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
+//import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,8 +24,7 @@ public class GroupStudentAdapter implements PersistenceGroupStudentPort {
 
     @Autowired
     private GroupStudentMapper groupStudentMapper;
-    @Autowired
-    private UserCrudRepo userCrudRepo;
+
 
     public GroupStudentAdapter(GroupStudentCrudRepo groupStudentCrudRepo) {
         this.groupStudentCrudRepo = groupStudentCrudRepo;

@@ -4,6 +4,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.UserServ
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 @UseCase
 public class UserServiceImpl implements UserServicePort {
 
-    private final PersistenceUserPort userRepository; // Cambiar a usar UserRepository
+    private final PersistenceUserPort userRepository;
 
     @Autowired
     public UserServiceImpl(PersistenceUserPort userRepository) {
@@ -19,27 +20,27 @@ public class UserServiceImpl implements UserServicePort {
     }
 
     @Override
-    public List<UserDomain> getAllUsers() {
-        return userRepository.findAll(); // Cambiado para usar el método del repositorio
+    public List<UserRepresentation> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public UserDomain getUserById(Integer id) {
-        return userRepository.findById(id); // Cambiado para usar el método del repositorio
+    public List<UserRepresentation> getUsersByUsername(String id) {
+        return userRepository.searchUserByUsername(id);
     }
 
     @Override
-    public UserDomain createUser(UserDomain UserDomain) { // Cambiar tipo de parámetro
-        return userRepository.save(UserDomain); // Cambiado para usar el método del repositorio
+    public String createUser(UserDomain UserDomain) {
+        return userRepository.save(UserDomain);
     }
 
     @Override
-    public UserDomain updateUser(Integer id, UserDomain UserDomain) { // Cambiar tipo de parámetro
-        return userRepository.update(id, UserDomain); // Cambiado para usar el método del repositorio
+    public void updateUser(String id, UserDomain UserDomain) {
+        userRepository.update(id, UserDomain);
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        userRepository.delete(id); // Cambiado para usar el método del repositorio
+    public void deleteUser(String id) {
+        userRepository.delete(id);
     }
 }

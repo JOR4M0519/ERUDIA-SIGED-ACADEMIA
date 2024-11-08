@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 @Data
 @Entity
 @Builder
@@ -49,7 +50,7 @@ public class User {
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-    @OneToMany(mappedBy = "student")
+/*    @OneToMany(mappedBy = "student")
     private Set<ActivityGrade> activityGrades = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "student")
@@ -74,6 +75,6 @@ public class User {
     private Set<UserDetail> userDetails = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserRole> userRoles = new LinkedHashSet<>();
+    private Set<UserRole> userRoles = new LinkedHashSet<>();*/
 
 }
