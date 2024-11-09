@@ -12,9 +12,9 @@ public class KeycloakProvider {
     private static final String REALM_NAME = "academy-glm-realm";
     private static final String REALM_MASTER = "master";
     private static final String ADMIN_CLI = "admin-cli";
-    private static final String USER_CONSOLE = "admin2";
+    private static final String USER_CONSOLE = "admin";
     private static final String PASSWORD_CONSOLE = "admin";
-    private static final String CLIENT_SECRET = "q9wyGSJrmrrXUq5sHQD7F9FFpa03DzXp";
+    private static final String CLIENT_SECRET = "admin";
 
     public static RealmResource getRealmResource() {
         Keycloak keycloak = KeycloakBuilder.builder()
@@ -25,7 +25,7 @@ public class KeycloakProvider {
                 .password(PASSWORD_CONSOLE)
                 .clientSecret(CLIENT_SECRET)
                 .resteasyClient(new ResteasyClientBuilderImpl()
-                        .connectionPoolSize(10)
+                        .connectionPoolSize(10)               //Number of conections of client to Keycloak
                         .build())
                 .build();
 

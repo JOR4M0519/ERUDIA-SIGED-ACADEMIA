@@ -1,46 +1,76 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.UserServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserKeycloakPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
+import lombok.RequiredArgsConstructor;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 @UseCase
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserServicePort {
 
-    private final PersistenceUserPort userRepository;
+    @Autowired
+    private final PersistenceUserPort userPort;
 
     @Autowired
-    public UserServiceImpl(PersistenceUserPort userRepository) {
-        this.userRepository = userRepository;
+    private final PersistenceUserKeycloakPort userKeycloakPort;
+
+
+    @Override
+    public List<UserRepresentation> getAllUsersKeycloak() {
+        return userKeycloakPort.getAllUsersKeycloak();
     }
 
     @Override
-    public List<UserRepresentation> getAllUsers() {
-        return userRepository.findAll();
+    public List<UserRepresentation> getUsersByUsername(String username) {
+        return userKeycloakPort.getUsersByUsername(username);
     }
 
     @Override
-    public List<UserRepresentation> getUsersByUsername(String id) {
-        return userRepository.searchUserByUsername(id);
+    public String createUsersKeycloak(UserDomain userDomain) {
+        String uuid = userKeycloakPort.createUsersKeycloak(userDomain);
+        return uuid;
     }
 
     @Override
-    public String createUser(UserDomain UserDomain) {
-        return userRepository.save(UserDomain);
+    public void updateUsersKeycloak(String username, UserDomain userDomain) {
+        userKeycloakPort.updateUsersKeycloak(username,userDomain);
     }
 
     @Override
-    public void updateUser(String id, UserDomain UserDomain) {
-        userRepository.update(id, UserDomain);
+    public void deleteUsersKeycloak(String username) {
+        userKeycloakPort.deleteUsersKeycloak(username);
+    }
+
+
+    @Override
+    public List<UserDomain> getAllUsers() {
+        return userPort.findAll();
     }
 
     @Override
-    public void deleteUser(String id) {
-        userRepository.delete(id);
+    public UserDomain getUserByUuid(String uuid) {
+        return userPort.searchUserByUuid(uuid);
+    }
+
+    @Override
+    public void createUser(UserDomain userDomain) {
+        userPort.save(userDomain);
+    }
+
+    @Override
+    public UserDomain updateUser(String uuid, UserDomain user) {
+        return userPort.update(uuid,user);
+    }
+
+    @Override
+    public void deleteUser(String uuid) {
+        userPort.delete(uuid);
     }
 }

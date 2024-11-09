@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface UserDetailServicePort {
     List<UserDetailDomain> getAllUsers();
-    UserDetailDomain getUserById(Integer id);
-    UserDetailDomain createUser(Integer id,UserDetailDomain user);
-    UserDetailDomain updateUser(Integer id, UserDetailDomain user);
-    void deleteUser(Integer id);
+    UserDetailDomain getUserById(String uuid);
+    UserDetailDomain createUser(String uuid,UserDetailDomain user);
+    UserDetailDomain updateUser(String uuid, UserDetailDomain user);
+    void deleteUser(String uuid);
 }

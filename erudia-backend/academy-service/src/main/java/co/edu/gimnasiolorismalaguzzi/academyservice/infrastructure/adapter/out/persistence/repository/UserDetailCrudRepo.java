@@ -7,4 +7,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDetailCrudRepo extends JpaRepository<UserDetail, Integer> {
     UserDetail findByUser_Id(Integer id);
+
+    UserDetail findByUser_Uuid(String uuid);
 }

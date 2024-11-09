@@ -6,9 +6,21 @@ import org.keycloak.representations.idm.UserRepresentation;
 import java.util.List;
 
 public interface UserServicePort {
-    List<UserRepresentation> getAllUsers();
-    List<UserRepresentation> getUsersByUsername(String id);
-    String createUser(UserDomain user);
-    void updateUser(String id, UserDomain user);
-    void deleteUser(String id);
+
+    //Keycloak Methods
+
+    List<UserRepresentation> getAllUsersKeycloak();
+    List<UserRepresentation> getUsersByUsername(String username);
+    String createUsersKeycloak(UserDomain uuid);
+    void updateUsersKeycloak(String uuid, UserDomain userDomain);
+    void deleteUsersKeycloak(String uuid);
+
+
+    //User DB Methods
+
+    List<UserDomain> getAllUsers();
+    UserDomain getUserByUuid(String uuid);
+    void createUser(UserDomain user);
+    UserDomain updateUser(String uuid, UserDomain user);
+    void deleteUser(String uuid);
 }

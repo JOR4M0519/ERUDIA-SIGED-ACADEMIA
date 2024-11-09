@@ -6,11 +6,11 @@ import java.util.List;
 
 public interface PersistenceUserPort  {
 
-    List<UserRepresentation> findAll();
-    List<UserRepresentation> searchUserByUsername(String username);
+    List<UserDomain> findAll();
+    UserDomain searchUserByUuid(String uuid);
     String save(UserDomain userDomain);
-    void update(String userId, UserDomain userDomain);
-    void delete(String userId);
+    UserDomain update(String uuid, UserDomain userDomain);
+    void delete(String uuid);
 
 
 }

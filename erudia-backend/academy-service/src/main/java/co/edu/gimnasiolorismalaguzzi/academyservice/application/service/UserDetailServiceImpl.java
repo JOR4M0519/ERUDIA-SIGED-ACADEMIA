@@ -21,22 +21,22 @@ public class UserDetailServiceImpl implements UserDetailServicePort {
     }
 
     @Override
-    public UserDetailDomain getUserById(Integer id) {
-        return userDetailPort.findById(id);
+    public UserDetailDomain getUserById(String uuid) {
+        return userDetailPort.findById(uuid);
     }
 
     @Override
-    public UserDetailDomain createUser(Integer id, UserDetailDomain userDetailDomain) {
-        return userDetailPort.saveDetailUser(id,userDetailDomain);
+    public UserDetailDomain createUser(String uuid, UserDetailDomain userDetailDomain) {
+        return userDetailPort.saveDetailUser(uuid,userDetailDomain);
     }
 
     @Override
-    public UserDetailDomain updateUser(Integer id, UserDetailDomain userDetailDomain) {
-        return userDetailPort.update(id, userDetailDomain);
+    public UserDetailDomain updateUser(String uuid, UserDetailDomain userDetailDomain) {
+        return userDetailPort.update(uuid, userDetailDomain);
     }
 
     @Override
-    public void deleteUser(Integer id) {
-        userDetailPort.delete(id);
+    public void deleteUser(String uuid) {
+        userDetailPort.delete(uuid);
     }
 }
