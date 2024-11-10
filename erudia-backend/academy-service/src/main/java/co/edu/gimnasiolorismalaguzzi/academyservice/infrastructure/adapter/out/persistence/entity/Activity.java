@@ -34,17 +34,17 @@ public class Activity {
     private String description;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "subject", nullable = false)
     private Subject subject;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "period_id", nullable = false)
     private AcademicPeriod period;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "knowledge", nullable = false)
     private Knowledge knowledge;
 
@@ -53,7 +53,7 @@ public class Activity {
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-    @OneToMany(mappedBy = "activity")
-    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "activity")
+//    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
 
 }

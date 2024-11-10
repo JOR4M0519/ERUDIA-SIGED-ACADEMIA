@@ -27,12 +27,12 @@ public class Knowledge {
     private String achievement;
 
     @Column(name = "status")
-    private Boolean status;
+    private String status;
 
-    @OneToMany(mappedBy = "knowledge")
-    private Set<Activity> activities = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "idKnowledge")
-    private Set<SubjectKnowledge> subjectKnowledges = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "knowledge")
+//    private Set<Activity> activities = new LinkedHashSet<>();
+//
+//    @OneToMany(mappedBy = "idKnowledge")
+//    private Set<SubjectKnowledge> subjectKnowledges = new LinkedHashSet<>();
 
 }

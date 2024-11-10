@@ -13,7 +13,7 @@ import java.util.List;
 @RequestMapping("/api/academy/subjects")
 public class SubjectController {
 
-        private final SubjectServicePort subjectServicePort;
+    private final SubjectServicePort subjectServicePort;
 
     public SubjectController(SubjectServicePort subjectServicePort) {
         this.subjectServicePort = subjectServicePort;

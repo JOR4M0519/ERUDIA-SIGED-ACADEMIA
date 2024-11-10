@@ -28,7 +28,7 @@ public class IdType {
     @Column(name = "name", nullable = false, length = 20)
     private String name;
 
-    @OneToMany(mappedBy = "idType")
-    private Set<UserDetail> userDetails = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "idType")
+//    private Set<UserDetail> userDetails = new LinkedHashSet<>();
 
 }

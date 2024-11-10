@@ -25,7 +25,6 @@ public class GroupStudentAdapter implements PersistenceGroupStudentPort {
     @Autowired
     private GroupStudentMapper groupStudentMapper;
 
-
     public GroupStudentAdapter(GroupStudentCrudRepo groupStudentCrudRepo) {
         this.groupStudentCrudRepo = groupStudentCrudRepo;
     }
@@ -49,10 +48,16 @@ public class GroupStudentAdapter implements PersistenceGroupStudentPort {
     }
 
     @Override
-    public GroupStudentDomain update(Integer id, GroupStudentDomain groupStudentDomain) {
+    public GroupStudentDomain update(Integer id, GroupStudentDomain entity) {
         try{
             Optional<GroupStudent> existingGroup = groupStudentCrudRepo.findById(id);
-            if(existingGroup.isPresent()) existingGroup.get().setGroupName(existingGroup.get().getGroupName());
+            if(existingGroup.isPresent()){
+                existingGroup.get().setLevel(entity.getLevel());
+                existingGroup.get().setGroupCode(entity.getGroupCode());
+                existingGroup.get().setGroupName(entity.getGroupName());
+                existingGroup.get().setProfessor(entity.getProfessor());
+                existingGroup.get().setStatus(entity.getStatus());
+            }
             return groupStudentMapper.toDomain(groupStudentCrudRepo.save(existingGroup.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Group with id: " + id + "not found!");

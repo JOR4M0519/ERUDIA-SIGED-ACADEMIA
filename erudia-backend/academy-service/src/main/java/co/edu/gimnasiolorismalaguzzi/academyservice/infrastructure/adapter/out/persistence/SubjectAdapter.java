@@ -56,12 +56,15 @@ public class SubjectAdapter implements PersistenceSubjectPort {
     }
 
     @Override
-    public SubjectDomain update(Integer id, SubjectDomain entity) {
+    public SubjectDomain update(Integer id, SubjectDomain subjectDomain) {
 
         try{
             Optional<Subject> existingSubject = subjectCrudRepo.findById(id);
 
-            if (existingSubject.get().getSubjectName() != null) existingSubject.get().setSubjectName(entity.getSubjectName());
+            if (existingSubject.isPresent()){
+                existingSubject.get().setSubjectName(subjectDomain.getSubjectName());
+                existingSubject.get().setStatus(subjectDomain.getStatus());
+            }
 
             return subjectMapper.toDomain(subjectCrudRepo.save(existingSubject.get()));
 
