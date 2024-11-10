@@ -51,7 +51,19 @@ public class InstitutionAdapter implements PersistenceInstitutionPort {
         try{
             Optional<Institution> existingInstitution = institutionCrudRepo.findById(id);
 
-            if (existingInstitution.get().getName() != null) existingInstitution.get().setName(entity.getName());
+            if (existingInstitution.isPresent()){
+                existingInstitution.get().setName(entity.getName());
+                existingInstitution.get().setNit(entity.getNit());
+                existingInstitution.get().setAddress(entity.getAddress());
+                existingInstitution.get().setPhoneNumber(entity.getPhoneNumber());
+                existingInstitution.get().setEmail(entity.getEmail());
+                existingInstitution.get().setCity(entity.getCity());
+                existingInstitution.get().setDepartment(entity.getDepartment());
+                existingInstitution.get().setCountry(entity.getCountry());
+                existingInstitution.get().setPostalCode(entity.getPostalCode());
+                existingInstitution.get().setLegalRepresentative(entity.getLegalRepresentative());
+                existingInstitution.get().setIncorporationDate(entity.getIncorporationDate());
+            }
 
             return institutionMapper.toDomain(institutionCrudRepo.save(existingInstitution.get()));
 

@@ -1,0 +1,31 @@
+spring:
+  application:
+    name: academy
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/academy_mc
+    username: postgres
+    password: root
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8181/realms/academy-glm-realm
+          jwk-set-uri: http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs
+server:
+  port: 0
+
+
+
+
+eureka:
+  instance.hostname: localhost
+  client:
+    serviceUrl.defaultZone: http://localhost:8761/eureka
+    # serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka

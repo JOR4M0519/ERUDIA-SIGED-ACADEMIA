@@ -87,8 +87,8 @@ VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), (SELECT id 
 
 -- Inserts for knowledge
 INSERT INTO knowledge (name, achievement, status)
-VALUES ('Math', 'Achieved basic skills', TRUE),
-       ('Science', 'Completed lab experiments', TRUE);
+VALUES ('Math', 'Achieved basic skills', 'A'),
+       ('Science', 'Completed lab experiments', 'A');
 
 -- Inserts for activity
 INSERT INTO activity (activity_name, description, subject, period_id, knowledge, status)
@@ -120,3 +120,26 @@ VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM users 
 -- Inserts for backup_history
 INSERT INTO backup_history (backup_name, description, file_path, created_by)
 VALUES ('backup_2024_01', 'Monthly backup', '/backups/backup_2024_01.sql', (SELECT id FROM users WHERE username = 'jdoe'));
+
+INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status)
+VALUES
+    ((SELECT id FROM users WHERE username = 'mbrown'),
+     (SELECT id FROM users WHERE username = 'asmith'),
+     'Bajo rendimiento en matemáticas',
+     'Asistir a tutorías adicionales dos veces por semana',
+     'Mejoría observada en comprensión de conceptos básicos',
+     'A'),
+
+    ((SELECT id FROM users WHERE username = 'mbrown'),
+     (SELECT id FROM users WHERE username = 'jdoe'),
+     'Falta de concentración en clase de ciencias',
+     'Completar ejercicios de concentración antes de la clase',
+     'Progreso parcial, necesita seguimiento adicional',
+     'A'),
+
+    ((SELECT id FROM users WHERE username = 'jdoe'),
+     (SELECT id FROM users WHERE username = 'asmith'),
+     'Dificultades en la participación en actividades grupales',
+     'Participar en una sesión de coaching grupal',
+     'Incremento en participación activa',
+     'A');

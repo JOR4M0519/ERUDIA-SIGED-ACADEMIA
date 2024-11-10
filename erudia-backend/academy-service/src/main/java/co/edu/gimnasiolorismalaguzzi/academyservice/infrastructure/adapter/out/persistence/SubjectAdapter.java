@@ -10,9 +10,8 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.p
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.UserDetail;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.SubjectMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.SubjectCrudRepo;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
+//import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,12 +56,15 @@ public class SubjectAdapter implements PersistenceSubjectPort {
     }
 
     @Override
-    public SubjectDomain update(Integer id, SubjectDomain entity) {
+    public SubjectDomain update(Integer id, SubjectDomain subjectDomain) {
 
         try{
             Optional<Subject> existingSubject = subjectCrudRepo.findById(id);
 
-            if (existingSubject.get().getSubjectName() != null) existingSubject.get().setSubjectName(entity.getSubjectName());
+            if (existingSubject.isPresent()){
+                existingSubject.get().setSubjectName(subjectDomain.getSubjectName());
+                existingSubject.get().setStatus(subjectDomain.getStatus());
+            }
 
             return subjectMapper.toDomain(subjectCrudRepo.save(existingSubject.get()));
 

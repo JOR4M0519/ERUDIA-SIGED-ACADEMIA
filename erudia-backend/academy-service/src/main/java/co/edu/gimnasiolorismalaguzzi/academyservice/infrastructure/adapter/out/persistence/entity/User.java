@@ -8,6 +8,7 @@ import lombok.*;
 import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
 @Data
 @Entity
 @Builder
@@ -15,7 +16,45 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "users")
 public class User {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
+    private Integer id;
+
+    @Size(max = 30)
+    @NotNull
+    @Column(name = "username", nullable = false, length = 30)
+    private String username;
+
+    @Size(max = 256)
+    @NotNull
+    @Column(name = "email", nullable = false, length = 256)
+    private String email;
+
+    @Size(max = 256)
+    @NotNull
+    @Column(name = "password", nullable = false, length = 256)
+    private String password;
+
+    @Size(max = 1)
+    @NotNull
+    @Column(name = "status", nullable = false, length = 1)
+    private String status;
+
+    @Size(max = 80)
+    @Column(name = "last_name", length = 80)
+    private String lastName;
+
+    @Size(max = 80)
+    @Column(name = "first_name", length = 80)
+    private String firstName;
+
+    @Size(max = 256)
+    @Column(name = "uuid", length = 256)
+    private String uuid;
+
+    /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
@@ -47,9 +86,9 @@ public class User {
     @Size(max = 1)
     @NotNull
     @Column(name = "status", nullable = false, length = 1)
-    private String status;
+    private String status;*/
 
-    @OneToMany(mappedBy = "student")
+/*    @OneToMany(mappedBy = "student")
     private Set<ActivityGrade> activityGrades = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "student")
@@ -74,6 +113,6 @@ public class User {
     private Set<UserDetail> userDetails = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<UserRole> userRoles = new LinkedHashSet<>();
+    private Set<UserRole> userRoles = new LinkedHashSet<>();*/
 
 }

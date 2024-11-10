@@ -3,6 +3,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.UserDetail;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserDetailMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.IdTypeMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserDetailCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
@@ -20,17 +21,20 @@ import java.util.Optional;
 public class UserDetailAdapter implements PersistenceUserDetailPort {
 
 
-    private final UserDetailCrudRepo userDetailCrudRepo; // Repositorio JPA
-
+    private final UserDetailCrudRepo userDetailCrudRepo;
 
     @Autowired
     private UserAdapter userAdapter;
+    @Autowired
+    private UserMapper userMapper;
+
+
 
     @Autowired
     private UserDetailMapper userDetailMapper;
 
-    @Autowired// Mapper inyectado
-    private IdTypeMapper typeMapper; // M
+    @Autowired
+    private IdTypeMapper typeMapper;
 
 
     public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo) {
@@ -42,8 +46,8 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     }
 
     @Override
-    public UserDetailDomain findById(Integer id) {
-        Optional<UserDetail> userDetailOptional = Optional.ofNullable(this.userDetailCrudRepo.findByUser_Id(id));
+    public UserDetailDomain findById(String uuid) {
+        Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Uuid(uuid));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
 
@@ -53,21 +57,20 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     }
 
     @Override
-    public UserDetailDomain saveDetailUser(Integer id, UserDetailDomain userDetailDomain) {
-        userDetailDomain.setUser(userAdapter.findById(id));
-        userDetailDomain.setId(this.userDetailCrudRepo.findByUser_Id(id).getId());
+    public UserDetailDomain saveDetailUser(String uuid, UserDetailDomain userDetailDomain) {
+        userDetailDomain.setUser(userAdapter.searchUserByUuid(uuid));
         UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
         UserDetail savedUserDetail = this.userDetailCrudRepo.save(userDetail);
         return userDetailMapper.toDomain(savedUserDetail);
     }
 
     @Override
-    public UserDetailDomain update(Integer id, UserDetailDomain userDetailDomain) {
+    public UserDetailDomain update(String uuid, UserDetailDomain userDetailDomain) {
         try{
-            UserDetail existingUserDetail = userDetailCrudRepo.findByUser_Id(id);
+            UserDetail existingUserDetail = userDetailCrudRepo.findByUser_Uuid(uuid);
 
             // Actualizar solo los campos que no sean nulos
-            //if (userDetailDomain.getUser() != null) existingUserDetail.setUser(userMapper.toDomain(userDetailDomain.getId()));
+            if (userDetailDomain.getUser() != null) existingUserDetail.setUser(userMapper.toEntity(userDetailDomain.getUser()));
             if (userDetailDomain.getFirstName() != null) existingUserDetail.setFirstName(userDetailDomain.getFirstName());
             if (userDetailDomain.getMiddleName() != null) existingUserDetail.setMiddleName(userDetailDomain.getMiddleName());
             if (userDetailDomain.getLastName() != null) existingUserDetail.setLastName(userDetailDomain.getLastName());
@@ -84,12 +87,12 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
             return userDetailMapper.toDomain(userDetailCrudRepo.save(existingUserDetail));
 
         }catch (EntityNotFoundException e){
-            throw new EntityNotFoundException("UserDetail with ID " + id + " not found");
+            throw new EntityNotFoundException("UserDetail with ID " + uuid + " not found");
         }
        }
 
     @Override
-    public HttpStatus delete(Integer id) {
+    public HttpStatus delete(String uuid) {
     /*    try{
             if (this.userDetailCrudRepository.existsById(id)) {
                 this.userDetailCrudRepository.deleteById(id);

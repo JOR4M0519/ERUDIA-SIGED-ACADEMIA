@@ -127,7 +127,7 @@ CREATE TABLE subject_schedule (
                                   day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
                                   start_time TIME NOT NULL,         -- E.g., '09:00'
                                   end_time TIME NOT NULL,           -- E.g., '11:00'
-                                  status BOOLEAN NOT NULL           -- To indicate if the schedule is active or not
+                                      status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
 );
 
 -- Table: attendance
@@ -152,7 +152,7 @@ CREATE TABLE knowledge (
                            id int primary key generated always as identity,
                            name varchar(10) default null,
                            achievement text,
-                           status boolean
+                           status varchar(1) DEFAULT 'A'
 );
 
 -- Table: activity
@@ -234,5 +234,5 @@ CREATE TABLE student_tracking (
                                   situation TEXT NOT NULL, -- Behavior description
                                   compromise TEXT NOT NULL, -- Commitment
                                   follow_up TEXT NOT NULL, -- Follow-up
-                                  status BOOLEAN NOT NULL
+                                  status VARCHAR(1) NOT NULL
 );

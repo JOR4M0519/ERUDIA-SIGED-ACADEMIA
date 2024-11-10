@@ -18,4 +18,6 @@ public interface SubjectCrudRepo extends JpaRepository<Subject, Integer> {
 
     @Override
     Optional<Subject> findById(Integer integer);
+
+
 }

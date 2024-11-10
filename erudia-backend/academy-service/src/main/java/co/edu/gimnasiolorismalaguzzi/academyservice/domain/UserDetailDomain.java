@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Data
 public class UserDetailDomain {
     private Integer id;
-    private UserDomain user; // Asegúrate de que esta clase también esté definida correctamente
+    private UserDomain user;
     private String firstName;
     private String middleName;
     private String lastName;
@@ -16,7 +16,7 @@ public class UserDetailDomain {
     private String phoneNumber;
     private LocalDate dateOfBirth;
     private String dni;
-    private IdTypeDomain idType; // Asegúrate de que esta clase también esté definida correctamente
+    private IdTypeDomain idType;
     private String neighborhood;
     private String city;
     private String positionJob;

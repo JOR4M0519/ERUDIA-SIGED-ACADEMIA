@@ -10,7 +10,7 @@ import java.util.List;
 
 @WebAdapter
 @RestController
-@RequestMapping("/api/academy/users")
+@RequestMapping("/api/academy/users/detail")
 public class UserController {
 
     private final UserDetailServicePort userDetailServicePort;
@@ -25,27 +25,27 @@ public class UserController {
         return ResponseEntity.ok(users);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserDetailDomain> getUserById(@PathVariable Integer id) {
-        UserDetailDomain user = userDetailServicePort.getUserById(id);
+    @GetMapping("/{uuid}")
+    public ResponseEntity<UserDetailDomain> getUserById(@PathVariable String uuid) {
+        UserDetailDomain user = userDetailServicePort.getUserById(uuid);
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/{id}")
-    public ResponseEntity<UserDetailDomain> createUser(@PathVariable Integer id,@RequestBody UserDetailDomain userDetailDomain) {
-        UserDetailDomain createdUser = userDetailServicePort.createUser(id,userDetailDomain);
+    @PostMapping("/{uuid}")
+    public ResponseEntity<UserDetailDomain> createUser(@PathVariable String uuid,@RequestBody UserDetailDomain userDetailDomain) {
+        UserDetailDomain createdUser = userDetailServicePort.createUser(uuid,userDetailDomain);
         return ResponseEntity.ok(createdUser);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserDetailDomain> updateUser(@PathVariable Integer id, @RequestBody UserDetailDomain userDetailDomain) {
-        UserDetailDomain updatedUser = userDetailServicePort.updateUser(id, userDetailDomain);
-        return ResponseEntity.ok(updatedUser);
+    @PutMapping("/{uuid}")
+    public ResponseEntity<?> updateUser(@PathVariable String uuid, @RequestBody UserDetailDomain userDetailDomain) {
+        userDetailServicePort.updateUser(uuid, userDetailDomain);
+        return ResponseEntity.ok("User updated successfully");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Integer id) {
-        userDetailServicePort.deleteUser(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteUser(@PathVariable String uuid) {
+        userDetailServicePort.deleteUser(uuid);
         return ResponseEntity.noContent().build();
     }
 }

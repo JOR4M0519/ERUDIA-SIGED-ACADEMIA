@@ -43,10 +43,10 @@ public class AcademicPeriod {
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-    @OneToMany(mappedBy = "period")
-    private Set<Activity> activities = new LinkedHashSet<>();
-
-    @OneToMany(mappedBy = "period")
-    private Set<RecoveryPeriod> recoveryPeriods = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "period")
+//    private Set<Activity> activities = new LinkedHashSet<>();
+//
+//    @OneToMany(mappedBy = "period")
+//    private Set<RecoveryPeriod> recoveryPeriods = new LinkedHashSet<>();
 
 }

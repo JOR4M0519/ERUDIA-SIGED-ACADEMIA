@@ -14,4 +14,8 @@ public interface UserCrudRepo extends JpaRepository<User, Integer> {
     @Modifying
     @Query("update User u set u.status = ?1 where u.id = ?2")
     int updateStatusById(String status, Integer id);
+
+    @Query("select u from User u where u.uuid = ?1")
+    User findByUuid(String uuid);
+
 }
