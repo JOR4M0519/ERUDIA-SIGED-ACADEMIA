@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.web;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityGradeServicePort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityGroupServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityGradeDomain;
 import org.springframework.http.ResponseEntity;

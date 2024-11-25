@@ -4,7 +4,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.Activity
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Activity;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

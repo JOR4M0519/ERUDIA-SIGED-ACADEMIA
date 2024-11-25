@@ -4,7 +4,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.SubjectS
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceSubjectSchedulePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.SubjectScheduleDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.SubjectSchedule;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

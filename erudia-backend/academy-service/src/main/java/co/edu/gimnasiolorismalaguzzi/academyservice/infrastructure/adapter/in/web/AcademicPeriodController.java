@@ -3,7 +3,6 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.w
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.AcademicPeriodServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.AcademicPeriodDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.AcademicPeriod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

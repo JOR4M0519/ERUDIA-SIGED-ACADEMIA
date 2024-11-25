@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.AcademicPeriod;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Activity;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

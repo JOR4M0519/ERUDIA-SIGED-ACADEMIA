@@ -4,5 +4,17 @@ spring:
   application:
     name: gateway
 
+
 jwt.auth.converter.resource-id: spring-cloud-client
 jwt.auth.converter.principle-attribute: preferred_username
+logging:
+  level:
+    org:
+      springframework:
+        web:
+          cors: DEBUG
+          reactive:
+            handler: DEBUG
+        cloud:
+          gateway: DEBUG
+

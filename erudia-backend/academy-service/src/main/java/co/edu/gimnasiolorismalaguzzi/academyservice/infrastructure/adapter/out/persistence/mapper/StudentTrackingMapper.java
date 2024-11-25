@@ -1,6 +1,5 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.StudentTrackingDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Knowledge;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.StudentTracking;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;

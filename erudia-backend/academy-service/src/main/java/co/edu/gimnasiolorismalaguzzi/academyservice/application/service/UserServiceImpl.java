@@ -48,6 +48,11 @@ public class UserServiceImpl implements UserServicePort {
         userKeycloakPort.deleteUsersKeycloak(username);
     }
 
+    @Override
+    public String getToken(String username, String password) {
+        return userKeycloakPort.getToken(username,password);
+    }
+
 
     @Override
     public List<UserDomain> getAllUsers() {

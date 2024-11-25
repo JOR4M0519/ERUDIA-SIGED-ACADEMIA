@@ -2,7 +2,6 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.application.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityGradeServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistanceActivityGradePort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceActivityGroupPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.UseCase;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityGradeDomain;
 import org.springframework.beans.factory.annotation.Autowired;

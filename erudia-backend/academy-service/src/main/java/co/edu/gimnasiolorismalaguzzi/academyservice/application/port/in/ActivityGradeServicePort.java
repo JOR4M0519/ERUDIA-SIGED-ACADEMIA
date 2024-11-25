@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityGradeDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.ActivityGrade;
 
 import java.util.List;
 

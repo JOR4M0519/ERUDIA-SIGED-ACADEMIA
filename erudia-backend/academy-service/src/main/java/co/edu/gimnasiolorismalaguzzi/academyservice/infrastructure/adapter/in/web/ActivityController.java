@@ -1,10 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.web;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityServicePort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.EducationalLevelServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Activity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

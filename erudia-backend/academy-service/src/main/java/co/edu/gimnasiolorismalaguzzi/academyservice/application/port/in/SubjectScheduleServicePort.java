@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.SubjectScheduleDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.SubjectSchedule;
 
 import java.util.List;
 

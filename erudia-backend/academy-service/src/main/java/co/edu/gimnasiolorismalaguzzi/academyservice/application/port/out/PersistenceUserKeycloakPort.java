@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface PersistenceUserKeycloakPort {
 
+    String getToken(String username, String password);
+
     List<UserRepresentation> getAllUsersKeycloak();
     List<UserRepresentation> getUsersByUsername(String username);
     String createUsersKeycloak(UserDomain userDomain);

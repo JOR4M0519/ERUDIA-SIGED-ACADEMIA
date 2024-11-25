@@ -2,12 +2,8 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserKeycloakPort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.util.KeycloakProvider;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +14,32 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 
 @PersistenceAdapter
 @Slf4j
 public class KeycloakAdapter implements PersistenceUserKeycloakPort {
+
+
+
+    @Override
+    public String getToken(String username, String password) {
+        try {
+            KeycloakProvider keycloakProvider = new KeycloakProvider();
+            // Obtén el token de acceso
+            String accessToken = keycloakProvider.getToken(username,password);
+
+            return accessToken;
+        } catch (Exception e) {
+            log.error("Error obtaining token from Keycloak: ", e);
+            throw new AppException("Unable to authenticate user.", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
 
     @Override
