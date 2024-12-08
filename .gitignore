@@ -76,3 +76,165 @@ build/
 #erudia-backend/config-service/src/main/resources/configuration/academy-service.yml
 
 erudia-backend/.gradle/
+
+
+# Java general ignores
+*.class
+*.log
+*.war
+*.ear
+*.jar
+
+# Gradle specific ignores
+.gradle/
+build/
+# gradle-app.setting
+.gradle/
+# gradle/ 
+# out/
+# !gradle/wrapper/gradle-wrapper.jar 
+# !gradlew
+# !gradlew.bat
+
+# IntelliJ IDEA project files
+.idea/
+*.iml
+
+# Eclipse/STS project files
+.classpath
+.project
+.settings/
+
+# Mac OS specific ignores
+.DS_Store
+
+# Linux specific ignores
+*~
+
+# Windows specific ignores
+Thumbs.db
+desktop.ini
+
+# Ignore other services
+auth-service2/
+
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Logs and reports
+logs/
+*.log
+*.out
+*.pid
+*.gz
+
+# Dependency directories
+node_modules/
+vendor/
+
+# Build directories
+target/
+build/
+
+# Generated files
+*.o
+*.pyc
+*.pyo
+*.min.js
+*.map
+
+# JetBrains Rider specific ignores
+.idea/
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/dictionaries
+.idea/**/shelf
+
+# Config file for database (academy)
+erudia-backend/config-service/src/main/resources/configuration/academy-service.yml
+
+
+
+##REACT
+
+
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build outputs
+/build
+
+# Static files
+*.cache
+*.log
+
+# Coverage directory used by testing tools
+/coverage
+
+# IDE or editor-specific files
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+*.swn
+
+# MacOS files
+.DS_Store
+
+# Windows files
+Thumbs.db
+ehthumbs.db
+
+# Dependency directories
+jspm_packages/
+bower_components/
+
+# Parcel-bundler cache (if used)
+/.cache
+
+# Temporary files
+tmp/
+temp/
+
+# ESLint cache
+.eslintcache
+
+# Webpack output
+/dist
+
+# Storybook files
+out/
+.storybook/
+
+# Testing reports
+/.jest/
+
+# Prettier cache
+.prettier-cache/
+
+# Firebase related files
+.firebase/
+
+# Miscellaneous
+*.tgz
+*.log
+*.bak
+*.backup
+*.sass-cache/
+
