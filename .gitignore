@@ -73,4 +73,6 @@ build/
 .idea/**/shelf
 
 # Config file for database (academy)
-erudia-backend/config-service/src/main/resources/configuration/academy-service.yml
+#erudia-backend/config-service/src/main/resources/configuration/academy-service.yml
+
+erudia-backend/.gradle/
