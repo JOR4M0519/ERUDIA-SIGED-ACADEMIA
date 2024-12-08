@@ -1,7 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.security;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.security.filter.SecurityContextFilter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -19,8 +19,9 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    @Autowired
-    private JwtAuthenticationConverter jwtAuthenticationConverter;
+    //@Autowired
+    //private JwtAuthenticationConverter jwtAuthenticationConverter;
+    private final SecurityContextFilter securityContextFilter; // Inyecta el filtro aquí
 
     @Bean
     public SecurityFilterChain securityFilterChain (HttpSecurity http) throws Exception {
@@ -29,21 +30,22 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> {
                     //Habilitar Rutas
-                    authorize.requestMatchers("/login", "/register", "/api/academy/public/**").permitAll();
+                    authorize.requestMatchers("/api/academy/public/**").permitAll();
                     //Rutas Aseguradas
                     authorize.anyRequest().authenticated();
                 })
-
+                .addFilterBefore(securityContextFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 //Funcionamiento por medio de OAuth2
-                .oauth2ResourceServer(oauth2 ->
+                /*.oauth2ResourceServer(oauth2 ->
 
                         //Configuración del Token
                         oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
-                )
+                )*/
                 // oauth.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter));
                 //Gestión de Sesion
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                        /*
 
                         //Se evita el ataque de Fijacion de sesion creando otra
                         .sessionFixation()
@@ -52,7 +54,7 @@ public class SecurityConfig {
                         .invalidSessionUrl("http://localhost:8080")  //Redireccionamiento failed login
                         .maximumSessions(1)
                         .expiredUrl("http://localhost:8080")         //Redireccionamiento cuando se expira el tiempo de la sesion
-                );
+                );*/
 
                 //Redireccionamiento de ingreso al login
                 /*.formLogin(form -> form

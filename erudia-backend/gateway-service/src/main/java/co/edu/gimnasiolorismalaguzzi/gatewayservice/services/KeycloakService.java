@@ -14,7 +14,6 @@ import java.util.List;
 @Slf4j
 public class KeycloakService {
 
-
     public String getToken(String username, String password) {
         try {
             KeycloakProvider keycloakProvider = new KeycloakProvider();
@@ -26,23 +25,5 @@ public class KeycloakService {
             log.error("Error obtaining token from Keycloak: ", e);
             throw new AppException("Unable to authenticate user.", HttpStatus.UNAUTHORIZED);
         }
-    }
-
-    public List<UserRepresentation> getAllUsersKeycloak() {
-        return KeycloakProvider.getRealmResource()
-                .users()
-                .list();
-    }
-
-    public List<UserRepresentation> getUsersByUsername(String username) {
-        return KeycloakProvider.getRealmResource()
-                .users()
-                .searchByUsername(username, true);
-    }
-
-    public void deleteUsersKeycloak(String userId) {
-        KeycloakProvider.getUserResource()
-                .get(userId)
-                .remove();
     }
 }

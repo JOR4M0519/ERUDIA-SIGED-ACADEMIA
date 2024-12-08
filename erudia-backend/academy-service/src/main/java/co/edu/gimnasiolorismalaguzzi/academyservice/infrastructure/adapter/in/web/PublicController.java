@@ -4,13 +4,14 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.UserServ
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/academy/public")
 public class PublicController {
 
-    @Autowired
+    /*@Autowired
     private UserServicePort userServicePort;
 
     @PostMapping("/login")
@@ -18,7 +19,13 @@ public class PublicController {
         String token = userServicePort. getToken(userDomain.getUsername(), userDomain.getPassword());
         return ResponseEntity.ok(token);
     }
-
+*/
+    @PreAuthorize("hasRole('admin_client_role')")
+    @GetMapping("/roless")
+    public ResponseEntity<String> getExample(@RequestHeader("X-Roles") String roles,
+                                             @RequestHeader("X-User") String user) {
+        return ResponseEntity.ok("User: " + user + ", Roles: " + roles);
+    }
 
 
     /*

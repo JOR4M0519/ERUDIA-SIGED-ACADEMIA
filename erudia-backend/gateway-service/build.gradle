@@ -32,6 +32,7 @@ dependencies {
 
 	implementation 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'
 	implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
 	implementation 'org.keycloak:keycloak-admin-client:26.0.2'
 
