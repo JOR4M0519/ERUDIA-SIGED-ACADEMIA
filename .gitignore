@@ -7,7 +7,7 @@
 
 # Gradle specific ignores
 .gradle/
-# build/
+build/
 # gradle-app.setting
 .gradle/
 # gradle/ 
