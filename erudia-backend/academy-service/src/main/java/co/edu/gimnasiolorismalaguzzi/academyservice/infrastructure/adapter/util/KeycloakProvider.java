@@ -1,10 +1,13 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.util;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
 import org.jboss.resteasy.client.jaxrs.internal.ResteasyClientBuilderImpl;
+import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.keycloak.admin.client.resource.RealmResource;
 import org.keycloak.admin.client.resource.UsersResource;
+import org.springframework.http.HttpStatus;
 
 public class KeycloakProvider {
 
@@ -30,6 +33,28 @@ public class KeycloakProvider {
                 .build();
 
         return keycloak.realm(REALM_NAME);
+    }
+
+    public String getToken(String username, String password) {
+        try {
+            // Construye un cliente Keycloak con el flujo de contraseña
+            Keycloak keycloak = KeycloakBuilder.builder()
+                    .serverUrl(KeycloakProvider.SERVER_URL)
+                    .realm(KeycloakProvider.REALM_NAME)
+                    .grantType(OAuth2Constants.PASSWORD)
+                    .clientId(KeycloakProvider.ADMIN_CLI)
+                    .username(username)
+                    .password(password)
+                    .resteasyClient(new ResteasyClientBuilderImpl().build())
+                    .build();
+
+            // Obtén el token de acceso
+            String accessToken = keycloak.tokenManager().getAccessToken().getToken();
+
+            return accessToken;
+        } catch (Exception e) {
+            throw new AppException("Unable to authenticate user.", HttpStatus.UNAUTHORIZED);
+        }
     }
 
     public static UsersResource getUserResource() {

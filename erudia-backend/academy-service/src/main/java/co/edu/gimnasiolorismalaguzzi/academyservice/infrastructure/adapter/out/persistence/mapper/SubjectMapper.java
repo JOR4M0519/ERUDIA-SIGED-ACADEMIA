@@ -2,7 +2,6 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.
 
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.SubjectDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Subject;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
 import org.mapstruct.InheritInverseConfiguration;

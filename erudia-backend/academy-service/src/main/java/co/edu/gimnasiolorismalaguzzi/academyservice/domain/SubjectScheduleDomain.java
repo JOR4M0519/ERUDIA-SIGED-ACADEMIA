@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.domain;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Subject;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.SubjectSchedule;
 import lombok.Data;
 
 import java.time.LocalTime;

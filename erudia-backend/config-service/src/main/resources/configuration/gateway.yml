@@ -1,10 +1,10 @@
-#server.port: 8080
+server.port: 8080
 app:
   eureka-server: localhost
 eureka:
   client:
     register-with-eureka: true
-    serviceUrl.defaultZone: http://localhost:8761/eureka
+    serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka/
   # serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka
 
 logging:
@@ -31,7 +31,6 @@ spring:
           uri: lb://academy
           predicates:
             - Path=/api/academy/**
-            #- Path=/api/keycloak/** #!!Se tiene que pasar al gateway!!
 
         ## Eureka Service
         - id: eureka
@@ -46,10 +45,15 @@ spring:
           predicates:
             - Path=/eureka/**
 
-
   security:
+    user:
+      name: eureka
+      password: password
     oauth2:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8181/realms/academy-glm-realm
           jwk-set-uri: http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs
+
+jwt.auth.converter.resource-id: spring-cloud-client
+jwt.auth.converter.principle-attribute: sub

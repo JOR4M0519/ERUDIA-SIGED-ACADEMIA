@@ -4,8 +4,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.p
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
 import lombok.Data;
 
-import java.util.Set;
-
 @Data
 public class GroupStudentDomain {
     private Integer id;

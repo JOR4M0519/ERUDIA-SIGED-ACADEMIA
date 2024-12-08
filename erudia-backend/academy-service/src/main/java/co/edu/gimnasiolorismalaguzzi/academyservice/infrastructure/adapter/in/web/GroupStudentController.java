@@ -3,7 +3,6 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.in.w
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.GroupStudentServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.GroupStudentDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.GroupStudentDomain;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

@@ -10,8 +10,6 @@ import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 @Data
 @Entity

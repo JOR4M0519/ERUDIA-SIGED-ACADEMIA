@@ -4,8 +4,10 @@ server:
 spring:
   application:
     name: eureka
-#  security.user.name: eureka
-#  security.user.password: password
+  security:
+    user:
+      name: eureka
+      password: password
 
 eureka:
   instance:

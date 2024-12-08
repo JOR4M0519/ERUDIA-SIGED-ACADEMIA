@@ -1,9 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.domain.GroupStudentDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.InstitutionDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.GroupStudent;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Institution;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

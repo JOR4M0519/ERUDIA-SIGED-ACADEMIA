@@ -15,6 +15,8 @@ public interface UserServicePort {
     void updateUsersKeycloak(String uuid, UserDomain userDomain);
     void deleteUsersKeycloak(String uuid);
 
+    public String getToken(String username, String password);
+
 
     //User DB Methods
 

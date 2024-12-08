@@ -3,7 +3,7 @@ import { LoginPage } from './login/LoginPage.jsx';
 
 const App = () => {
     const router = createBrowserRouter(createRoutesFromElements(
-        <Route path="/" element={<LoginPage />} />
+        <Route path="/login" element={<LoginPage />} />
     ));
 
     return (

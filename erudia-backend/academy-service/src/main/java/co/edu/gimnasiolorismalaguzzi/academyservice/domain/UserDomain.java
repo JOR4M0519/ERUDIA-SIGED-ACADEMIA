@@ -3,7 +3,6 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.domain;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 import java.util.Set;
 
 @Data
