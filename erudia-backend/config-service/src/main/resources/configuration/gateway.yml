@@ -31,6 +31,8 @@ spring:
           uri: lb://academy
           predicates:
             - Path=/api/academy/**
+          #filters:
+           # - StripPrefix=1  # Elimina el primer segmento de la ruta (/api)
 
         ## Eureka Service
         - id: eureka

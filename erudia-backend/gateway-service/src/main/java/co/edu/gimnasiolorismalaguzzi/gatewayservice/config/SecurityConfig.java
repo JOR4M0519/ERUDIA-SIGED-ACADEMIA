@@ -77,7 +77,7 @@ public class SecurityConfig {
 
                 // Configuración de autorizaciones para intercambios HTTP
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/api/login/**").permitAll() // Permitir acceso sin autenticación a rutas de login
+                        .pathMatchers("/api/gtw/public/**").permitAll() // Permitir acceso sin autenticación a rutas de login
                         //.pathMatchers("/eureka/**").authenticated() // Requiere autenticación para rutas de eureka
                         .anyExchange().authenticated() // Requiere autenticación para cualquier otra ruta
                 )
