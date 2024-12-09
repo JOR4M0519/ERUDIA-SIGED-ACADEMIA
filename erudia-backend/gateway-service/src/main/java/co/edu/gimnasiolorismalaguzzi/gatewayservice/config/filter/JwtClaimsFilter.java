@@ -47,7 +47,7 @@ public class JwtClaimsFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/eureka")) {
+        if (path.startsWith("/eureka") || path.contains("/api/gtw/public")) {
             return chain.filter(exchange);
         }
 
@@ -109,8 +109,7 @@ public class JwtClaimsFilter implements WebFilter {
      * @throws RuntimeException Si el token es inválido o no se puede decodificar.
      */
     private Jwt decodeJwt(String token) {
-        // Configura el endpoint de la clave pública del servidor de autorización (Keycloak)
-        String jwkSetUri1 = "http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs";
+
         // Crea un JwtDecoder usando NimbusJwtDecoder con un URI de conjunto de claves públicas (JWK)
         JwtDecoder jwtDecoder = NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
 
