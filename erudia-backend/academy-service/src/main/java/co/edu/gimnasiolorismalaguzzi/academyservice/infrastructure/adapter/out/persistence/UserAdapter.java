@@ -1,14 +1,14 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.User;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.UserMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 
 import lombok.extern.slf4j.Slf4j;

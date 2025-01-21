@@ -1,12 +1,12 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceStudentTrackingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.StudentTrackingDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.StudentTracking;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.StudentTrackingMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.StudentTrackingCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.StudentTrackingDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.StudentTracking;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.StudentTrackingMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.StudentTrackingCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

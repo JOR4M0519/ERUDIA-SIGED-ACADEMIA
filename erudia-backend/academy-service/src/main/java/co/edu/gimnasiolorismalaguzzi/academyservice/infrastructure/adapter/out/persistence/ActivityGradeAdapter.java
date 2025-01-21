@@ -2,10 +2,10 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistanceActivityGradePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.ActivityGradeDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.ActivityGrade;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.ActivityGradeMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.ActivityGradeCurdRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGradeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGrade;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityGradeMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.ActivityGradeCurdRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

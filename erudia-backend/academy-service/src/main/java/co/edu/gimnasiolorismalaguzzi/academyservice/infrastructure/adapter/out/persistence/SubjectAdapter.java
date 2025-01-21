@@ -1,13 +1,13 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceSubjectPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.SubjectDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Subject;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.SubjectMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.SubjectCrudRepo;
-//import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.UserCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectCrudRepo;
+//import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

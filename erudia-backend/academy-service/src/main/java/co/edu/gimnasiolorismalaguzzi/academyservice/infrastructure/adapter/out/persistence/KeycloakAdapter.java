@@ -1,10 +1,10 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceUserKeycloakPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.util.KeycloakProvider;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.util.KeycloakProvider;
 import jakarta.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.OAuth2Constants;

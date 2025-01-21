@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.InstitutionDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.InstitutionDomain;
 
 import java.util.List;
 

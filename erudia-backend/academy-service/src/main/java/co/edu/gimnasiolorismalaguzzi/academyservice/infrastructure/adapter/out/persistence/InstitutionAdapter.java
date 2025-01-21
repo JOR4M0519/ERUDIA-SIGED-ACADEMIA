@@ -2,10 +2,10 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out.PersistenceInstitutionPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.InstitutionDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.entity.Institution;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.mapper.InstitutionMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.adapter.out.persistence.repository.InstitutionCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.InstitutionDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Institution;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.InstitutionMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.InstitutionCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

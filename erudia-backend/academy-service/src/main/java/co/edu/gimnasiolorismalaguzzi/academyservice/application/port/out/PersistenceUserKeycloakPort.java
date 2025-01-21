@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.application.port.out;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import org.keycloak.representations.idm.UserRepresentation;
 
 import java.util.List;
