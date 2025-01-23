@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.SubjectKnowledgeServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.PersistenceSubjectKnowledgePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowledgeDomain;
 import org.springframework.http.ResponseEntity;
@@ -13,39 +13,39 @@ import java.util.List;
 @RequestMapping("/api/academy/subject_knowledge")
 public class SubjectKnowledgeController {
     
-    private final SubjectKnowledgeServicePort port;
+    private final PersistenceSubjectKnowledgePort subjectKnowledgePort;
 
-    public SubjectKnowledgeController(SubjectKnowledgeServicePort port) {
-        this.port = port;
+    public SubjectKnowledgeController(PersistenceSubjectKnowledgePort subjectKnowledgePort) {
+        this.subjectKnowledgePort = subjectKnowledgePort;
     }
 
     @GetMapping
     public ResponseEntity<List<SubjectKnowledgeDomain>> getAllKnowledge(){
-        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains = port.getAllSubject_Knowledge();
+        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains = subjectKnowledgePort.findAll();
         return ResponseEntity.ok(SubjectKnowledgeDomains);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SubjectKnowledgeDomain> getKnowledgeById(@PathVariable Integer id) {
-        SubjectKnowledgeDomain Knowledge = port.getSubjectKnowledgeById(id);
+        SubjectKnowledgeDomain Knowledge = subjectKnowledgePort.findById(id);
         return ResponseEntity.ok(Knowledge);
     }
 
     @PostMapping()
     public ResponseEntity<SubjectKnowledgeDomain> createKnowledge(@RequestBody SubjectKnowledgeDomain SubjectKnowledgeDomain) {
-        SubjectKnowledgeDomain createdKnowledge = port.createSubjectKnowledge(SubjectKnowledgeDomain);
+        SubjectKnowledgeDomain createdKnowledge = subjectKnowledgePort.save(SubjectKnowledgeDomain);
         return ResponseEntity.ok(createdKnowledge);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<SubjectKnowledgeDomain> updateKnowledge(@PathVariable Integer id, @RequestBody SubjectKnowledgeDomain SubjectKnowledgeDomain) {
-        SubjectKnowledgeDomain updatedKnowledge = port.updateSubjectKnowledge(id, SubjectKnowledgeDomain);
+        SubjectKnowledgeDomain updatedKnowledge = subjectKnowledgePort.update(id, SubjectKnowledgeDomain);
         return ResponseEntity.ok(updatedKnowledge);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteKnowledge(@PathVariable Integer id) {
-        port.deleteSubjectKnowledge(id);
+        subjectKnowledgePort.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
