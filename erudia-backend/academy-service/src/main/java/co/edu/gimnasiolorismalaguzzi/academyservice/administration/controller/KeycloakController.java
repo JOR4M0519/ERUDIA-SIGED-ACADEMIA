@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.UserServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserKeycloakPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 
 import jakarta.annotation.security.PermitAll;
@@ -18,30 +19,32 @@ import java.net.URISyntaxException;
 public class KeycloakController {
 
     @Autowired
-    private UserServicePort userServicePort;
+    private PersistenceUserKeycloakPort persistenceUserKeycloakPort;
+    @Autowired
+    private PersistenceUserPort persistenceUserPort;
 
 
     @GetMapping()
     @PermitAll
     public ResponseEntity<?> findAllUsers(){
-        return ResponseEntity.ok(userServicePort.getAllUsers());
+        return ResponseEntity.ok(persistenceUserKeycloakPort.getAllUsersKeycloak());
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<?> searchUserByUuid(@PathVariable String uuid){
-        return ResponseEntity.ok(userServicePort.getUserByUuid(uuid));
+        return ResponseEntity.ok(persistenceUserPort.searchUserByUuid(uuid));
     }
 
     @GetMapping("/keycloak")
     //@PreAuthorize("hasRole('client_admin')")
     public ResponseEntity<?> findAllUsersKeycloak(){
-        return ResponseEntity.ok(userServicePort.getAllUsersKeycloak());
+        return ResponseEntity.ok(persistenceUserKeycloakPort.getAllUsersKeycloak());
     }
 
     @GetMapping("/{username}/keycloak")
     @PreAuthorize("hasRole('admin_client_role')")
     public ResponseEntity<?> searchUserByUsername(@PathVariable String username){
-        return ResponseEntity.ok(userServicePort.getUsersByUsername(username));
+        return ResponseEntity.ok(persistenceUserKeycloakPort.getUsersByUsername(username));
     }
 
 
@@ -50,11 +53,11 @@ public class KeycloakController {
     public ResponseEntity<?> createUser(@RequestBody UserDomain userDomain) throws URISyntaxException {
 
         //Se crea en la BD Keycloak
-        String uuid = userServicePort.createUsersKeycloak(userDomain);
+        String uuid = persistenceUserKeycloakPort.createUsersKeycloak(userDomain);
 
         //Se crea en la BD APP
         userDomain.setUuid(uuid);
-        userServicePort.createUser(userDomain);
+        persistenceUserPort.save(userDomain);
 
         return ResponseEntity.ok("The user was Created succesfully");
 
@@ -64,15 +67,15 @@ public class KeycloakController {
 
     @PutMapping("/{uuid}")
     public ResponseEntity<?> updateUser(@PathVariable String uuid, @RequestBody UserDomain userDomain){
-        userServicePort.updateUsersKeycloak(uuid, userDomain);
-        userServicePort.updateUser(uuid, userDomain);
+        persistenceUserKeycloakPort.updateUsersKeycloak(uuid, userDomain);
+        persistenceUserPort.update(uuid, userDomain);
         return ResponseEntity.ok("User updated successfully");
     }
 
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<?> deleteUser(@PathVariable String uuid){
-        userServicePort.deleteUsersKeycloak(uuid);
+        persistenceUserKeycloakPort.deleteUsersKeycloak(uuid);
         //userServicePort.deleteUser(uuid);
         return ResponseEntity.noContent().build();
     }

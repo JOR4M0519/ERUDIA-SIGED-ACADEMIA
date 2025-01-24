@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.UserDetailServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
 import org.springframework.http.ResponseEntity;
@@ -13,39 +13,39 @@ import java.util.List;
 @RequestMapping("/api/academy/users/detail")
 public class UserController {
 
-    private final UserDetailServicePort userDetailServicePort;
+    private final PersistenceUserDetailPort persistenceUserDetailPort;
 
-    public UserController(UserDetailServicePort userDetailServicePort) {
-        this.userDetailServicePort = userDetailServicePort;
+    public UserController(PersistenceUserDetailPort persistenceUserDetailPort) {
+        this.persistenceUserDetailPort = persistenceUserDetailPort;
     }
 
     @GetMapping()
     public ResponseEntity<List<UserDetailDomain>> getAllUsers() {
-        List<UserDetailDomain> users = userDetailServicePort.getAllUsers();
+        List<UserDetailDomain> users = persistenceUserDetailPort.findAll();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{uuid}")
     public ResponseEntity<UserDetailDomain> getUserById(@PathVariable String uuid) {
-        UserDetailDomain user = userDetailServicePort.getUserById(uuid);
+        UserDetailDomain user = persistenceUserDetailPort.findById(uuid);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/{uuid}")
     public ResponseEntity<UserDetailDomain> createUser(@PathVariable String uuid,@RequestBody UserDetailDomain userDetailDomain) {
-        UserDetailDomain createdUser = userDetailServicePort.createUser(uuid,userDetailDomain);
+        UserDetailDomain createdUser = persistenceUserDetailPort.save(userDetailDomain);
         return ResponseEntity.ok(createdUser);
     }
 
     @PutMapping("/{uuid}")
     public ResponseEntity<?> updateUser(@PathVariable String uuid, @RequestBody UserDetailDomain userDetailDomain) {
-        userDetailServicePort.updateUser(uuid, userDetailDomain);
+        persistenceUserDetailPort.update(uuid, userDetailDomain);
         return ResponseEntity.ok("User updated successfully");
     }
 
     @DeleteMapping("/{uuid}")
     public ResponseEntity<Void> deleteUser(@PathVariable String uuid) {
-        userDetailServicePort.deleteUser(uuid);
+        persistenceUserDetailPort.delete(uuid);
         return ResponseEntity.noContent().build();
     }
 }

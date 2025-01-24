@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityGradeServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.PersistanceActivityGradePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGradeDomain;
 import org.springframework.http.ResponseEntity;
@@ -12,33 +12,33 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/academy/activity-grade")
 public class ActivityGradeController {
-    private final ActivityGradeServicePort port;
+    private final PersistanceActivityGradePort persistanceActivityGradePort;
 
-    public ActivityGradeController(ActivityGradeServicePort port) {
-        this.port = port;
+    public ActivityGradeController(PersistanceActivityGradePort persistanceActivityGradePort) {
+        this.persistanceActivityGradePort = persistanceActivityGradePort;
     }
 
     @GetMapping
     public ResponseEntity<List<ActivityGradeDomain>> getAllActivity_Group(){
-        List<ActivityGradeDomain> ActivityGradeDomainList = port.getAttAcitivitiesWithGrades();
+        List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.findAll();
         return ResponseEntity.ok(ActivityGradeDomainList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ActivityGradeDomain> getActivityGroupById(@PathVariable Integer id){
-        ActivityGradeDomain ActivityGradeDomain = port.getActivityGradeById(id);
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.findById(id);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 
     @PostMapping
     public ResponseEntity<ActivityGradeDomain> createActivityGroup(@RequestBody ActivityGradeDomain ActivityGradeDomain){
-        ActivityGradeDomain createdDimension = port.createActivityGrade(ActivityGradeDomain);
+        ActivityGradeDomain createdDimension = persistanceActivityGradePort.save(ActivityGradeDomain);
         return ResponseEntity.ok(createdDimension);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ActivityGradeDomain> updateActivityGroup(@PathVariable Integer id, @RequestBody ActivityGradeDomain ActivityGradeDomain){
-        ActivityGradeDomain updatedDimension = port.updateActivityGrade(id,ActivityGradeDomain);
+        ActivityGradeDomain updatedDimension = persistanceActivityGradePort.update(id,ActivityGradeDomain);
         return ResponseEntity.ok(updatedDimension);
     }
 }

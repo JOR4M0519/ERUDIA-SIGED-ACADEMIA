@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.ActivityGroupServicePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.PersistenceActivityGroupPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
 import org.springframework.http.ResponseEntity;
@@ -12,32 +12,32 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/academy/activity-group")
 public class ActivityGroupController {
-    private final ActivityGroupServicePort port;
+    private final PersistenceActivityGroupPort persistenceActivityGroupPort;
 
-    public ActivityGroupController(ActivityGroupServicePort port) {
-        this.port = port;
+    public ActivityGroupController(PersistenceActivityGroupPort persistenceActivityGroupPort) {
+        this.persistenceActivityGroupPort = persistenceActivityGroupPort;
     }
     @GetMapping
     public ResponseEntity<List<ActivityGroupDomain>> getAllActivity_Group(){
-        List<ActivityGroupDomain> ActivityGroupDomainList = port.getAllActivity_Group();
+        List<ActivityGroupDomain> ActivityGroupDomainList = persistenceActivityGroupPort.findAll();
         return ResponseEntity.ok(ActivityGroupDomainList);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ActivityGroupDomain> getActivityGroupById(@PathVariable Integer id){
-        ActivityGroupDomain ActivityGroupDomain = port.getActivityGroupById(id);
+        ActivityGroupDomain ActivityGroupDomain = persistenceActivityGroupPort.findById(id);
         return ResponseEntity.ok(ActivityGroupDomain);
     }
 
     @PostMapping
     public ResponseEntity<ActivityGroupDomain> createActivityGroup(@RequestBody ActivityGroupDomain activityGroupDomain){
-        ActivityGroupDomain createdDimension = port.createActivityGroup(activityGroupDomain);
+        ActivityGroupDomain createdDimension = persistenceActivityGroupPort.save(activityGroupDomain);
         return ResponseEntity.ok(createdDimension);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<ActivityGroupDomain> updateActivityGroup(@PathVariable Integer id, @RequestBody ActivityGroupDomain ActivityGroupDomain){
-        ActivityGroupDomain updatedDimension = port.updateActivityGroup(id,ActivityGroupDomain);
+        ActivityGroupDomain updatedDimension = persistenceActivityGroupPort.update(id,ActivityGroupDomain);
         return ResponseEntity.ok(updatedDimension);
     }
 }

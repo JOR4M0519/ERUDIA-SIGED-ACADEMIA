@@ -1,6 +1,5 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.application.port.in.KnowledgeServicePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.PersistenceKnowledgePort;
