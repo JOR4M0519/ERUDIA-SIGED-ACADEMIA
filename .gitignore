@@ -89,7 +89,6 @@ erudia-backend/.gradle/
 .gradle/
 build/
 # gradle-app.setting
-.gradle/
 # gradle/ 
 # out/
 # !gradle/wrapper/gradle-wrapper.jar 
