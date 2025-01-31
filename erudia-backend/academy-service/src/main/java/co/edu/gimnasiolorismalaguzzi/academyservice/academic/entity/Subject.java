@@ -33,8 +33,8 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     private Set<Activity> activities = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "subject")
-    private Set<RecoveryPeriod> recoveryPeriods = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "subject")
+//    private Set<RecoveryPeriod> recoveryPeriods = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "subject")
     private Set<SubjectDimension> subjectDimensions = new LinkedHashSet<>();

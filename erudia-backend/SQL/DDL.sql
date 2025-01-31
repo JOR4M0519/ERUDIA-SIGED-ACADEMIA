@@ -127,7 +127,7 @@ CREATE TABLE subject_schedule (
                                   day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
                                   start_time TIME NOT NULL,         -- E.g., '09:00'
                                   end_time TIME NOT NULL,           -- E.g., '11:00'
-                                      status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
+                                  status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
 );
 
 -- Table: attendance
@@ -190,14 +190,20 @@ CREATE TABLE activity_grade (
                                 comment TEXT
 );
 
+CREATE TABLE subject_grade (
+                               id int not null primary key generated always as identity,
+                               subject_id INT NOT NULL REFERENCES subject(id),
+                               student_id INT NOT NULL REFERENCES users(id),
+                               period_id INT NOT NULL REFERENCES academic_period(id),
+                               total_score NUMERIC (5,2) NOT NULL,
+                               recovered VARCHAR(1)
+);
+
 -- Table: recovery_period
 CREATE TABLE recovery_period(
                                 id int not null primary key generated always as identity,
-                                student_id int not null references users(id),
-                                subject_id int not null references subject(id),
-                                previous_score NUMERIC(5, 2) NOT NULL,
-                                new_score NUMERIC(5, 2) NOT NULL,
-                                period int not null references academic_period(id)
+                                subject_grade INT NOT NULL REFERENCES subject_grade(id),
+                                previous_score NUMERIC(5, 2) NOT NULL
 );
 
 -- Table: institution
