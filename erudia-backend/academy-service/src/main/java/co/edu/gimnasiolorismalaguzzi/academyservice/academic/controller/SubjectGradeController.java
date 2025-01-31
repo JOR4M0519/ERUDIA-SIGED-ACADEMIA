@@ -19,11 +19,8 @@ import java.util.List;
 @RequestMapping("/api/academy/subject-grade")
 public class SubjectGradeController {
     private final PersistenceSubjectGradePort subjectGradePort;
-    private final ActivityGroupAdapter activityGroupAdapter;
-
-    public SubjectGradeController(PersistenceSubjectGradePort subjectGradePort, ActivityGroupAdapter activityGroupAdapter) {
+    public SubjectGradeController(PersistenceSubjectGradePort subjectGradePort) {
         this.subjectGradePort = subjectGradePort;
-        this.activityGroupAdapter = activityGroupAdapter;
     }
 
     @GetMapping

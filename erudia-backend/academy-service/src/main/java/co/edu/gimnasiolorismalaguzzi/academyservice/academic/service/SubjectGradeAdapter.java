@@ -24,7 +24,7 @@ public class SubjectGradeAdapter implements PersistenceSubjectGradePort{
 
     @Autowired
     SubjectGradeMapper subjectGradeMapper;
-    @Qualifier("loadBalancedRestTemplateInitializerDeprecated")
+
     @Autowired
     private SmartInitializingSingleton loadBalancedRestTemplateInitializerDeprecated;
 
