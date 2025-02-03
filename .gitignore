@@ -7,7 +7,7 @@
 
 # Gradle specific ignores
 .gradle/
-  build/
+build/
 # gradle-app.setting
 # gradle/ 
 # out/
@@ -157,6 +157,7 @@ erudia-backend/config-service/src/main/resources/configuration/academy-service.y
 
 
 
+
 ##REACT
 
 
@@ -236,3 +237,7 @@ out/
 *.bak
 *.backup
 *.sass-cache/
+<<<<<<< HEAD
+=======
+
+>>>>>>> e1222fd38020fb2aab496eabac0a6152a60e54ac

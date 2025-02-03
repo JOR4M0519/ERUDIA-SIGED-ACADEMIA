@@ -1,43 +1,43 @@
-import React, { useState } from "react";
-import googleOauth from "./resources/google-oauth.png";
+import  { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import googleOauthIcon from "./resources/google-oauth.png";
 import image1 from "../login/resources/bg-Image.png";
 import logo from "../login/resources/logo.png";
-import { Button } from "../components/custom/form/Button.jsx";
 import "./style.css";
+import { request, setAuthHeader } from "../service/config/axios_helper"
+
 
 const LoginPage = () => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("click")
+        console.log("Iniciando sesión...");
+    
         try {
-            const response = await fetch("http://localhost:8080/api/login", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ username, password }),
-                credentials: "include", // Permite el envío de cookies o credenciales
-            });
-
-            if (response.ok) {
-                const token = await response.text();
-                console.log("Token:", token);
-
-                // Guarda el token en localStorage
-                localStorage.setItem("token", token);
-
-                // Redirige al usuario a otra página si es necesario
-                //window.location.href = "/dashboard";
+            const response = await request("POST", "gtw", "/public/login", { username, password });
+    
+            if (response.status === 200) {
+                const token = response.data; // Axios maneja la conversión automática de JSON
+                
+                if (token) {
+                    setAuthHeader(token); // Guarda el token, roles y nombre en sessionStorage
+    
+                    console.log("Autenticación exitosa:", token);
+                    
+                    // Redirigir al Dashboard
+                    navigate("/dashboard");
+                }
             } else {
                 setErrorMessage("Credenciales inválidas. Por favor verifica e intenta nuevamente.");
             }
         } catch (error) {
-            console.error("Error during login:", error);
-            setErrorMessage("Ocurrió un error durante el inicio de sesión.");
+            console.error("Error durante el inicio de sesión:", error);
+            setErrorMessage("Ocurrió un error inesperado. Intenta nuevamente.");
         }
     };
 
@@ -96,7 +96,7 @@ const LoginPage = () => {
 
                 <button className="flex items-center mt-4 bg-white border-2 border-gray-300 rounded-lg p-2">
                     <img 
-                        src={googleOauth} 
+                        src={googleOauthIcon} 
                         alt="Google Oauth" 
                         className="w-6 h-6 mr-2" 
                         style={{

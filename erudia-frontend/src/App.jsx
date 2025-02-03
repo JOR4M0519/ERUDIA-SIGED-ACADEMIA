@@ -1,14 +1,22 @@
-import { Route, RouterProvider, createBrowserRouter, createRoutesFromElements } from "react-router-dom";
-import { LoginPage } from './login/LoginPage.jsx';
+import React from "react";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { LoginPage } from "./login/LoginPage";
+import { Dashboard }  from "./Dashboard/Dashboard" 
+import { Layout }  from "./components/Layout" 
 
 const App = () => {
-    const router = createBrowserRouter(createRoutesFromElements(
+  return (
+    <BrowserRouter>
+      <Routes>
         <Route path="/login" element={<LoginPage />} />
-    ));
-
-    return (
-        <RouterProvider router={router} />
-    );
-}
+        <Route path="/dashboard" element={  
+          <Layout>
+            <Dashboard />
+          </Layout>
+          } />
+      </Routes>
+    </BrowserRouter>
+  );
+};
 
 export default App;
