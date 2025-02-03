@@ -25,9 +25,6 @@ public class SubjectGradeAdapter implements PersistenceSubjectGradePort{
     @Autowired
     SubjectGradeMapper subjectGradeMapper;
 
-    @Autowired
-    private SmartInitializingSingleton loadBalancedRestTemplateInitializerDeprecated;
-
     public SubjectGradeAdapter(SubjectGradeCrudRepo subjectGradeCrudRepo) {
         this.subjectGradeCrudRepo = subjectGradeCrudRepo;
     }

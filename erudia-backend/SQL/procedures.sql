@@ -1,3 +1,5 @@
+--Ver para implementar reglas
+
 CREATE PROCEDURE recover_student(idStudent int, idSubject int, idPeriod int, newScore NUMERIC(5,2))
     LANGUAGE plpgsql
 AS $$

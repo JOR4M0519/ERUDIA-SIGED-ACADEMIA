@@ -152,6 +152,7 @@ CREATE TABLE knowledge (
                            id int primary key generated always as identity,
                            name varchar(10) default null,
                            achievement text,
+                           percentage int,
                            status varchar(1) DEFAULT 'A'
 );
 
@@ -242,3 +243,28 @@ CREATE TABLE student_tracking (
                                   follow_up TEXT NOT NULL, -- Follow-up
                                   status VARCHAR(1) NOT NULL
 );
+
+-------------------------------------------------------------------------------------------------------------------------
+------------------------------------------ [ ADMINISTRACIÓN ] -----------------------------------------------------------
+
+-- ( PARA SETEAR EL SISTEMA CORRECTAMENTE, HAY QUE SEGUIR LOS SIGUIENTES PASOS ADMINISTRATIVOS )
+
+-- 1. Creación de periodos: Nombre del periodo -> Decidir fecha inicio y fecha fin = Crear
+-- 2. Creación de nivel educativo: Nombre del nivel = Crear
+-- 3. Configuración del sistema de notas: Seleccionar periodo -> Seleccionar nivel educativo -> Seleccionar nota maxima, minima y pasable = Crear
+-- 4. Creación de dimensiones: Nombre de la dimensión y descripción = Crear
+-- 5. Creación de saberes: Nombre del saber -> Descripción -> Porcentaje = Crear
+-- 6. Creación de materias: Nombre de la materia -> Asignar Profesor -> Asignar dimension = Crear (Saberes se asocian automáticamente)
+-- 7. Creación de logro (descripción del saber) : Seleccionar materia -> Administrar -> Saberes -> Editar -> Rellenar logro = Crear
+-- 8. Creación de horarios: Seleccionar materia -> Seleccionar curso -> Seleccionar franja horaria = Crear
+-- 9. Creación de grupos (cursos de estudiantes | 1a, 1,b etc..): Crear curso -> Nombre del curso -> Asignar estudiantes (Opcional) = Crear
+
+-- (). Editar definitivas (Si se necesita) -> Entrar a materia -> Calificaciones -> En la columna de definitiva -> Editar = Crear
+
+-- (). Abrir periodo (Para profesores): -> Configuración -> Periodo -> Abrir periodo = Crear
+-------------------------------------------------------------------------------------------------------------------------
+------------------------------------------ [ ACTIVIDADES O TAREAS ] -----------------------------------------------------------
+
+-- 1. Creación de tareas: Entrar al apartado de tareas -> Crear tarea -> Rellenar datos -> Asignar Cursos = Crear
+-- 2. Toma de asistencia: Entrar a materia -> Estudiantes -> Asistencia -> Seleccionar clase -> Rellenar asistencia = Crear
+-- 3. Registro de notas (actividades): Entrar a materia -> Actividades -> Seleccionar actividad -> Rellenar notas = Crear

@@ -4,19 +4,20 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
-import org.mapstruct.InheritInverseConfiguration;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Mappings;
+import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {SubjectProfessorMapper.class}
+)
 public interface SubjectMapper {
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "subjectName", target = "subjectName"),
+            @Mapping(target = "professor", ignore = true),
             @Mapping(source = "status", target = "status")
     })
     SubjectDomain toDomain(Subject subject);
