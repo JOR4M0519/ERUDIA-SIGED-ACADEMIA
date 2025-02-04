@@ -11,7 +11,7 @@ import React from "react";
 
 // import { Layout }  from "./components/Layout" 
 import { Login } from './pages/login/Login';
-import { Dashboard } from './pages/Private/Dashboard/Dashboard';
+import { Dashboard } from './pages/private/Dashboard/Dashboard';
 import { Layout }  from "./components/Layout" 
 import Private from './pages/private/Private';
 
