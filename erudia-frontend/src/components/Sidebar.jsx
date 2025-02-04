@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom"
 import { Home, User, Settings, Menu } from "lucide-react"
+import Logout from "./Logout"
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   return (
@@ -11,6 +12,7 @@ export default function Sidebar({ isOpen, setIsOpen }) {
         {/* <button onClick={() => setIsOpen(!isOpen)} className="p-2 rounded-lg hover:bg-gray-100">
           <Menu className="h-5 w-5" />
         </button> */}
+        <Logout/>
       </div>
       <nav className="space-y-2">
         <NavItem to="/dashboard" icon={<Home className="h-5 w-5" />} label="Dashboard" />

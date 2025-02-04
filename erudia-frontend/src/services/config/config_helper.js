@@ -50,7 +50,7 @@ export const getAuthToken = () => {
  * Guarda los roles encriptados en sessionStorage.
  */
 export const storeEncryptedRoles = (roles) => {
-  const encryptedRoles = roles.map(role => encryptData(role));
+  const encryptedRoles = roles.map(role => role); //encryptData(role)
   setInfoBrowser("roles", JSON.stringify(encryptedRoles));
 };
 

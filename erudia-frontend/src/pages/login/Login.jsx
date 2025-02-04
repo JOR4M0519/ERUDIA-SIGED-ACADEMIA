@@ -1,20 +1,35 @@
-import  { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import  { useState } from "react"; // De pronto no sea necesaria
+
 import googleOauthIcon from "./resources/google-oauth.png";
-import image1 from "../login/resources/bg-Image.png";
-import logo from "../login/resources/logo.png";
+import image1 from "./resources/bg-Image.png";
+import logo from "./resources/logo.png";
 import "./style.css";
-import { request, setAuthHeader } from "../service/config/axios_helper"
 
+import { PrivateRoutes, PublicRoutes, Roles } from '../../models';
+import { createUser, resetUser, UserKey } from '../../redux/states/user';
+import { clearLocalStorage } from '../../utilities';
 
-const LoginPage = () => {
+import { decodeUserInfo, request, setAuthHeader } from "../../services/config/axios_helper"
+
+const Login = () => {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [errorMessage, setErrorMessage] = useState("");
 
-    const navigate = useNavigate();
+    useEffect(() => {
+        clearLocalStorage(UserKey);
+        dispatch(resetUser());
+        navigate(`/${PublicRoutes.LOGIN}`, { replace: true });
+      }, []);
 
-    const handleSubmit = async (e) => {
+    const login = async (e) => {
         e.preventDefault();
         console.log("Iniciando sesión...");
     
@@ -26,11 +41,11 @@ const LoginPage = () => {
                 
                 if (token) {
                     setAuthHeader(token); // Guarda el token, roles y nombre en sessionStorage
-    
-                    console.log("Autenticación exitosa:", token);
-                    
+
+                    dispatch(createUser({ ...decodeUserInfo(token)},token));
+                    navigate(`/${PrivateRoutes.PRIVATE}`, { replace: true });
                     // Redirigir al Dashboard
-                    navigate("/dashboard");
+                    //navigate("/dashboard");
                 }
             } else {
                 setErrorMessage("Credenciales inválidas. Por favor verifica e intenta nuevamente.");
@@ -45,7 +60,7 @@ const LoginPage = () => {
         <div className="frame flex w-full h-screen">
             {/* Left column for the login form */}
             <div className="flex flex-col bg-white justify-center items-center w-1/2 p-8">
-                <form className="flex flex-col items-center bg-white p-8 rounded-lg" onSubmit={handleSubmit}>
+                <form className="flex flex-col items-center bg-white p-8 rounded-lg" onSubmit={login}>
                     <img src={logo} alt="Logo" className="w-[200px] h-auto mb-6" />
                     
                     <div className="mb-4 w-full">
@@ -120,4 +135,4 @@ const LoginPage = () => {
     );
 };
 
-export { LoginPage };
+export { Login };

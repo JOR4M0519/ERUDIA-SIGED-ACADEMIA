@@ -1,28 +1,7 @@
 
-// const Dashboard = () => {
-//     //const [username, setUsername] = useState("");
-
-    
-
-//     console.log(storedRole)
-    
-//     return (
-//         <div>
-//             <h1>Dashboard</h1>
-//             <h2>Bienvenido {storedName}</h2>
-//             <h2>Roles: {
-//                 storedRole.map((role, index) => (
-//                 <strong key={index}>{role.replace("/", "")}</strong>
-//             ))}
-//             </h2>
-//         </div>
-//     );
-// };
-
-
-import ProfileSection from "../components/ProfileSection"
-import PersonalInfoSection from "../components/PersonalInfoSection"
-import ActionCards from "../components/ActionCards"
+import ProfileSection from "../../../components/ProfileSection"
+import PersonalInfoSection from "../../../components/PersonalInfoSection"
+import ActionCards from "../../../components/ActionCards"
 
 export function Dashboard() {
   

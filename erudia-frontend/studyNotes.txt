@@ -14,6 +14,8 @@ npm run dev
     npm install lucide-react
     npm install react-router-dom@latest
     npm install crypto-js
+    npm install react-redux @reduxjs/toolkit
+
 
     npm install tailwindcss @tailwindcss/vite
     

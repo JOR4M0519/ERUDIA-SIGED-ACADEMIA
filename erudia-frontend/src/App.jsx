@@ -1,22 +1,71 @@
-import React from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import { LoginPage } from "./login/LoginPage";
-import { Dashboard }  from "./Dashboard/Dashboard" 
-import { Layout }  from "./components/Layout" 
+import { lazy, Suspense } from 'react';
+import { Provider } from 'react-redux';
+import { BrowserRouter, Navigate, Route } from 'react-router-dom';
 
-const App = () => {
+import { AuthGuard, RoleGuard } from './guards';
+import { PrivateRoutes, PublicRoutes, Roles } from './models';
+import store from './redux/store';
+import { RoutesWithNotFound } from './utilities';
+
+import React from "react";
+
+// import { Layout }  from "./components/Layout" 
+import { Login } from './pages/login/Login';
+import { Dashboard } from './pages/Private/Dashboard/Dashboard';
+import { Layout }  from "./components/Layout" 
+import Private from './pages/private/Private';
+
+// const Login = lazy(() => import('./pages/login/Login'));
+// const Private = lazy(() => import('./pages/Private/Private'));
+
+
+function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={  
-          <Layout>
-            <Dashboard />
-          </Layout>
-          } />
-      </Routes>
-    </BrowserRouter>
+    <div className="App">
+      {/* Agregar spin de carga */}
+      <Suspense fallback={<div>Loading...</div>}>
+        <Provider store={store}>
+          <BrowserRouter>
+            {/* Componente redirige a un sitio cuando no existe la ruta */}
+            <RoutesWithNotFound>
+              <Route path="/" element={<Navigate to={PrivateRoutes.PRIVATE} />} />
+              
+              <Route path={PublicRoutes.LOGIN} element={<Login />} />
+
+              <Route element={<AuthGuard privateValidation={true} />}>
+                <Route path={`${PrivateRoutes.PRIVATE}/*`} element={<Private />} />
+              </Route>
+              
+              <Route element={<RoleGuard rol={Roles.ADMIN} />}>
+                <Route path={PrivateRoutes.DASHBOARD} element={<Layout><Dashboard /></Layout>} />
+              </Route>
+            </RoutesWithNotFound>
+          </BrowserRouter>
+        </Provider>
+      </Suspense>
+    </div>
   );
-};
+}
+
+
+
+// const App = () => {
+//   return (
+//     <BrowserRouter>
+//       <Routes>
+//         <Route path="/"           element={<LoginPage />} />
+//         <Route path="/login"      element={<LoginPage />} />
+//         <Route path="/dashboard"  element={  
+//           <Layout>
+//             <Dashboard />
+//           </Layout>
+//           } />
+
+//           {/* Cuano no exista la ruta */}
+//         <Route path="*"           element={<LoginPage />} /> 
+//       </Routes>
+//     </BrowserRouter>
+//   );
+// };
 
 export default App;

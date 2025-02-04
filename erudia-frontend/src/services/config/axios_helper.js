@@ -1,8 +1,8 @@
 import axios from "axios";
-import { storeEncryptedRoles, setInfoBrowser, setAuthToken, getAuthToken } from "./config_helper";
+import { storeEncryptedRoles, setInfoBrowser, setAuthToken, getAuthToken, encryptData } from "./config_helper";
 import config from "./config";
 import { jwtDecode } from "jwt-decode";
-
+import { Roles } from '../../models/roles';
 /**
  * Establece el token de autenticación en el almacenamiento y encripta los roles del usuario.
  *
@@ -19,6 +19,27 @@ export const setAuthHeader = (token) => {
   
   // Guardar el nombre del usuario en sessionStorage
   setInfoBrowser("name", decodedToken.name || "");
+};
+
+export const decodeUserInfo = (token) => {
+  const decodedToken = jwtDecode(token);
+  // Obtener los roles del token -> elimina el "/" y filtra solo los válidos
+  const userRoles = decodedToken.roles_group && Array.isArray(decodedToken.roles_group)
+  ? decodedToken.roles_group.map(role => role.replace("/", "").toLowerCase())
+  : [];
+
+  // Filtrar los roles válidos
+  const assignedRoles = userRoles.filter(role => Object.values(Roles).includes(role));
+
+  // Encriptar los roles antes de almacenarlos
+  const encryptedRoles = assignedRoles.map(role => encryptData(role));
+
+  return {
+      id: null,
+      name: decodedToken.name || "",
+      username: '',
+      email: decodedToken.email || "",
+      rol: encryptedRoles,};
 };
 
 // Configuración global de axios
