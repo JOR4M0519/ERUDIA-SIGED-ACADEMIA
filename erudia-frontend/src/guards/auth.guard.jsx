@@ -4,7 +4,7 @@ import { PrivateRoutes, PublicRoutes } from '../models';
 
 
 const PrivateValidationFragment = <Outlet />;
-const PublicValidationFragment = <Navigate replace to={PrivateRoutes.PRIVATE} />;
+const PublicValidationFragment = <Navigate replace to={PublicRoutes.LOGIN} />;
 
 export const AuthGuard = ({ privateValidation }) => {
   const userState = useSelector((store) => store.user);

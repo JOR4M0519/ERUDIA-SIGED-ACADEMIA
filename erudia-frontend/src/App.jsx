@@ -37,9 +37,9 @@ function App() {
                 <Route path={`${PrivateRoutes.DASHBOARD}/*`} element={<Dashboard />} />
               </Route>
                
-              {/* <Route element={<RoleGuard rol={Roles.ADMIN} />}> */}
+              <Route element={<RoleGuard rol={Roles.ADMIN} />}>
                 <Route path={PrivateRoutes.DASHBOARD} element={<Layout><Dashboard /></Layout>} />
-              {/* </Route> */}
+              </Route>
             </RoutesWithNotFound>
           </BrowserRouter>
         </Provider>

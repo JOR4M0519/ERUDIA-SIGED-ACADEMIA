@@ -1,6 +1,6 @@
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import { PrivateRoutes} from '../models';
+import { PrivateRoutes, PublicRoutes} from '../models';
 import { decodeRoles } from '../utilities';
 
 
@@ -11,7 +11,7 @@ export function RoleGuard({ rol }) {
   return userRoles.includes(rol) ? ( // 🔥 Aquí se arregla la comparación
     <Outlet />
   ) : (
-    <Navigate replace to={PrivateRoutes.PRIVATE} />
+    <Navigate replace to={PublicRoutes.LOGIN} />
   );
   //  return userRole === rol ? (
   //   <Outlet />
