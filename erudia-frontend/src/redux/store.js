@@ -4,7 +4,8 @@ import userSliceReducer from './states/user';
 export default configureStore({
     reducer: {
       user: userSliceReducer
-    }
+    },
+    devTools: true // Habilita Redux DevTools para depuración
 });
 
 

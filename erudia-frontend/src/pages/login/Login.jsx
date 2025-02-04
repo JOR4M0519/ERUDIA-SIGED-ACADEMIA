@@ -9,11 +9,11 @@ import image1 from "./resources/bg-Image.png";
 import logo from "./resources/logo.png";
 import "./style.css";
 
-import { PrivateRoutes, PublicRoutes, Roles } from '../../models';
+import { PrivateRoutes, PublicRoutes} from '../../models/index';
 import { createUser, resetUser, UserKey } from '../../redux/states/user';
-import { clearLocalStorage } from '../../utilities';
+import { clearStorage } from '../../utilities';
 
-import { decodeUserInfo, request, setAuthHeader } from "../../services/config/axios_helper"
+import { encodeUserInfo, request } from "../../services/config/axios_helper"
 
 const Login = () => {
     const dispatch = useDispatch();
@@ -21,10 +21,10 @@ const Login = () => {
 
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState(""); // Aplicar modal de error.
 
     useEffect(() => {
-        clearLocalStorage(UserKey);
+        clearStorage(UserKey);
         dispatch(resetUser());
         navigate(`/${PublicRoutes.LOGIN}`, { replace: true });
       }, []);
@@ -40,12 +40,10 @@ const Login = () => {
                 const token = response.data; // Axios maneja la conversión automática de JSON
                 
                 if (token) {
-                    setAuthHeader(token); // Guarda el token, roles y nombre en sessionStorage
+                    //setAuthHeader(token); // Guarda el token, roles y nombre en sessionStorage
 
-                    dispatch(createUser({ ...decodeUserInfo(token)},token));
-                    navigate(`/${PrivateRoutes.PRIVATE}`, { replace: true });
-                    // Redirigir al Dashboard
-                    //navigate("/dashboard");
+                    dispatch(createUser({ ...encodeUserInfo(token)}));
+                    navigate(`/${PrivateRoutes.DASHBOARD}`, { replace: true });
                 }
             } else {
                 setErrorMessage("Credenciales inválidas. Por favor verifica e intenta nuevamente.");

@@ -1,28 +1,20 @@
 import axios from "axios";
-import { storeEncryptedRoles, setInfoBrowser, setAuthToken, getAuthToken, encryptData } from "./config_helper";
-import config from "./config";
 import { jwtDecode } from "jwt-decode";
-import { Roles } from '../../models/roles';
+import {Roles} from '../../models/index';
+import {encryptData, Config, getStorage} from "../../utilities/index";
+import {UserKey} from "../../redux/states/user";
+
+
 /**
- * Establece el token de autenticación en el almacenamiento y encripta los roles del usuario.
+ * Establece de acuerdo con el token de autenticación la decodificación
+ * de los datos del usuarioy encripta los roles del usuario.
  *
  * @param {string} token - Token JWT obtenido después del login.
  */
-export const setAuthHeader = (token) => {
-  const decodedToken = jwtDecode(token);
-  
-  // Encripta y almacena el token
-  setAuthToken(token);
-  
-  // Encriptar y almacenar roles en sessionStorage
-  storeEncryptedRoles(decodedToken.roles_group || []);
-  
-  // Guardar el nombre del usuario en sessionStorage
-  setInfoBrowser("name", decodedToken.name || "");
-};
 
-export const decodeUserInfo = (token) => {
+export const encodeUserInfo = (token) => {
   const decodedToken = jwtDecode(token);
+
   // Obtener los roles del token -> elimina el "/" y filtra solo los válidos
   const userRoles = decodedToken.roles_group && Array.isArray(decodedToken.roles_group)
   ? decodedToken.roles_group.map(role => role.replace("/", "").toLowerCase())
@@ -34,16 +26,19 @@ export const decodeUserInfo = (token) => {
   // Encriptar los roles antes de almacenarlos
   const encryptedRoles = assignedRoles.map(role => encryptData(role));
 
+  // Retornar el usuario con datos 
   return {
-      id: null,
-      name: decodedToken.name || "",
-      username: '',
-      email: decodedToken.email || "",
-      rol: encryptedRoles,};
+    id: null,
+    token: token,
+    name: decodedToken.name || "",
+    username: decodedToken.username || "",
+    email: decodedToken.email || "",
+    roles: encryptedRoles,
+  };
 };
 
 // Configuración global de axios
-axios.defaults.baseURL = config.apiBaseUrl;
+axios.defaults.baseURL = Config.apiBaseUrl;
 axios.defaults.headers.post["Content-Type"] = "application/json";
 
 /**
@@ -60,19 +55,21 @@ export const request = (method, serviceType = "academy", url, data = {}) => {
   let headers = {};
 
   // Obtener el token de autenticación desde sessionStorage
-  const token = getAuthToken();
+  const token = getStorage(UserKey);
 
   // Si hay un token válido, lo añade a los headers
-  if (token && token !== "null") {
-    headers = { Authorization: `Bearer ${token}` };
+  if (token) {
+    headers.Authorization = `Bearer ${decryptedToken}`;
   }
 
   // if (data && data.token != null) {
   //   headers.token = data.token;
   // }
 
-  // Si la solicitud es de login, habilita el envío de credenciales
-  if (url.includes("login")) {
+  // Lista de endpoints que requieren credenciales
+  const endpointsWithCredentials = ["/public/login", "/user/session"];
+
+  if (endpointsWithCredentials.some(endpoint => url.includes(endpoint))) {
     withCredentials = true;
   }
 

@@ -28,17 +28,18 @@ function App() {
           <BrowserRouter>
             {/* Componente redirige a un sitio cuando no existe la ruta */}
             <RoutesWithNotFound>
-              <Route path="/" element={<Navigate to={PrivateRoutes.PRIVATE} />} />
+              {/* Redirige a una ruta cuando ingresa a la raiz y esta autenticado */}
+              <Route path="/" element={<Navigate to={PrivateRoutes.DASHBOARD} />} />
               
               <Route path={PublicRoutes.LOGIN} element={<Login />} />
 
               <Route element={<AuthGuard privateValidation={true} />}>
-                <Route path={`${PrivateRoutes.PRIVATE}/*`} element={<Private />} />
+                <Route path={`${PrivateRoutes.DASHBOARD}/*`} element={<Dashboard />} />
               </Route>
-              
-              <Route element={<RoleGuard rol={Roles.ADMIN} />}>
+               
+              {/* <Route element={<RoleGuard rol={Roles.ADMIN} />}> */}
                 <Route path={PrivateRoutes.DASHBOARD} element={<Layout><Dashboard /></Layout>} />
-              </Route>
+              {/* </Route> */}
             </RoutesWithNotFound>
           </BrowserRouter>
         </Provider>

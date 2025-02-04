@@ -1,16 +1,20 @@
 
+import { useSelector } from "react-redux";
+
 import ProfileSection from "../../../components/ProfileSection"
 import PersonalInfoSection from "../../../components/PersonalInfoSection"
 import ActionCards from "../../../components/ActionCards"
+import { decodeRoles } from "../../../utilities";
+
 
 export function Dashboard() {
   
-    const storedName = sessionStorage.getItem("name") || "Usuario";
+    const userState = useSelector(store => store.user);
     // Parsear el string a un array
-    const storedRole = JSON.parse(sessionStorage.getItem("roles")) || []; 
+    const storedRole = decodeRoles(userState.roles) || []; 
     
     const userData = {
-        name: storedName,
+        name: userState.name,
         period: "2023-1",
         studentId: "123456",
         role: storedRole
@@ -22,7 +26,7 @@ export function Dashboard() {
             <div className="flex justify-between items-center">
             <div>
                 <h1 className="text-2xl font-semibold">Bienvenida {userData.name}</h1>
-                <p className="text-gray-600">{userData.storedRole} Periodo {userData.period}</p>
+                <p className="text-gray-600">Role: {userData.role} Periodo {userData.period}</p>
             </div>
             <div className="text-sm text-gray-600">
                 <p>Periodo {userData.period}</p>
