@@ -8,10 +8,10 @@ export function RoleGuard({ rol }) {
   const userState = useSelector(store => store.user);
   const userRoles = decodeRoles(userState.roles) || [];
 
-  return userRoles.includes(rol) ? ( // 🔥 Aquí se arregla la comparación
+  return userRoles.includes(rol) ? (
     <Outlet />
   ) : (
-    <Navigate replace to={PublicRoutes.LOGIN} />
+    <Navigate replace to={PrivateRoutes.DASHBOARD} />
   );
   //  return userRole === rol ? (
   //   <Outlet />

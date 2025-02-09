@@ -43,7 +43,7 @@ const Login = () => {
                     //setAuthHeader(token); // Guarda el token, roles y nombre en sessionStorage
 
                     dispatch(createUser({ ...encodeUserInfo(token)}));
-                    navigate(`/${PrivateRoutes.DASHBOARD}`, { replace: true });
+                    navigate(`${PrivateRoutes.DASHBOARD}`);
                 }
             } else {
                 setErrorMessage("Credenciales inválidas. Por favor verifica e intenta nuevamente.");
