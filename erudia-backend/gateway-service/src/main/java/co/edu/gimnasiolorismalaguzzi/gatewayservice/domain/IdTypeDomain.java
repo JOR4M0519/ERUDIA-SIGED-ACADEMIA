@@ -1,4 +1,4 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
+package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
 import lombok.Data;
 

@@ -14,13 +14,9 @@ import {
 } from "lucide-react";
 import Logout from "./Logout";
 import { PrivateRoutes, SideBarRoles } from "../models";
-import { decodeRoles } from "../utilities";
+import { decodeRoles,hasAccess } from "../utilities";
 import { searchService } from "../windows/Search/searchService";
 
-
-const hasAccess = (userRoles, allowedRoles) => {
-  return userRoles.some(role => allowedRoles.includes(role));
-};
 
 export default function Sidebar({ isOpen, setIsOpen }) {
   const userState = useSelector(store => store.user);

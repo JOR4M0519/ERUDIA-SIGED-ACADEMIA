@@ -12,6 +12,9 @@ import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 @EnableMethodSecurity
 @Configuration
@@ -34,6 +37,7 @@ public class SecurityConfig {
                     //Rutas Aseguradas
                     authorize.anyRequest().authenticated();
                 })
+                .cors(cors -> cors.disable())
                 .addFilterBefore(securityContextFilter, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter.class)
                 //Funcionamiento por medio de OAuth2
                 /*.oauth2ResourceServer(oauth2 ->
@@ -62,6 +66,7 @@ public class SecurityConfig {
                         .permitAll());*/
         return http.build();
     }
+
 
     @Bean
     public SessionRegistry sessionRegistry(){

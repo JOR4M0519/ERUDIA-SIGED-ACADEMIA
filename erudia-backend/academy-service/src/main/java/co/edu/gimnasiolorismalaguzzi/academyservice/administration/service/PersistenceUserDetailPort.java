@@ -6,4 +6,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 
 public interface PersistenceUserDetailPort extends PersistencePort<UserDetailDomain, String> {
     UserDetailDomain saveDetailUser(String uuid,UserDetailDomain user);
+
+    UserDetailDomain findByUsername(String username);
 }

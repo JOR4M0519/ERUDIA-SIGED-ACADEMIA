@@ -1,8 +1,9 @@
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import {Roles} from '../../models/index';
-import {encryptData, Config, getStorage} from "../../utilities/index";
-import {UserKey} from "../../redux/states/user";
+import { Roles } from '../../models/index';
+import { encryptData, Config, getStorage } from "../../utilities/index";
+import { UserKey } from "../../redux/states/user";
+import { toast } from "react-toastify"; // Para mostrar notificaciones
 
 
 /**
@@ -12,13 +13,13 @@ import {UserKey} from "../../redux/states/user";
  * @param {string} token - Token JWT obtenido después del login.
  */
 
-export const encodeUserInfo = (token) => {
+export const encodeUserInfo = (id,token) => {
   const decodedToken = jwtDecode(token);
 
   // Obtener los roles del token -> elimina el "/" y filtra solo los válidos
   const userRoles = decodedToken.roles_group && Array.isArray(decodedToken.roles_group)
-  ? decodedToken.roles_group.map(role => role.replace("/", "").toLowerCase())
-  : [];
+    ? decodedToken.roles_group.map(role => role.replace("/", "").toLowerCase())
+    : [];
 
   // Filtrar los roles válidos
   const assignedRoles = userRoles.filter(role => Object.values(Roles).includes(role));
@@ -28,7 +29,7 @@ export const encodeUserInfo = (token) => {
 
   // Retornar el usuario con datos 
   return {
-    id: null,
+    id: id,
     token: token,
     name: decodedToken.name || "",
     username: decodedToken.username || "",
@@ -40,6 +41,32 @@ export const encodeUserInfo = (token) => {
 // Configuración global de axios
 axios.defaults.baseURL = Config.apiBaseUrl;
 axios.defaults.headers.post["Content-Type"] = "application/json";
+
+/**
+ * Interceptor de respuestas para manejar expiración del token
+ */
+axios.interceptors.response.use(
+  (response) => response, // Si la respuesta es exitosa, se deja pasar
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      console.warn("⚠️ Token expirado o sesión no válida");
+
+      // Mostrar alerta al usuario
+      toast.error("⚠️ Sesión expirada. Por favor, inicia sesión nuevamente.");
+
+      // Eliminar token y limpiar sessionStorage
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+
+      // Redirigir al usuario al login
+      setTimeout(() => {
+        window.location.href = "/login"; // 🔥 Redirección forzada
+      }, 2000);
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 /**
  * Realiza una petición HTTP al backend utilizando Axios.
@@ -55,11 +82,20 @@ export const request = (method, serviceType = "academy", url, data = {}) => {
   let headers = {};
 
   // Obtener el token de autenticación desde sessionStorage
-  const token = getStorage(UserKey);
+  //const token = getStorage(UserKey);
+  let token = null;
+  if (!url.includes("/public/login")) {
+    try {
+      token = JSON.parse(localStorage.getItem("user")).token;
+    } catch (e) {
+      console.log("No existe token ", e);
+    }
+  }
+
 
   // Si hay un token válido, lo añade a los headers
   if (token) {
-    headers.Authorization = `Bearer ${decryptedToken}`;
+    headers.Authorization = `Bearer ${token}`;
   }
 
   // if (data && data.token != null) {

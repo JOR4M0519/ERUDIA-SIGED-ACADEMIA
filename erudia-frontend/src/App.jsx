@@ -70,6 +70,9 @@ function App() {
                 <Route path={PrivateRoutes.SETTINGS} element={<Layout><Settings /></Layout>} />
               </Route>
 
+              <Route path={`${PrivateRoutes.PROFILE}/*`} element={<Layout><Settings /></Layout>} />
+              
+
 
             </RoutesWithNotFound>
           </BrowserRouter>

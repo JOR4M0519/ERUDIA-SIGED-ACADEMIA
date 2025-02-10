@@ -2,10 +2,22 @@ package co.edu.gimnasiolorismalaguzzi.gatewayservice.controller;
 
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.Login;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.KeycloakService;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.UserService;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.springframework.http.ResponseCookie;
+import org.springframework.web.server.ServerWebExchange;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/gtw/public")
@@ -14,12 +26,61 @@ public class PublicController {
     @Autowired
     private KeycloakService keycloakService;
 
-    @PostMapping("/login")
+    @Autowired
+    private UserService userService;
+
+    /*@PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Login userDomain) {
         String token = keycloakService.getToken(userDomain.getUsername(), userDomain.getPassword());
+        UserDetailDomain userDetail = userService.getDetailUser(userDomain.getUsername());
         return ResponseEntity.ok(token);
+    }*/
+
+    @PostMapping("/login")
+    public Mono<ResponseEntity<Map<String, Object>>> login(@RequestBody Login request) {
+        return keycloakService.getToken(request.getUsername(), request.getPassword())  // 🔥 Llamada reactiva para el token
+                .flatMap(token -> userService.getDetailUser(request.getUsername())  // 🔥 Llamada reactiva para los detalles del usuario
+                        .map(userDetail -> {
+                            Map<String, Object> response = new HashMap<>();
+                            response.put("token", token);
+                            response.put("user", userDetail);
+                            return ResponseEntity.ok(response);
+                        })
+                );
     }
 
+
+
+/*    @GetMapping("/groups/{username}")
+    public ResponseEntity<?> getGroupByUser(@PathVariable String username) {
+        List<String> groups = keycloakService.getGroupByUser(username);
+        return ResponseEntity.ok(groups);
+    }*/
+
+    /*@PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Login loginRequest, ServerWebExchange exchange) {
+        // Aquí validas el usuario y generas el token (esto depende de tu lógica)
+        String token = generateJwtToken(loginRequest.getUsername(),loginRequest.getPassword());
+
+        // Crear cookie con el token JWT
+        ResponseCookie cookie = ResponseCookie.from("jwt", token)
+                .httpOnly(true) // Evita acceso desde JavaScript (protección contra XSS)
+                .secure(false)  // En producción usa true si estás en HTTPS
+                .sameSite("Strict") // Protección contra CSRF
+                .path("/") // Disponible en toda la aplicación
+                .build();
+
+        // Agregar la cookie en la respuesta
+        exchange.getResponse().addCookie(cookie);
+
+        return Mono.just(ResponseEntity.ok().build()).block(); // Retornar respuesta 200 OK
+    }
+
+
+    private String generateJwtToken(String username, String password) {
+        // Genera el token JWT (debes implementar esto según tu configuración actual)
+        return keycloakService.getToken(username, password);
+    }*/
 
 
     /*

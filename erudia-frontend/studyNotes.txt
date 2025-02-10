@@ -16,7 +16,7 @@ npm run dev
     npm install crypto-js
     npm install react-redux @reduxjs/toolkit
     npm install rxjs
-
+    react-toastify
 
 
     npm install tailwindcss @tailwindcss/vite

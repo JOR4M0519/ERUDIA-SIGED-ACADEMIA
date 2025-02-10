@@ -63,6 +63,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         return userDetailMapper.toDomain(savedUserDetail);
     }
 
+
     @Override
     public UserDetailDomain update(String uuid, UserDetailDomain userDetailDomain) {
         try{
@@ -104,4 +105,11 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         }*/
         return HttpStatus.OK;
     }
+
+    @Override
+    public UserDetailDomain findByUsername(String username) {
+        Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Username(username));
+        return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
+    }
+
 }

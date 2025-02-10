@@ -1,4 +1,4 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
+package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
 import lombok.Data;
 
@@ -15,7 +15,6 @@ public class UserDetailDomain implements Serializable {
     private String secondLastName;
     private String address;
     private String phoneNumber;
-    private LocalDate dateOfBirth;
     private String dni;
     private IdTypeDomain idType;
     private String neighborhood;

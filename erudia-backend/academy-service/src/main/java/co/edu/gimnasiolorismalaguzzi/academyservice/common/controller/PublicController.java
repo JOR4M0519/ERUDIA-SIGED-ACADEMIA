@@ -1,5 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.common.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserDetailPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/academy/public")
 public class PublicController {
 
+    private final PersistenceUserDetailPort persistenceUserDetailPort;
     /*@Autowired
     private UserServicePort userServicePort;
 
@@ -17,6 +20,16 @@ public class PublicController {
         return ResponseEntity.ok(token);
     }
 */
+    public PublicController(PersistenceUserDetailPort persistenceUserDetailPort) {
+        this.persistenceUserDetailPort = persistenceUserDetailPort;
+    }
+
+    @GetMapping("/users/{username}")
+    public ResponseEntity<UserDetailDomain> getUserByUsername(@PathVariable String username) {
+        UserDetailDomain user = persistenceUserDetailPort.findByUsername(username);
+        return ResponseEntity.ok(user);
+    }
+
     @PreAuthorize("hasRole('admin_client_role')")
     @GetMapping("/roless")
     public ResponseEntity<String> getExample(@RequestHeader("X-Roles") String roles,

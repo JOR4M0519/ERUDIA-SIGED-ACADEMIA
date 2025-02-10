@@ -2,10 +2,11 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
 
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
-public class InstitutionDomain {
+public class InstitutionDomain implements Serializable {
     private Integer id;
     private String name;
     private String nit;
