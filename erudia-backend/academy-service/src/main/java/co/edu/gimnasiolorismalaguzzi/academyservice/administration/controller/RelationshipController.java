@@ -1,7 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.RelationshipDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceRelationshipPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceRelationshipPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

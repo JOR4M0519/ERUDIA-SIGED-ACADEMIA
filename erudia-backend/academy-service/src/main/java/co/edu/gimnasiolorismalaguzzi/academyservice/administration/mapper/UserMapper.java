@@ -19,7 +19,7 @@ public interface UserMapper {
             @Mapping(source = "lastName", target = "lastName"),
             @Mapping(source = "uuid", target = "uuid"),
             //@Mapping(source = "createdAt", target = "createdAt"),
-           // @Mapping(source = "lastLogin", target = "lastLogin"),
+            // @Mapping(source = "lastLogin", target = "lastLogin"),
             //@Mapping(source = "attemptedFailedLogin", target = "attemptedFailedLogin"),
             @Mapping(source = "status", target = "status")
     })

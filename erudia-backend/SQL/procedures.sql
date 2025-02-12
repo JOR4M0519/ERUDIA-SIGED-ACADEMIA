@@ -19,4 +19,13 @@ BEGIN
     update subject_grade sg set recovered = 'R', total_score = newScore where sg.subject_id = idSubject and student_id = idStudent and sg.period_id = idPeriod returning id into subjectGradeId;
     insert into recovery_period (subject_grade, previous_score) values (subjectGradeId, previousScore);
 end;
+$$;
+
+CREATE PROCEDURE insert_family(idStudent int, idUser int, relationship int)
+LANGUAGE plpgsql
+AS $$
+    BEGIN
+        insert into family (student_id, user_id, relationship_id) values (idStudent, idUser, relationship);
+    end;
 $$
+

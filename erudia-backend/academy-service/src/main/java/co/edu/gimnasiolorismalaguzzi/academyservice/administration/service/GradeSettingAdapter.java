@@ -4,6 +4,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeS
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.GradeSetting;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.GradeSettingMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.GradeSettingsCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceGradeSettingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
-public class GradeSettingAdapter implements PersistenceGradeSettingPort{
+public class GradeSettingAdapter implements PersistenceGradeSettingPort {
 
     private final GradeSettingsCrudRepo crudRepo;
 

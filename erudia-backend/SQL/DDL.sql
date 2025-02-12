@@ -13,6 +13,7 @@ CREATE TABLE users (
                        created_at TIMESTAMPTZ DEFAULT now(),
                        last_login TIMESTAMPTZ,
                        attempted_failed_login INT,
+                       uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
 
@@ -73,21 +74,43 @@ CREATE TABLE audit_log (
                            ip VARCHAR(20) NOT NULL
 );
 
--- Table: academic_period
-CREATE TABLE academic_period (
-                                 id int primary key generated always as identity,
-                                 start_date DATE NOT NULL,
-                                 end_date DATE NOT NULL,
-                                 name VARCHAR(8) NOT NULL UNIQUE,
-                                 status varchar(1) NOT NULL
+CREATE TABLE relationship(
+                             id int not null primary key generated always as identity,
+                             relationship_type varchar(10)
 );
 
+CREATE TABLE family(
+                       id int not null primary key generated always as identity,
+                       student_id int not null references users(id),
+                       user_id int not null references users(id),
+                       relationship_id int not null references relationship(id)
+);
 -- Table: educational_level
 CREATE TABLE educational_level (
                                    id int primary key generated always as identity,
                                    level_name VARCHAR(30) NOT NULL,
                                    status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
+
+
+CREATE TABLE grade_settings(
+                               id int not null primary key generated always as identity,
+                               level_id int not null references educational_level (id),
+                               minimum_grade int,
+                               pass_grade int,
+                               maximum_grade int
+);
+
+-- Table: academic_period
+CREATE TABLE academic_period (
+                                 id int primary key generated always as identity,
+                                 setting_id int not null references grade_settings(id),
+                                 start_date DATE NOT NULL,
+                                 end_date DATE NOT NULL,
+                                 name VARCHAR(8) NOT NULL UNIQUE,
+                                 status varchar(1) NOT NULL
+);
+
 
 -- Table: group_students
 CREATE TABLE group_students (
@@ -243,6 +266,7 @@ CREATE TABLE student_tracking (
                                   follow_up TEXT NOT NULL, -- Follow-up
                                   status VARCHAR(1) NOT NULL
 );
+
 
 -------------------------------------------------------------------------------------------------------------------------
 ------------------------------------------ [ ADMINISTRACIÓN ] -----------------------------------------------------------

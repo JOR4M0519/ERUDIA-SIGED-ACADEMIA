@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceIdTypePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.IdTypeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.IdType;

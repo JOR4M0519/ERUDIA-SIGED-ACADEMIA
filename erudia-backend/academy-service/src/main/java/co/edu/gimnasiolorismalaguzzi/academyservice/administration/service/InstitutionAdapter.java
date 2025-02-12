@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceInstitutionPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.InstitutionDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Institution;

@@ -1,9 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeSettingDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceGradeSettingPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceGradeSettingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
-import jakarta.ws.rs.core.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

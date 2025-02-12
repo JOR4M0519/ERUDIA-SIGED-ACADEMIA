@@ -27,6 +27,6 @@ public class Family {
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "relationship_id", nullable = false)
-    private co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relationship relationship;
+    private Relationship relationship;
 
 }

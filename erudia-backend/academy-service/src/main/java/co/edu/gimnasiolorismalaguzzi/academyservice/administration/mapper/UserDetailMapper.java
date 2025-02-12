@@ -7,7 +7,10 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(
+        componentModel = "spring",
+        uses = {FamilyMapper.class}
+)
 public interface UserDetailMapper {
 
 /*    @Mapping(source = "user", target = "user")
@@ -31,7 +34,8 @@ public interface UserDetailMapper {
             @Mapping(source = "idType", target = "idType"),
             @Mapping(source = "neighborhood", target = "neighborhood"),
             @Mapping(source = "city", target = "city"),
-            @Mapping(source = "positionJob", target = "positionJob")
+            @Mapping(source = "positionJob", target = "positionJob"),
+            @Mapping(target = "relatives", ignore = true)
     })
     UserDetailDomain toDomain(UserDetail userDetail);
 

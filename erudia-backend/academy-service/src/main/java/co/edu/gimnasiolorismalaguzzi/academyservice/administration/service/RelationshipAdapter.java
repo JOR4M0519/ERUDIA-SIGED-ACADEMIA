@@ -4,6 +4,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.Relati
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relationship;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.RelationshipMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.RelationshipCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceRelationshipPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +16,7 @@ import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
-public class RelationshipAdapter implements PersistenceRelationshipPort{
+public class RelationshipAdapter implements PersistenceRelationshipPort {
 
     @Autowired
     private final RelationshipCrudRepo relationshipCrudRepo;
