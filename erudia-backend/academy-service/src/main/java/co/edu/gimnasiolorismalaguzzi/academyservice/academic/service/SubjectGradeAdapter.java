@@ -4,12 +4,11 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGrade
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGrade;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectGradeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGradeCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGradePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 
 import java.math.BigDecimal;
@@ -18,7 +17,7 @@ import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
-public class SubjectGradeAdapter implements PersistenceSubjectGradePort{
+public class SubjectGradeAdapter implements PersistenceSubjectGradePort {
 
     private final SubjectGradeCrudRepo subjectGradeCrudRepo;
 
