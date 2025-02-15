@@ -13,6 +13,7 @@ CREATE TABLE users (
                        created_at TIMESTAMPTZ DEFAULT now(),
                        last_login TIMESTAMPTZ,
                        attempted_failed_login INT,
+                       uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
 
@@ -73,21 +74,43 @@ CREATE TABLE audit_log (
                            ip VARCHAR(20) NOT NULL
 );
 
--- Table: academic_period
-CREATE TABLE academic_period (
-                                 id int primary key generated always as identity,
-                                 start_date DATE NOT NULL,
-                                 end_date DATE NOT NULL,
-                                 name VARCHAR(8) NOT NULL UNIQUE,
-                                 status varchar(1) NOT NULL
+CREATE TABLE relationship(
+                             id int not null primary key generated always as identity,
+                             relationship_type varchar(10)
 );
 
+CREATE TABLE family(
+                       id int not null primary key generated always as identity,
+                       student_id int not null references users(id),
+                       user_id int not null references users(id),
+                       relationship_id int not null references relationship(id)
+);
 -- Table: educational_level
 CREATE TABLE educational_level (
                                    id int primary key generated always as identity,
                                    level_name VARCHAR(30) NOT NULL,
                                    status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
+
+
+CREATE TABLE grade_settings(
+                               id int not null primary key generated always as identity,
+                               level_id int not null references educational_level (id),
+                               minimum_grade int,
+                               pass_grade int,
+                               maximum_grade int
+);
+
+-- Table: academic_period
+CREATE TABLE academic_period (
+                                 id int primary key generated always as identity,
+                                 setting_id int not null references grade_settings(id),
+                                 start_date DATE NOT NULL,
+                                 end_date DATE NOT NULL,
+                                 name VARCHAR(8) NOT NULL UNIQUE,
+                                 status varchar(1) NOT NULL
+);
+
 
 -- Table: group_students
 CREATE TABLE group_students (
@@ -127,7 +150,7 @@ CREATE TABLE subject_schedule (
                                   day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
                                   start_time TIME NOT NULL,         -- E.g., '09:00'
                                   end_time TIME NOT NULL,           -- E.g., '11:00'
-                                      status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
+                                  status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
 );
 
 -- Table: attendance
@@ -152,6 +175,7 @@ CREATE TABLE knowledge (
                            id int primary key generated always as identity,
                            name varchar(10) default null,
                            achievement text,
+                           percentage int,
                            status varchar(1) DEFAULT 'A'
 );
 
@@ -190,14 +214,20 @@ CREATE TABLE activity_grade (
                                 comment TEXT
 );
 
+CREATE TABLE subject_grade (
+                               id int not null primary key generated always as identity,
+                               subject_id INT NOT NULL REFERENCES subject(id),
+                               student_id INT NOT NULL REFERENCES users(id),
+                               period_id INT NOT NULL REFERENCES academic_period(id),
+                               total_score NUMERIC (5,2) NOT NULL,
+                               recovered VARCHAR(1)
+);
+
 -- Table: recovery_period
 CREATE TABLE recovery_period(
                                 id int not null primary key generated always as identity,
-                                student_id int not null references users(id),
-                                subject_id int not null references subject(id),
-                                previous_score NUMERIC(5, 2) NOT NULL,
-                                new_score NUMERIC(5, 2) NOT NULL,
-                                period int not null references academic_period(id)
+                                subject_grade INT NOT NULL REFERENCES subject_grade(id),
+                                previous_score NUMERIC(5, 2) NOT NULL
 );
 
 -- Table: institution
@@ -236,3 +266,29 @@ CREATE TABLE student_tracking (
                                   follow_up TEXT NOT NULL, -- Follow-up
                                   status VARCHAR(1) NOT NULL
 );
+
+
+-------------------------------------------------------------------------------------------------------------------------
+------------------------------------------ [ ADMINISTRACIÓN ] -----------------------------------------------------------
+
+-- ( PARA SETEAR EL SISTEMA CORRECTAMENTE, HAY QUE SEGUIR LOS SIGUIENTES PASOS ADMINISTRATIVOS )
+
+-- 1. Creación de periodos: Nombre del periodo -> Decidir fecha inicio y fecha fin = Crear
+-- 2. Creación de nivel educativo: Nombre del nivel = Crear
+-- 3. Configuración del sistema de notas: Seleccionar periodo -> Seleccionar nivel educativo -> Seleccionar nota maxima, minima y pasable = Crear
+-- 4. Creación de dimensiones: Nombre de la dimensión y descripción = Crear
+-- 5. Creación de saberes: Nombre del saber -> Descripción -> Porcentaje = Crear
+-- 6. Creación de materias: Nombre de la materia -> Asignar Profesor -> Asignar dimension = Crear (Saberes se asocian automáticamente)
+-- 7. Creación de logro (descripción del saber) : Seleccionar materia -> Administrar -> Saberes -> Editar -> Rellenar logro = Crear
+-- 8. Creación de horarios: Seleccionar materia -> Seleccionar curso -> Seleccionar franja horaria = Crear
+-- 9. Creación de grupos (cursos de estudiantes | 1a, 1,b etc..): Crear curso -> Nombre del curso -> Asignar estudiantes (Opcional) = Crear
+
+-- (). Editar definitivas (Si se necesita) -> Entrar a materia -> Calificaciones -> En la columna de definitiva -> Editar = Crear
+
+-- (). Abrir periodo (Para profesores): -> Configuración -> Periodo -> Abrir periodo = Crear
+-------------------------------------------------------------------------------------------------------------------------
+------------------------------------------ [ ACTIVIDADES O TAREAS ] -----------------------------------------------------------
+
+-- 1. Creación de tareas: Entrar al apartado de tareas -> Crear tarea -> Rellenar datos -> Asignar Cursos = Crear
+-- 2. Toma de asistencia: Entrar a materia -> Estudiantes -> Asistencia -> Seleccionar clase -> Rellenar asistencia = Crear
+-- 3. Registro de notas (actividades): Entrar a materia -> Actividades -> Seleccionar actividad -> Rellenar notas = Crear
