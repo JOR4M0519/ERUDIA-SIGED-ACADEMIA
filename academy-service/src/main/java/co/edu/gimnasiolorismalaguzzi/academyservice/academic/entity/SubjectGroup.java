@@ -1,6 +1,6 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.student.entity;
+package co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -9,8 +9,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "group_students")
-public class GroupStudent {
+@Table(name = "subject_groups")
+public class SubjectGroup {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -18,12 +18,12 @@ public class GroupStudent {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "student_id", nullable = false)
-    private User student;
+    @JoinColumn(name = "subject_id", nullable = false)
+    private Subject subject;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "group_id", nullable = false)
-    private Groups group;
+    @JoinColumn(name = "group_students", nullable = false)
+    private Groups groups;
 
 }

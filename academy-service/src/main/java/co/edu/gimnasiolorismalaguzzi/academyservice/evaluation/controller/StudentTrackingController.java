@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.PersistenceStudentTrackingPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceStudentTrackingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.StudentTrackingDomain;
 import org.springframework.http.ResponseEntity;

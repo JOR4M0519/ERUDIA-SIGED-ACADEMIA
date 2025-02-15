@@ -5,6 +5,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceDom
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Attendance;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.AttendanceMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.AttendanceCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceAttendancePort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

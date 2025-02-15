@@ -5,6 +5,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGr
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityGroupMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.ActivityGroupCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityGroupPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,13 +47,14 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
     }
 
     @Override
-    public ActivityGroupDomain update(Integer integer, ActivityGroupDomain entity) {
+    public ActivityGroupDomain update(Integer integer, ActivityGroupDomain domain) {
         try{
             Optional<ActivityGroup> existingActivityGroup = crudRepo.findById(integer);
             if(existingActivityGroup.isPresent()){
-                existingActivityGroup.get().setActivity(entity.getActivityDomain());
-                existingActivityGroup.get().setGroup(entity.getGroup());
-                existingActivityGroup.get().setDue(entity.getDue());
+                existingActivityGroup.get().setActivity(mapper.toEntity(domain).getActivity());
+                existingActivityGroup.get().setGroup(mapper.toEntity(domain).getGroup());
+                existingActivityGroup.get().setStartDate(mapper.toEntity(domain).getStartDate());
+                existingActivityGroup.get().setEndDate(mapper.toEntity(domain).getEndDate());
             }
             return mapper.toDomain(crudRepo.save(existingActivityGroup.get()));
         } catch (EntityNotFoundException e){

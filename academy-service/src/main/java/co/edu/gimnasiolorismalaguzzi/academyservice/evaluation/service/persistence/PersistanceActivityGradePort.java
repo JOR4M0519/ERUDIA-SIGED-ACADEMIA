@@ -1,4 +1,4 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service;
+package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGradeDomain;

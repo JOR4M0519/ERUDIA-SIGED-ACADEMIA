@@ -2,7 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.DimensionDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.PersistenceDimensionPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceDimensionPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

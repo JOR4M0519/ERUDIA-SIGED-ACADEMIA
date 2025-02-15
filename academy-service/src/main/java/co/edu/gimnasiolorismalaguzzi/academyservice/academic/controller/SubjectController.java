@@ -15,11 +15,9 @@ import java.util.List;
 public class SubjectController {
 
     private final PersistenceSubjectPort subjectServicePort;
-    private final SubjectProfessorAdapter subjectProfessorAdapter;
 
     public SubjectController(PersistenceSubjectPort subjectServicePort, SubjectProfessorAdapter subjectProfessorAdapter) {
         this.subjectServicePort = subjectServicePort;
-        this.subjectProfessorAdapter = subjectProfessorAdapter;
     }
 
     @GetMapping()
