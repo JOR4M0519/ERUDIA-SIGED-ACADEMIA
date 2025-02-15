@@ -19,7 +19,7 @@ public class AcademicPeriodController {
     }
 
     @GetMapping
-    public ResponseEntity<List<AcademicPeriodDomain>> getAllStudentGroups(){
+    public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriods(){
         List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.findAll();
         return ResponseEntity.ok(AcademicPeriodDomains);
     }

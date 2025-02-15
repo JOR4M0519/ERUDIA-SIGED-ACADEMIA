@@ -72,8 +72,8 @@ VALUES ((SELECT id FROM dimensions WHERE name = 'Cognitive'), (SELECT id FROM su
 
 -- Inserts for subject_schedule
 INSERT INTO subject_schedule (subject_id, day_of_week, start_time, end_time, status)
-VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), 'Monday', '09:00', '11:00', TRUE),
-       ((SELECT id FROM subject WHERE subject_name = 'Science'), 'Wednesday', '10:00', '12:00', TRUE);
+VALUES ((SELECT id FROM subject WHERE subject_name = 'Mathematics'), 'Monday', '09:00', '11:00', 'A'),
+       ((SELECT id FROM subject WHERE subject_name = 'Science'), 'Wednesday', '10:00', '12:00', 'A');
 
 -- Inserts for attendance
 INSERT INTO attendance (student_id, schedule_id, attendance_date, status)
@@ -105,17 +105,13 @@ INSERT INTO activity_grade (student_id, activity_id, score, comment)
 VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM activity_group WHERE activity_id = (SELECT id FROM activity WHERE activity_name = 'Math Exam')), 85.50, 'Good effort'),
        ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM activity_group WHERE activity_id = (SELECT id FROM activity WHERE activity_name = 'Science Project')), 90.00, 'Excellent project');
 
--- Inserts for recovery_period
-INSERT INTO recovery_period (student_id, subject_id, previous_score, new_score, period)
-VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM subject WHERE subject_name = 'Mathematics'), 65.00, 80.00, (SELECT id FROM academic_period WHERE name = '2024-1'));
-
 -- Inserts for institution
 INSERT INTO institution (name, nit, address, phone_number, email, city, department, country, postal_code, legal_representative, incorporation_date)
 VALUES ('ABC School', '123456789', '123 School Rd', '555-987-6543', 'contact@abcschool.com', 'Metropolis', 'Central', 'USA', '12345', 'Jane Doe', '2000-01-01');
 
 -- Inserts for student_tracking
 INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status)
-VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM users WHERE username = 'asmith'), 'Disruptive behavior in class', 'Will attend extra tutoring', 'Improved behavior noticed', TRUE);
+VALUES ((SELECT id FROM users WHERE username = 'mbrown'), (SELECT id FROM users WHERE username = 'asmith'), 'Disruptive behavior in class', 'Will attend extra tutoring', 'Improved behavior noticed', 'A');
 
 -- Inserts for backup_history
 INSERT INTO backup_history (backup_name, description, file_path, created_by)

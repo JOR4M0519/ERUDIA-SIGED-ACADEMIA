@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
@@ -23,7 +24,6 @@ import java.util.Optional;
 @Slf4j
 public class UserAdapter implements PersistenceUserPort {
 
-
     private final UserCrudRepo userCrudRepo; // Repositorio JPA
 
     @Autowired
@@ -33,7 +33,7 @@ public class UserAdapter implements PersistenceUserPort {
     private KeycloakAdapter keycloakAdapter;
 
 
-    public UserAdapter(UserCrudRepo userCrudRepo) {
+    public UserAdapter(UserCrudRepo userCrudRepo, FamilyAdapter familyAdapter) {
         this.userCrudRepo = userCrudRepo;
     }
 
@@ -55,9 +55,7 @@ public class UserAdapter implements PersistenceUserPort {
         User savedUser = null;
         try {
             savedUser = this.userCrudRepo.save(user);
-
         }catch (DataIntegrityViolationException e){
-
             keycloakAdapter.deleteUsersKeycloak(userDomain.getUsername());   //Si genera un error elimina rel usuario de Keycloak
             throw new AppException("The email or username already exist", HttpStatus.CONFLICT);
         }catch (Exception e){

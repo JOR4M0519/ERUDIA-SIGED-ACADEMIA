@@ -1,8 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relationship;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class UserDetailDomain {
@@ -20,4 +23,7 @@ public class UserDetailDomain {
     private String neighborhood;
     private String city;
     private String positionJob;
+    private List<User> relatives;  //Campo externo
 }
+
+

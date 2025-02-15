@@ -64,7 +64,7 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
     public HttpStatus delete(Integer integer) {
         try {
             if(this.crudRepo.existsById(integer)){
-                crudRepo.delete(this.crudRepo.getById(integer));
+                crudRepo.delete(this.crudRepo.getReferenceById(integer));
                 return HttpStatus.OK;
             } else {
                 throw new AppException("Relation within Subject and Knowledge ID doesnt exist", HttpStatus.NOT_FOUND);

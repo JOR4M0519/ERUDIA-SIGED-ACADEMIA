@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceIdTypePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceIdTypePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.IdTypeDomain;
 import org.springframework.http.ResponseEntity;

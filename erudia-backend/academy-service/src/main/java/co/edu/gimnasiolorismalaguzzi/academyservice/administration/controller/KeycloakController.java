@@ -1,7 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserKeycloakPort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserKeycloakPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 
 import jakarta.annotation.security.PermitAll;
