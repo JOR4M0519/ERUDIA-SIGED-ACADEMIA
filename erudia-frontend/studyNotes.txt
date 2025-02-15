@@ -1,0 +1,112 @@
+{
+(
+npm init -y
+npm create vite@latest
+
+cd erudia-frontend
+npm install
+npm run dev
+)
+
+    Running commands:
+    npm install
+    npm install axios jwt-decode
+    npm install lucide-react
+    npm install react-router-dom@latest
+    npm install crypto-js
+    npm install react-redux @reduxjs/toolkit
+    npm install rxjs
+    react-toastify
+
+
+    npm install tailwindcss @tailwindcss/vite
+    
+    npm run dev
+
+    (
+    NO npm install -D tailwindcss @tailwindcss/postcss postcss autoprefixer
+    NO npm install -D tailwindcss postcss autoprefixer
+    )
+}
+{
+    @import "tailwindcss";
+
+
+}
+
+PascalCase (React)
+camerCase
+snake_case
+Kebab-case
+
+JS VANILLA  - Imperativo (Crear por medio de funciones, se sa instruccion por instruccion)
+
+JSX         - Declarativo (Mostrar componentes)
+
+Se evaluan expresiones por medio de las llaves '{``}'
+
+Se pueden enviar funciones a los componentes ej:
+´
+const formatUserName = (userName) => `@${username}`
+
+return(
+    <WindowImage
+    formatUserName={formatUserName}
+    />
+);
+´ 
+En JSX se renderizan "elementos"
+
+Diferenia de "elemento" & "componente"
+"componente" = envuelve elementos
+"elemento" = Tag de html
+
+
+-----------------
+(children)
+los elementos que se encuentran dentro de las etiquetas ej:
+<Button>
+    This is children
+</Button>
+
+children= This is children
+-----------------
+(default values)
+ej:
+export function Bar({username= 'unknown'})
+
+-----------------
+*No es muy buena práctica*
+send props from an array const to component 
+ej:
+
+const midudevInfo = {isFollowing=true, userName='midudev'}
+
+<Card {...midudevInfo}>
+    Ángel Durán
+</Card>
+-----------------
+
+---Consejos---
+* no mutar(cambiar props)
+export function Bar({username})
+
+username = `@${username}`
+
+---Dato Curioso---
+Si el padre cambia los hijos van a renderizar los componentes,
+sin importar que si el otro hijo tiene los mismos props
+
+-----------------
+Estado... Ternarios
+
+  const text = isFollowing ? 'Siguiendo' : 'Seguir'
+  const buttonClassName = isFollowing
+    ? 'tw-followCard-button is-following'
+    : 'tw-followCard-button'
+
+++++++++++++++
+initialIsFollowing
+const [valor,setvalor] = useState(initialIsFollowing)
+
+-----------------

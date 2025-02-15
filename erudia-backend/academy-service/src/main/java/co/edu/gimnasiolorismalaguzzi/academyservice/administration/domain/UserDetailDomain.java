@@ -4,11 +4,12 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relati
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class UserDetailDomain {
+public class UserDetailDomain implements Serializable {
     private Integer id;
     private UserDomain user;
     private String firstName;

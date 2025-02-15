@@ -43,6 +43,7 @@ public class KeycloakProvider {
                     .realm(KeycloakProvider.REALM_NAME)
                     .grantType(OAuth2Constants.PASSWORD)
                     .clientId(KeycloakProvider.ADMIN_CLI)
+                    //.scope(OAuth2Constants.OFFLINE_ACCESS)
                     .username(username)
                     .password(password)
                     .resteasyClient(new ResteasyClientBuilderImpl().build())
@@ -57,7 +58,30 @@ public class KeycloakProvider {
         }
     }
 
-    public static UsersResource getUserResource() {
+    public String getTokenOAuth(String username, String password) {
+        try {
+            // Construye un cliente Keycloak con el flujo de contraseña
+            Keycloak keycloak = KeycloakBuilder.builder()
+                    .serverUrl(KeycloakProvider.SERVER_URL)
+                    .realm(KeycloakProvider.REALM_NAME)
+                    .grantType(OAuth2Constants.PASSWORD)
+                    .clientId("spring-cloud-client")
+                    .username(username)
+                    .password(password)
+                    .scope("openid offline_access")
+                    .resteasyClient(new ResteasyClientBuilderImpl().build())
+                    .build();
+
+            // Obtén el token de acceso
+            String accessToken = keycloak.tokenManager().getAccessToken().getToken();
+
+            return accessToken;
+        } catch (Exception e) {
+            throw new AppException("Unable to authenticate user.", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    public UsersResource getUserResource() {
         RealmResource realmResource = getRealmResource();
         return realmResource.users();
     }

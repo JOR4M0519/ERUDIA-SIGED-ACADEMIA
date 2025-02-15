@@ -1,0 +1,20 @@
+install react-redux 
+
+--Manejador de estados--
+
+*Se evita coonsultar al backend, consultando a los estados
+
+*Proposito compartir la info en toda la app evitando la dependencia entre componente padre e hijo
+
+*Se utiliza useDispatcher 
+(Este recibe las acciones que se tienen)
+
+
+
+*Selecciona el usuario
+useSelector(store => store.user)
+
+
+Link: libreria iconos
+https://lucide.dev/icons/
+
