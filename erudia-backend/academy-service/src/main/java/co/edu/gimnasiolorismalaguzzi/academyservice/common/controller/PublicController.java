@@ -1,7 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.common.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.PersistenceUserDetailPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
