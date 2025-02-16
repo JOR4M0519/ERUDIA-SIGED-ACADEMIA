@@ -5,4 +5,5 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 
 
 public interface PersistenceSubjectPort extends PersistencePort<SubjectDomain, Integer> {
+
 }

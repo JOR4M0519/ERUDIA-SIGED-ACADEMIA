@@ -31,9 +31,9 @@ public class AcademicPeriodController {
         return ResponseEntity.ok(AcademicPeriodDomains);
     }
 
-    @GetMapping("/active")
-    public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriodsByStatus(){
-        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getAllPeriodsByStatus("A");
+    @GetMapping("/active/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getPeriodsByYear(@PathVariable String year){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getPeriodsByYear(year);
         return ResponseEntity.ok(AcademicPeriodDomains);
     }
 

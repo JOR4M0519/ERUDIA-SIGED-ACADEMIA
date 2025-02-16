@@ -71,6 +71,12 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     }
 
     @Override
+    public List<AcademicPeriodDomain> getPeriodsByYear(String year){
+        List<AcademicPeriodDomain> academicPeriodDomain = this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.getPeriodsByYear(year));
+        return academicPeriodDomain;
+    }
+
+    @Override
     public HttpStatus delete(Integer integer) {
         try {
             if(this.academicPeriodCrudRepo.existsById(integer)){
