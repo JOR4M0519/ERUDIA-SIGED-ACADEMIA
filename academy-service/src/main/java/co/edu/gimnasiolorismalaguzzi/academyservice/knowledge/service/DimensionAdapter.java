@@ -5,6 +5,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.DimensionDo
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Dimension;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.mapper.DimensionMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.repository.DimensionCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceDimensionPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

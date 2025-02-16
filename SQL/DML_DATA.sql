@@ -262,3 +262,4 @@ INSERT INTO student_tracking (student, professor, situation, compromise, follow_
                                                                                                 (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario', 'A'),
                                                                                                 (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral', 'A'),
                                                                                                 (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico', 'A');
+

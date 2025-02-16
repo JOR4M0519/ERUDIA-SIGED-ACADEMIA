@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.PersistenceAcademicPeriodPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +21,19 @@ public class AcademicPeriodController {
     @GetMapping
     public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriods(){
         List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.findAll();
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+
+    @GetMapping("/{status}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriodsByStatus(@PathVariable String status){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getAllPeriodsByStatus(status);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriodsByStatus(){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getAllPeriodsByStatus("A");
         return ResponseEntity.ok(AcademicPeriodDomains);
     }
 

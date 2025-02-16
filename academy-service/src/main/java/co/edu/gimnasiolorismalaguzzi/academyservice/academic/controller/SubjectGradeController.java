@@ -1,13 +1,9 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGradeDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.PersistenceSubjectGradePort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectGradeAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGradePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.ActivityGroupAdapter;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

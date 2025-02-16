@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
@@ -23,8 +24,6 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
 
     @Autowired
     private AcademicPeriodMapper academicPeriodMapper;
-    @Autowired
-    private InetUtils inetUtils;
 
     public AcademicPeriodAdapter(AcademicPeriodCrudRepo academicPeriodCrudRepo) {
         this.academicPeriodCrudRepo = academicPeriodCrudRepo;
@@ -34,6 +33,11 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     @Override
     public List<AcademicPeriodDomain> findAll() {
         return this.academicPeriodMapper.toDomains(this.academicPeriodCrudRepo.findAll());
+    }
+
+    @Override
+    public List<AcademicPeriodDomain> getAllPeriodsByStatus(String status) {
+        return this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.findByStatus(status));
     }
 
     @Override
@@ -79,4 +83,6 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
             throw new AppException("Intern Error!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 }

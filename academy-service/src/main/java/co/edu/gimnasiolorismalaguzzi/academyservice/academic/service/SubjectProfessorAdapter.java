@@ -4,6 +4,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfe
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectProfessorMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectProfessorCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectProfessorPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import jakarta.persistence.EntityNotFoundException;

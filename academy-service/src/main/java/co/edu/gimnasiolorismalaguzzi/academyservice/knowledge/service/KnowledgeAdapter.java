@@ -6,6 +6,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDo
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Knowledge;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.mapper.KnowledgeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.repository.KnowledgeCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceKnowledgePort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +52,6 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
             Optional<Knowledge> existingKnowledge = knowledgeCrudRepo.findById(integer);
             if(existingKnowledge.isPresent()) {
                 existingKnowledge.get().setName(entity.getName());
-                existingKnowledge.get().setAchievement(entity.getAchievement());
                 existingKnowledge.get().setStatus(entity.getStatus());
             }
             return knowledgeMapper.toDomain(knowledgeCrudRepo.save(existingKnowledge.get()));

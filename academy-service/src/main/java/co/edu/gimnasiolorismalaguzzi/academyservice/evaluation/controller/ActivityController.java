@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.PersistenceActivityPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityDomain;
 import org.springframework.http.ResponseEntity;

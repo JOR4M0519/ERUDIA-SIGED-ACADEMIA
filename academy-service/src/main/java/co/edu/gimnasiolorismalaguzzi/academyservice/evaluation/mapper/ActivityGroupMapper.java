@@ -14,9 +14,10 @@ public interface ActivityGroupMapper {
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "activity", target = "activityDomain"),
+            @Mapping(source = "activity", target = "activity"),
             @Mapping(source = "group", target = "group"),
-            @Mapping(source = "due", target = "due")
+            @Mapping(source = "startDate", target = "startDate"),
+            @Mapping(source = "endDate", target = "endDate")
 
     })
     ActivityGroupDomain toDomain(ActivityGroup activityGroup);

@@ -20,9 +20,6 @@ public class Knowledge {
     @Column(name = "name", length = 10)
     private String name;
 
-    @Column(name = "achievement", length = Integer.MAX_VALUE)
-    private String achievement;
-
     @Column(name = "status")
     private String status;
 

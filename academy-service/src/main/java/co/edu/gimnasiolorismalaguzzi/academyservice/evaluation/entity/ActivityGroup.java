@@ -3,21 +3,14 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.GroupStudent;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "activity_group")
 public class ActivityGroup {
     @Id
@@ -36,10 +29,10 @@ public class ActivityGroup {
     private GroupStudent group;
 
     @NotNull
-    @Column(name = "due", nullable = false)
-    private LocalDate due;
+    @Column(name = "start_date", nullable = false)
+    private LocalDate startDate;
 
-    @OneToMany(mappedBy = "activity")
-    private Set<ActivityGrade> activityGrades = new LinkedHashSet<>();
+    @Column(name = "end_date")
+    private LocalDate endDate;
 
 }

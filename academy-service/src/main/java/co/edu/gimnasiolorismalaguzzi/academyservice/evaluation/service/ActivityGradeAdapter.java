@@ -5,6 +5,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGr
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGrade;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityGradeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.ActivityGradeCurdRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistanceActivityGradePort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
