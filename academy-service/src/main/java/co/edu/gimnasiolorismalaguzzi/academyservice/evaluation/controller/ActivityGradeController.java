@@ -25,7 +25,7 @@ public class ActivityGradeController {
     }
 
     //Se necesita agregar el pageable - Buscar como se usa
-    @GetMapping("/periods/{periodId}/users/{userId} ")
+    @GetMapping("/periods/{periodId}/users/{userId}")
     public ResponseEntity<List<?>> getAllActivity_ByPeriodUser(@PathVariable Integer periodId,
                                                                @PathVariable Integer userId){
         List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.getAllActivity_ByPeriodUser(periodId, userId);
