@@ -34,6 +34,11 @@ public class SubjectGradeAdapter implements PersistenceSubjectGradePort {
     }
 
     @Override
+    public List<SubjectGradeDomain> findBySubjectPeriodStudentId(int subjectId, int periodId, int studentId) {
+        return this.subjectGradeMapper.toDomains(subjectGradeCrudRepo.findByStudent_IdAndPeriod_IdAndSubject_Id(studentId,periodId,subjectId));
+    }
+
+    @Override
     public SubjectGradeDomain findById(Integer integer) {
         Optional<SubjectGrade> subjectGradeOptional = this.subjectGradeCrudRepo.findById(integer);
         return subjectGradeOptional.map(subjectGradeMapper::toDomain).orElse(null);
@@ -73,4 +78,6 @@ public class SubjectGradeAdapter implements PersistenceSubjectGradePort {
     public void recoverStudent(int idStudent, int idSubject, int idPeriod, BigDecimal newScore) {
         subjectGradeCrudRepo.recoverStudent(newScore,idSubject,idStudent, idPeriod);
     }
+
+
 }

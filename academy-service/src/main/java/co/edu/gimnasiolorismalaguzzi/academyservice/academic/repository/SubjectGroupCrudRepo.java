@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface SubjectGroupCrudRepo extends JpaRepository<SubjectGroup, Integer> {
     List<SubjectGroup> findByGroups_Id(Integer id);
+
 }

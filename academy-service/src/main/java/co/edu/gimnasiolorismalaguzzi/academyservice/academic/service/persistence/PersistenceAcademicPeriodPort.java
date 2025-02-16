@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface PersistenceAcademicPeriodPort extends PersistencePort<AcademicPeriodDomain, Integer> {
     List<AcademicPeriodDomain>  getAllPeriodsByStatus(String status);
+    List<AcademicPeriodDomain> getPeriodsByYear(String year);
 }

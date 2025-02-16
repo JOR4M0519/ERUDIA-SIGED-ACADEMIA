@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface SubjectGradeCrudRepo extends JpaRepository<SubjectGrade, Integer> {
     @Transactional
@@ -19,4 +20,6 @@ public interface SubjectGradeCrudRepo extends JpaRepository<SubjectGrade, Intege
             @Param("idStudent") Integer studentId,
             @Param("idPeriod") Integer periodId
     );
+
+    List<SubjectGrade> findByStudent_IdAndPeriod_IdAndSubject_Id(Integer id, Integer id1, Integer id2);
 }

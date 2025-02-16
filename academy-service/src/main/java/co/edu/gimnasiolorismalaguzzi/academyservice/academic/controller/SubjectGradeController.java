@@ -31,6 +31,12 @@ public class SubjectGradeController {
         return ResponseEntity.ok(subjectGradeDomain);
     }
 
+    @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{studentId}")
+    public ResponseEntity<List<?>> getFinalGradeById(@PathVariable Integer subjectId,@PathVariable Integer periodId,@PathVariable Integer studentId){
+        List<SubjectGradeDomain> subjectGradeList = subjectGradePort.findBySubjectPeriodStudentId(subjectId,periodId,studentId);
+        return ResponseEntity.ok(subjectGradeList);
+    }
+
     @PostMapping("/recover")
     public ResponseEntity<String> recoverStudent(
             @RequestParam int idStudent,
