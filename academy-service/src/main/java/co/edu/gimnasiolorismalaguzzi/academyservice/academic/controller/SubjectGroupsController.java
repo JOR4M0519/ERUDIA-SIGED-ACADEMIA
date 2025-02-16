@@ -24,6 +24,12 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomains);
     }
 
+    /**
+     * Obtiene las materias de los estudiante con base en un id del estudiante
+     * @param id
+     * @return Materias de los estudiantes
+     */
+
     @GetMapping("/students-groups/{id}")
     public ResponseEntity<List<?>> getAllSubjectGroupsByStudentsGroupsId(@PathVariable Integer id){
         List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectGroupsByStudentsGroupsId(id);

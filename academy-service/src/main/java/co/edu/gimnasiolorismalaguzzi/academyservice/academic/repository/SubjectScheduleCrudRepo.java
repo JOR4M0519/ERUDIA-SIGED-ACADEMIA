@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SubjectScheduleCrudRepo extends JpaRepository<SubjectSchedule, Integer> {
@@ -16,4 +17,6 @@ public interface SubjectScheduleCrudRepo extends JpaRepository<SubjectSchedule, 
 
     @Override
     Optional<SubjectSchedule> findById(Integer id);
+
+    List<SubjectSchedule> findBySubjectGroup_Groups_Id(Integer id);
 }

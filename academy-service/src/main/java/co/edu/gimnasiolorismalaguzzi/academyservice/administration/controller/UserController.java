@@ -65,4 +65,5 @@ public class UserController {
         persistenceUserDetailPort.delete(id);
         return ResponseEntity.noContent().build();
     }
+
 }

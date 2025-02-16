@@ -8,10 +8,13 @@ import java.util.List;
 
 public interface PersistanceActivityGradePort extends PersistencePort<ActivityGradeDomain, Integer> {
 
-    List<ActivityGradeDomain> getAllActivity_ByPeriodUser(Integer periodId,Integer  userId);
+    List<ActivityGradeDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String status);
 
     List<ActivityGradeDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId,
                                                                       Integer periodId,
-                                                                      Integer userId );
+                                                                      Integer userId,
+                                                                      String status);
+
+
 
 }

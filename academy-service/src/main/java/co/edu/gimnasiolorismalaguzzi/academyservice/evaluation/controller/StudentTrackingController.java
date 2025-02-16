@@ -30,6 +30,12 @@ public class StudentTrackingController {
         return ResponseEntity.ok(StudentTracking);
     }
 
+    @GetMapping("/students/{id}")
+    public ResponseEntity<List<?>> getTrackingByStudentId(@PathVariable Integer id){
+        List<StudentTrackingDomain> StudentTrackingDomains = persistenceStudentTrackingPort.getTrackingByStudentId(id);
+        return ResponseEntity.ok(StudentTrackingDomains);
+    }
+
     @PostMapping()
     public ResponseEntity<StudentTrackingDomain> createStudentTracking(@RequestBody StudentTrackingDomain StudentTrackingDomain) {
         StudentTrackingDomain createdStudentTracking = persistenceStudentTrackingPort.save(StudentTrackingDomain);

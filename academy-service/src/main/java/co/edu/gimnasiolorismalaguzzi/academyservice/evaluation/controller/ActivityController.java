@@ -31,6 +31,18 @@ public class ActivityController {
         return ResponseEntity.ok(activityDomain);
     }
 
+    /**
+     * Obtiene los knowledges, junto a los achievements por actividad
+     * @param id
+     * @return
+     */
+
+    @GetMapping("knowledges/{id}")
+    public ResponseEntity<List<?>> getAllActivitiesWithKnowledgesAchievements(@PathVariable Integer id) {
+        List<ActivityDomain> activityDomains = persistenceActivityPort.getAllActivitiesWithKnowledgesAchievements(id);
+        return ResponseEntity.ok(activityDomains);
+    }
+
     @PostMapping()
     public ResponseEntity<ActivityDomain> createEducationalLevel(@RequestBody ActivityDomain ActivityDomain) {
         ActivityDomain createdActivity = persistenceActivityPort.save(ActivityDomain);

@@ -31,8 +31,15 @@ public class SubjectGradeController {
         return ResponseEntity.ok(subjectGradeDomain);
     }
 
+    /**
+     * Obtiene la nota final de un estudiante, de una materia en un periodo especifico
+     * @param subjectId
+     * @param periodId
+     * @param studentId
+     * @return El estudiante, la materia y el periodo
+     */
     @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{studentId}")
-    public ResponseEntity<List<?>> getFinalGradeById(@PathVariable Integer subjectId,@PathVariable Integer periodId,@PathVariable Integer studentId){
+    public ResponseEntity<?> getFinalGradeById(@PathVariable Integer subjectId,@PathVariable Integer periodId,@PathVariable Integer studentId){
         List<SubjectGradeDomain> subjectGradeList = subjectGradePort.findBySubjectPeriodStudentId(subjectId,periodId,studentId);
         return ResponseEntity.ok(subjectGradeList);
     }

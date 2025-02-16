@@ -77,4 +77,9 @@ public class StudentTrackingAdapter implements PersistenceStudentTrackingPort {
             throw new AppException("Interal Error! ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public List<StudentTrackingDomain> getTrackingByStudentId(Integer id) {
+        return mapper.toDomains(crudRepo.findByStudent_Id(id));
+    }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public interface AchievementGroupsMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "knowledge", target = "knowledge"),
+            @Mapping(source = "subjectKnowledge", target = "subjectKnowledgeDomain"),
             @Mapping(source = "achievement", target = "achievement"),
             @Mapping(source = "group", target = "group"),
             @Mapping(source = "period", target = "period")

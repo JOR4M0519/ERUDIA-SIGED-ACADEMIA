@@ -34,16 +34,23 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     }
 
     @Override
-    public List<ActivityGradeDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId) {
-        return gradeMapper.toDomains(activityGradeCrudRepo.findByActivity_Activity_Period_IdAndStudent_Id(periodId,userId));
+    public List<ActivityGradeDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String status) {
+        return gradeMapper.toDomains(activityGradeCrudRepo.findByActivity_Activity_AchievementGroup_Period_IdAndStudent_IdAndActivity_Activity_StatusNotLike(
+                periodId,
+                userId,
+                status
+        ));
     }
 
     @Override
-    public List<ActivityGradeDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId) {
+    public List<ActivityGradeDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId, String status) {
         return gradeMapper.toDomains(
                 activityGradeCrudRepo.
-                        findByActivity_Activity_Subject_IdAndActivity_Activity_Period_IdAndStudent_Id(
-                                subjectId,periodId,userId
+                        findByActivity_Activity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndActivity_Activity_AchievementGroup_Period_IdAndStudent_IdAndActivity_Activity_StatusNotLike(
+                                subjectId,
+                                periodId,
+                                userId,
+                                status
                         ));
     }
     @Override

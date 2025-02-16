@@ -51,17 +51,15 @@ public class ActivityAdapter implements PersistenceActivityPort {
     }
 
     @Override
-    public ActivityDomain update(Integer integer, ActivityDomain entity) {
+    public ActivityDomain update(Integer integer, ActivityDomain domain) {
         try{
             Optional<Activity> existingActivity = activityCrudRepo.findById(integer);
 
             if (existingActivity.isPresent()){
-                existingActivity.get().setActivityName(entity.getActivityName());
-                existingActivity.get().setDescription(entity.getDescription());
-                existingActivity.get().setSubject(entity.getSubject());
-                existingActivity.get().setPeriod(entity.getPeriod());
-                existingActivity.get().setKnowledge(entity.getKnowledge());
-                existingActivity.get().setStatus(entity.getStatus());
+                existingActivity.get().setActivityName(domain.getActivityName());
+                existingActivity.get().setDescription(domain.getDescription());
+                existingActivity.get().setAchievementGroup(activityMapper.toEntity(domain).getAchievementGroup());
+                existingActivity.get().setStatus(domain.getStatus());
             }
 
             return activityMapper.toDomain(activityCrudRepo.save(existingActivity.get()));
@@ -83,5 +81,10 @@ public class ActivityAdapter implements PersistenceActivityPort {
         }catch(Exception e){
             throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public List<ActivityDomain> getAllActivitiesWithKnowledgesAchievements(Integer id) {
+        return this.activityMapper.toDomains(this.activityCrudRepo.findAll());
     }
 }

@@ -152,12 +152,12 @@ INSERT INTO subject_dimension (dimension_id, subject_id) VALUES
                                                              (5, 5);
 
 -- 20. Tabla: subject_schedule
-INSERT INTO subject_schedule (subject_id, day_of_week, start_time, end_time, status) VALUES
+INSERT INTO subject_schedule (subject_group_id, day_of_week, start_time, end_time, status) VALUES
                                                                                          (1, 'Monday', '08:00', '10:00', 'A'),
-                                                                                         (2, 'Tuesday', '10:00', '12:00', 'A'),
-                                                                                         (3, 'Wednesday', '14:00', '16:00', 'A'),
-                                                                                         (4, 'Thursday', '08:00', '10:00', 'A'),
-                                                                                         (5, 'Friday', '12:00', '14:00', 'A');
+                                                                                         (1, 'Tuesday', '10:00', '12:00', 'A'),
+                                                                                         (1, 'Wednesday', '14:00', '16:00', 'A'),
+                                                                                         (1, 'Thursday', '08:00', '10:00', 'A'),
+                                                                                         (1, 'Friday', '12:00', '14:00', 'A');
 
 -- 21. Tabla: attendance
 INSERT INTO attendance (student_id, schedule_id, attendance_date, status) VALUES
@@ -182,9 +182,17 @@ INSERT INTO knowledge (name, percentage, status) VALUES
                                                      ('Nose', 40, 'A'),
                                                      ('test', 50, 'A'),
                                                      ('a', 60, 'A');
+-- 27. Tabla: subject_knowledge
+INSERT INTO subject_knowledge (id_subject, id_knowledge) VALUES
+                                                             (1, 1),
+                                                             (2, 2),
+                                                             (3, 3),
+                                                             (4, 4),
+                                                             (5, 5);
+
 
 -- 24. Tabla: achievement_groups
-INSERT INTO achievement_groups (knowledge_id, achievement, group_id, period_id) VALUES
+INSERT INTO achievement_groups (subject_knowledge_id, achievement, group_id, period_id) VALUES
                                                                                     (1, 'Logro en teoría', 1, 1),
                                                                                     (2, 'Logro en práctica', 2, 2),
                                                                                     (3, 'Logro en evaluación', 3, 3),
@@ -192,12 +200,12 @@ INSERT INTO achievement_groups (knowledge_id, achievement, group_id, period_id) 
                                                                                     (5, 'Logro en investigación', 5, 5);
 
 -- 25. Tabla: activity
-INSERT INTO activity (activity_name, description, subject, period_id, knowledge, status) VALUES
-                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 1, 1, 1, 'A'),
-                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 2, 2, 2, 'A'),
-                                                                                             ('Laboratorio Ciencias', 'Experimento químico', 3, 3, 3, 'A'),
-                                                                                             ('Debate Lenguaje', 'Debate sobre literatura', 4, 4, 4, 'A'),
-                                                                                             ('Listening Inglés', 'Comprensión auditiva', 5, 5, 5, 'A');
+INSERT INTO activity (activity_name, description, achievement_groups_id, status) VALUES
+                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 1, 'A'),
+                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 2, 'A'),
+                                                                                             ('Laboratorio Ciencias', 'Experimento químico',  3, 'A'),
+                                                                                             ('Debate Lenguaje', 'Debate sobre literatura',  4, 'A'),
+                                                                                             ('Listening Inglés', 'Comprensión auditiva',  5, 'A');
 
 -- 26. Tabla: activity_group
 INSERT INTO activity_group (activity_id, group_id, start_date, end_date) VALUES
@@ -206,14 +214,6 @@ INSERT INTO activity_group (activity_id, group_id, start_date, end_date) VALUES
                                                                              (3, 3, '2024-02-09', '2024-02-10'),
                                                                              (4, 4, '2024-02-11', '2024-02-12'),
                                                                              (5, 5, '2024-02-13', '2024-02-14');
-
--- 27. Tabla: subject_knowledge
-INSERT INTO subject_knowledge (id_subject, id_knowledge) VALUES
-                                                             (1, 1),
-                                                             (2, 2),
-                                                             (3, 3),
-                                                             (4, 4),
-                                                             (5, 5);
 
 -- 28. Tabla: activity_grade
 INSERT INTO activity_grade (student_id, activity_id, score, comment) VALUES

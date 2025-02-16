@@ -30,6 +30,12 @@ public class SubjectScheduleController {
         return ResponseEntity.ok(EducationalLevel);
     }
 
+    @GetMapping("/groups/{id}")
+    public ResponseEntity<List<SubjectScheduleDomain>> getScheduleByGroupStudentId(@PathVariable Integer id) {
+        List<SubjectScheduleDomain> subjectScheduleGroup = subjectSchedulePort.getScheduleByGroupStudentId(id);
+        return ResponseEntity.ok(subjectScheduleGroup);
+    }
+
     @PostMapping()
     public ResponseEntity<SubjectScheduleDomain> createEducationalLevel(@RequestBody SubjectScheduleDomain SubjectScheduleDomain) {
         SubjectScheduleDomain createdEducationalLevel = subjectSchedulePort.save(SubjectScheduleDomain);

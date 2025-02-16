@@ -18,45 +18,45 @@ import java.util.Optional;
 @Slf4j
 public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
-    private ActivityGroupCrudRepo crudRepo;
+    private ActivityGroupCrudRepo activityGroupCrudRepo;
 
     @Autowired
-    private ActivityGroupMapper mapper;
+    private ActivityGroupMapper activityGroupMapper;
 
     public ActivityGroupAdapter(ActivityGroupCrudRepo activityGroupCrudRepo, ActivityGroupMapper activityGroupMapper){
-        this.crudRepo = activityGroupCrudRepo;
-        this.mapper = activityGroupMapper;
+        this.activityGroupCrudRepo = activityGroupCrudRepo;
+        this.activityGroupMapper = activityGroupMapper;
     }
 
     @Override
     public List<ActivityGroupDomain> findAll() {
-        return mapper.toDomains(crudRepo.findAll());
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findAll());
     }
 
     @Override
     public ActivityGroupDomain findById(Integer integer) {
-        Optional<ActivityGroup> activityGroup = this.crudRepo.findById(integer);
-        return activityGroup.map(mapper::toDomain).orElse(null);
+        Optional<ActivityGroup> activityGroup = this.activityGroupCrudRepo.findById(integer);
+        return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
     }
 
     @Override
     public ActivityGroupDomain save(ActivityGroupDomain entity) {
-        ActivityGroup activityGroup = mapper.toEntity(entity);
-        ActivityGroup savedActivityGroup = this.crudRepo.save(activityGroup);
-        return mapper.toDomain(savedActivityGroup);
+        ActivityGroup activityGroup = activityGroupMapper.toEntity(entity);
+        ActivityGroup savedActivityGroup = this.activityGroupCrudRepo.save(activityGroup);
+        return activityGroupMapper.toDomain(savedActivityGroup);
     }
 
     @Override
     public ActivityGroupDomain update(Integer integer, ActivityGroupDomain domain) {
         try{
-            Optional<ActivityGroup> existingActivityGroup = crudRepo.findById(integer);
+            Optional<ActivityGroup> existingActivityGroup = activityGroupCrudRepo.findById(integer);
             if(existingActivityGroup.isPresent()){
-                existingActivityGroup.get().setActivity(mapper.toEntity(domain).getActivity());
-                existingActivityGroup.get().setGroup(mapper.toEntity(domain).getGroup());
-                existingActivityGroup.get().setStartDate(mapper.toEntity(domain).getStartDate());
-                existingActivityGroup.get().setEndDate(mapper.toEntity(domain).getEndDate());
+                existingActivityGroup.get().setActivity(activityGroupMapper.toEntity(domain).getActivity());
+                existingActivityGroup.get().setGroup(activityGroupMapper.toEntity(domain).getGroup());
+                existingActivityGroup.get().setStartDate(activityGroupMapper.toEntity(domain).getStartDate());
+                existingActivityGroup.get().setEndDate(activityGroupMapper.toEntity(domain).getEndDate());
             }
-            return mapper.toDomain(crudRepo.save(existingActivityGroup.get()));
+            return activityGroupMapper.toDomain(activityGroupCrudRepo.save(existingActivityGroup.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Relation Activity Group with ID " + integer + " Not found!");
         }
@@ -65,5 +65,10 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
     @Override
     public HttpStatus delete(Integer integer) {
         return null;
+    }
+
+    @Override
+    public List<ActivityGroupDomain> findActivitiesByGroupId(Integer id, String status) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByGroup_IdAndActivity_StatusNotLike(id, status));
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 public interface SubjectScheduleMapper {
     @Mappings({
         @Mapping(source = "id", target = "id"),
-        @Mapping(source = "subject", target = "subject"),
+        @Mapping(source = "subjectGroup", target = "subjectGroup"),
         @Mapping(source = "dayOfWeek", target = "dayOfWeek"),
         @Mapping(source = "startTime", target = "startTime"),
         @Mapping(source = "endTime", target = "endTime"),

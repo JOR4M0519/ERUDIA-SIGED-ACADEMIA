@@ -6,9 +6,13 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface StudentTrackingCrudRepo extends JpaRepository<StudentTracking, Integer> {
     @Transactional
     @Modifying
     @Query("update StudentTracking u set u.status = ?1 where u.id = ?2")
     int updateStatusById(String status, Integer id);
+
+    List<StudentTracking> findByStudent_Id(Integer id);
 }

@@ -158,7 +158,7 @@ CREATE TABLE subject_dimension (
 -- Needs a trigger
 CREATE TABLE subject_schedule (
                                   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                  subject_id INT NOT NULL REFERENCES subject(id),
+                                  subject_group_id INT NOT NULL REFERENCES subject_groups(id),
                                   day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
                                   start_time TIME NOT NULL,         -- E.g., '09:00'
                                   end_time TIME NOT NULL,           -- E.g., '11:00'
@@ -190,9 +190,17 @@ CREATE TABLE knowledge (
                            status varchar(1) DEFAULT 'A'
 );
 
+-- Table: subject_knowledge
+CREATE TABLE subject_knowledge (
+                                   id int not null primary key generated always as identity,
+                                   id_subject int not null references subject(id),
+                                   id_knowledge int not null references knowledge(id)
+);
+
+
 CREATE TABLE achievement_groups(
                                    id int not null primary key generated always as identity,
-                                   knowledge_id int not null references knowledge(id),
+                                   subject_knowledge_id int not null references subject_knowledge(id),
                                    achievement text not null ,
                                    group_id int not null references groups(id),
                                    period_id int not null references academic_period(id)
@@ -204,9 +212,7 @@ CREATE TABLE activity (
                           id int primary key generated always as identity,
                           activity_name VARCHAR(50) NOT NULL,
                           description TEXT NOT NULL,
-                          subject INT NOT NULL REFERENCES subject(id),
-                          period_id INT NOT NULL REFERENCES academic_period(id),
-                          knowledge int not null references knowledge(id),
+                          achievement_groups_id int not null references achievement_groups(id),
                           status varchar(1) NOT NULL
 );
 
@@ -217,13 +223,6 @@ CREATE TABLE activity_group(
                                group_id INT NOT NULL REFERENCES group_students(id),
                                start_date DATE NOT NULL,
                                end_date DATE
-);
-
--- Table: subject_knowledge
-CREATE TABLE subject_knowledge (
-                                   id int not null primary key generated always as identity,
-                                   id_subject int not null references subject(id),
-                                   id_knowledge int not null references knowledge(id)
 );
 
 -- Table: grades

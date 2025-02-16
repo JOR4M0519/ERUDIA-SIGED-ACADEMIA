@@ -16,9 +16,7 @@ public interface ActivityMapper {
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "activityName", target = "activityName"),
             @Mapping(source = "description", target = "description"),
-            @Mapping(source = "subject", target = "subject"),
-            @Mapping(source = "period", target = "period"),
-            @Mapping(source = "knowledge", target = "knowledge"),
+            @Mapping(source = "achievementGroup", target = "achievementGroup"),
             @Mapping(source = "status", target = "status"),
     })
 

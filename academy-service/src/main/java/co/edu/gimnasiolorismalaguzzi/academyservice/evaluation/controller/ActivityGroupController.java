@@ -29,6 +29,12 @@ public class ActivityGroupController {
         return ResponseEntity.ok(ActivityGroupDomain);
     }
 
+    @GetMapping("/groups/{id}")
+    public ResponseEntity<List<?>> getActivitiesByGroupId(@PathVariable Integer id){
+        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.findActivitiesByGroupId(id, "I");
+        return ResponseEntity.ok(activityGroupDomains);
+    }
+
     @PostMapping
     public ResponseEntity<ActivityGroupDomain> createActivityGroup(@RequestBody ActivityGroupDomain activityGroupDomain){
         ActivityGroupDomain createdDimension = persistenceActivityGroupPort.save(activityGroupDomain);

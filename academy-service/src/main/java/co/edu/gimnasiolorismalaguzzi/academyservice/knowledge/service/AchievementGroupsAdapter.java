@@ -1,13 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.AchievementGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.mapper.AchievementGroupsMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.repository.AchievementGroupsCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceAchievementGroups;
-import com.netflix.discovery.converters.Auto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +53,7 @@ public class AchievementGroupsAdapter implements PersistenceAchievementGroups {
                 existingAchievement.get().setAchievement(achievementGroupsMapper.toEntity(domain).getAchievement());
                 existingAchievement.get().setGroup(achievementGroupsMapper.toEntity(domain).getGroup());
                 existingAchievement.get().setPeriod(achievementGroupsMapper.toEntity(domain).getPeriod());
-                existingAchievement.get().setKnowledge(achievementGroupsMapper.toEntity(domain).getKnowledge());
+                existingAchievement.get().setSubjectKnowledge(achievementGroupsMapper.toEntity(domain).getSubjectKnowledge());
             }
             return achievementGroupsMapper.toDomains(achievementGroupsCrudRepo.save(existingAchievement.get()));
         } catch (EntityNotFoundException e){
@@ -67,5 +65,10 @@ public class AchievementGroupsAdapter implements PersistenceAchievementGroups {
     public HttpStatus delete(Integer integer) {
         //NO hay necesidad de borrar un achievement
         return HttpStatus.I_AM_A_TEAPOT;
+    }
+
+    @Override
+    public List<AchievementGroupDomain> getKnowledgeAchievementBySubjectId(Integer subjectId, Integer groupid) {
+        return this.achievementGroupsMapper.toDomains(achievementGroupsCrudRepo.findByGroup_IdAndSubjectKnowledge_IdSubject_Id(subjectId,groupid));
     }
 }

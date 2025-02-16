@@ -30,8 +30,8 @@ public class Subject {
     @Column(name = "status",  nullable = false, length = 1)
     private String status;
 
-    @OneToMany(mappedBy = "subject")
-    private Set<Activity> activities = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "subject")
+//    private Set<Activity> activities = new LinkedHashSet<>();
 
 //    @OneToMany(mappedBy = "subject")
 //    private Set<RecoveryPeriod> recoveryPeriods = new LinkedHashSet<>();
@@ -45,7 +45,7 @@ public class Subject {
     @OneToMany(mappedBy = "subject")
     private Set<SubjectProfessor> subjectProfessors = new LinkedHashSet<>();
 
-    @OneToMany(mappedBy = "subject")
-    private Set<SubjectSchedule> subjectSchedules = new LinkedHashSet<>();
+//    @OneToMany(mappedBy = "subject")
+//    private Set<SubjectSchedule> subjectSchedules = new LinkedHashSet<>();
 
 }
