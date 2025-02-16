@@ -24,6 +24,22 @@ public class ActivityGradeController {
         return ResponseEntity.ok(ActivityGradeDomainList);
     }
 
+    //Se necesita agregar el pageable - Buscar como se usa
+    @GetMapping("/periods/{periodId}/users/{userId} ")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodUser(@PathVariable Integer periodId,
+                                                               @PathVariable Integer userId){
+        List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.getAllActivity_ByPeriodUser(periodId, userId);
+        return ResponseEntity.ok(ActivityGradeDomainList);
+    }
+
+    @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{userId}")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodByStudentBySubject(@PathVariable Integer subjectId,
+                                                                                                @PathVariable Integer periodId,
+                                                                                                @PathVariable Integer userId ){
+        List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.getAllActivity_ByPeriod_Student_Subject(subjectId,periodId,userId);
+        return ResponseEntity.ok(ActivityGradeDomainList);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ActivityGradeDomain> getActivityGroupById(@PathVariable Integer id){
         ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.findById(id);
