@@ -34,6 +34,12 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findAll());
     }
 
+
+    @Override
+    public List<SubjectGroupDomain> getAllSubjectGroupsByStudentsGroupsId(Integer id) {
+        return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findByGroups_Id(id));
+    }
+
     @Override
     public SubjectGroupDomain findById(Integer integer) {
         Optional<SubjectGroup> subjectGradeDomain = subjectGroupCrudRepo.findById(integer);
@@ -74,4 +80,5 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
             throw new AppException("Intern Error!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

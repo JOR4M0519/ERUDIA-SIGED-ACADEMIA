@@ -24,6 +24,12 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomains);
     }
 
+    @GetMapping("/students-groups/{id}")
+    public ResponseEntity<List<?>> getAllSubjectGroupsByStudentsGroupsId(@PathVariable Integer id){
+        List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectGroupsByStudentsGroupsId(id);
+        return ResponseEntity.ok(subjectGroupDomains);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<SubjectGroupDomain> getSubjectGroupById(@PathVariable Integer id){
         SubjectGroupDomain subjectGroupDomain = subjectGroupPort.findById(id);
