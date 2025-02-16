@@ -1,4 +1,4 @@
--- Table: id_type
+--1 Table: id_type
 CREATE TABLE id_type (
                          id int primary key generated always as identity,
                          name VARCHAR(20) NOT NULL
