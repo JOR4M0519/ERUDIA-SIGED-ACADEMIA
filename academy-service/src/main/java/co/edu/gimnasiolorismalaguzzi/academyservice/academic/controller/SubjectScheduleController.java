@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.PersistenceSubjectSchedulePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectSchedulePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectScheduleDomain;
 import org.springframework.http.ResponseEntity;

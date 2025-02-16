@@ -2,7 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;

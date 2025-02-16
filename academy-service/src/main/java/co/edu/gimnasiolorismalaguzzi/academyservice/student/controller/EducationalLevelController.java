@@ -2,7 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.EducationalLevelDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.PersistenceEducationalLevelPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceEducationalLevelPort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;

@@ -1,23 +1,14 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.entity;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-@Data
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "group_students")
 public class GroupStudent {
     @Id
@@ -27,28 +18,12 @@ public class GroupStudent {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "level_id", nullable = false)
-    private EducationalLevel level;
-
-    @Size(max = 15)
-    @Column(name = "group_code", length = 15)
-    private String groupCode;
-
-    @Size(max = 50)
-    @NotNull
-    @Column(name = "group_name", nullable = false, length = 50)
-    private String groupName;
+    @JoinColumn(name = "student_id", nullable = false)
+    private User student;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "professor_id", nullable = false)
-    private User professor;
-
-    @NotNull
-    @Column(name = "status", nullable = false)
-    private String status;
-
-    @OneToMany(mappedBy = "group")
-    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+    @JoinColumn(name = "group_id", nullable = false)
+    private Groups group;
 
 }

@@ -10,9 +10,6 @@ CREATE TABLE users (
                        username VARCHAR(30) NOT NULL UNIQUE,
                        email VARCHAR(256) NOT NULL UNIQUE,
                        password VARCHAR(256) NOT NULL,
-                       created_at TIMESTAMPTZ DEFAULT now(),
-                       last_login TIMESTAMPTZ,
-                       attempted_failed_login INT,
                        uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
@@ -107,20 +104,29 @@ CREATE TABLE academic_period (
                                  setting_id int not null references grade_settings(id),
                                  start_date DATE NOT NULL,
                                  end_date DATE NOT NULL,
-                                 name VARCHAR(8) NOT NULL UNIQUE,
+                                 name VARCHAR(8) NOT NULL,
                                  status varchar(1) NOT NULL
 );
 
 
--- Table: group_students
-CREATE TABLE group_students (
-                                id int primary key generated always as identity,
-                                level_id INT NOT NULL REFERENCES educational_level(id),
-                                group_code varchar(15),
-                                group_name VARCHAR(50) NOT NULL,
-                                professor_id INT NOT NULL REFERENCES users(id),
-                                status VARCHAR (1) NOT NULL DEFAULT 'A'
+-- Table: group_students (Primero, segundo tercero)
+CREATE TABLE groups (
+                        id int primary key generated always as identity,
+                        level_id INT NOT NULL REFERENCES educational_level(id),
+                        group_code varchar(15),
+                        group_name VARCHAR(50) NOT NULL,
+                        mentor_id INT NOT NULL REFERENCES users(id),
+                        status VARCHAR (1) NOT NULL DEFAULT 'A'
 );
+
+-- La relación / agrupación
+CREATE TABLE group_students (
+                                id int not null primary key generated always as identity,
+                                student_id int not null references users(id),
+                                group_id int not null references groups(id)
+);
+
+
 
 -- Table: dimensions
 CREATE TABLE dimensions (
@@ -134,6 +140,12 @@ CREATE TABLE subject (
                          id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                          subject_name VARCHAR(50) NOT NULL,
                          status VARCHAR(1) NOT NULL DEFAULT 'A'
+);
+
+CREATE TABLE subject_groups (
+                                id int not null primary key generated always as identity,
+                                subject_id int not null references subject(id),
+                                group_students int not  null references groups(id)
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.
@@ -174,9 +186,17 @@ CREATE TABLE subject_professors (
 CREATE TABLE knowledge (
                            id int primary key generated always as identity,
                            name varchar(10) default null,
-                           achievement text,
                            percentage int,
                            status varchar(1) DEFAULT 'A'
+);
+
+CREATE TABLE achievement_groups(
+                                   id int not null primary key generated always as identity,
+                                   knowledge_id int not null references knowledge(id),
+                                   achievement text not null ,
+                                   group_id int not null references groups(id),
+                                   period_id int not null references academic_period(id)
+
 );
 
 -- Table: activity
@@ -195,7 +215,8 @@ CREATE TABLE activity_group(
                                id int primary key generated always as identity,
                                activity_id INT NOT NULL REFERENCES activity(id),
                                group_id INT NOT NULL REFERENCES group_students(id),
-                               due DATE NOT NULL
+                               start_date DATE NOT NULL,
+                               end_date DATE
 );
 
 -- Table: subject_knowledge

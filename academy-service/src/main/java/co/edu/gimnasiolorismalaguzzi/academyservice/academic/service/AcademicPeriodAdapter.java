@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
@@ -23,8 +24,6 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
 
     @Autowired
     private AcademicPeriodMapper academicPeriodMapper;
-    @Autowired
-    private InetUtils inetUtils;
 
     public AcademicPeriodAdapter(AcademicPeriodCrudRepo academicPeriodCrudRepo) {
         this.academicPeriodCrudRepo = academicPeriodCrudRepo;

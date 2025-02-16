@@ -6,6 +6,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.EducationalLe
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.EducationalLevel;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.EducationalLevelMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.EduLevelCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceEducationalLevelPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

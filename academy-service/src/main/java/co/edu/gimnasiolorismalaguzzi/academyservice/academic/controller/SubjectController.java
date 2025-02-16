@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.PersistenceSubjectPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectProfessorAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
@@ -15,11 +15,9 @@ import java.util.List;
 public class SubjectController {
 
     private final PersistenceSubjectPort subjectServicePort;
-    private final SubjectProfessorAdapter subjectProfessorAdapter;
 
     public SubjectController(PersistenceSubjectPort subjectServicePort, SubjectProfessorAdapter subjectProfessorAdapter) {
         this.subjectServicePort = subjectServicePort;
-        this.subjectProfessorAdapter = subjectProfessorAdapter;
     }
 
     @GetMapping()
