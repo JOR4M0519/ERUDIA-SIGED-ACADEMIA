@@ -20,6 +20,10 @@ public class Knowledge {
     @Column(name = "name", length = 10)
     private String name;
 
+
+    @Column(name = "percentage")
+    private Integer percentage;
+
     @Column(name = "status")
     private String status;
 
