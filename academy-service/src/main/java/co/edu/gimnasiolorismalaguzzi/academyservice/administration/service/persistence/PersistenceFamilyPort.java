@@ -10,4 +10,6 @@ public interface PersistenceFamilyPort extends PersistencePort<FamilyDomain, Int
 
     FamilyDomain saveById(Integer id, FamilyDomain familyDomain);
 
+    List<FamilyDomain> findStudentsByRelativeId(Integer relativeId);
+
 }

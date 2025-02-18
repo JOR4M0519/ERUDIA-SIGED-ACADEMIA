@@ -6,5 +6,6 @@ import lombok.Data;
 public class KnowledgeDomain {
     private Integer id;
     private String name;
+    private int percentage;
     private String status;
 }

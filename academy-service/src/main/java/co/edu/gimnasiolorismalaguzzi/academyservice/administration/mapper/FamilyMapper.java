@@ -13,7 +13,7 @@ import java.util.List;
 public interface FamilyMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "student", target = "student"),
+            @Mapping(source = "student", target = "relativeUser"),
             @Mapping(source = "user", target = "user"),
             @Mapping(source = "relationship", target = "relationship")
     })

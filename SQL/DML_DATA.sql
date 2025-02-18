@@ -84,7 +84,7 @@ INSERT INTO educational_level (level_name, status) VALUES
                                                        ('Preescolar', 'A'),
                                                        ('Primaria', 'A'),
                                                        ('Secundaria', 'A'),
-                                                       ('Media', 'A'),
+                                                       ('Primaria', 'A'),
                                                        ('Universitaria', 'A');
 
 -- 12. Tabla: grade_settings
@@ -97,18 +97,18 @@ INSERT INTO grade_settings (level_id, minimum_grade, pass_grade, maximum_grade) 
 
 -- 13. Tabla: academic_period
 INSERT INTO academic_period (setting_id, start_date, end_date, name, status) VALUES
-                                                                                 (1, '2024-01-01', '2024-06-30', 'Q1', 'A'),
-                                                                                 (2, '2024-07-01', '2024-12-31', 'Q2', 'A'),
-                                                                                 (3, '2023-01-01', '2023-06-30', 'Q1', 'I'),
-                                                                                 (4, '2023-07-01', '2023-12-31', 'Q2', 'I'),
-                                                                                 (5, '2022-01-01', '2022-12-31', 'Annual', 'I');
+                                                                                 (1, '2025-01-01', '2025-06-30', 'P2025-1', 'A'),
+                                                                                 (2, '2025-07-01', '2025-12-31', 'P2025-2', 'I'),
+                                                                                 (3, '2026-01-01', '2026-06-30', 'P2026-1', 'I'),
+                                                                                 (4, '2026-07-01', '2026-12-31', 'P2026-2', 'I'),
+                                                                                 (5, '2027-01-01', '2027-12-31', 'P2021-1', 'I');
 
 -- 14. Tabla: groups
 INSERT INTO groups (level_id, group_code, group_name, mentor_id, status) VALUES
                                                                              (1, 'G1A', 'Preescolar A', 1, 'A'),
                                                                              (2, 'G2B', 'Primaria B', 2, 'A'),
                                                                              (3, 'G3C', 'Secundaria C', 3, 'A'),
-                                                                             (4, 'G4D', 'Media D', 4, 'A'),
+                                                                             (4, 'G4D', 'Segundo B', 3, 'A'),
                                                                              (5, 'G5E', 'Universitaria E', 5, 'A');
 
 -- 15. Tabla: group_students
@@ -140,6 +140,9 @@ INSERT INTO subject_groups (subject_id, group_students) VALUES
                                                             (1, 1),
                                                             (2, 2),
                                                             (3, 3),
+                                                            (1, 4),
+                                                            (2, 4),
+                                                            (3, 4),
                                                             (4, 4),
                                                             (5, 5);
 
@@ -172,21 +175,24 @@ INSERT INTO subject_professors (subject_id, professor_id) VALUES
                                                               (1, 1),
                                                               (2, 2),
                                                               (3, 3),
-                                                              (4, 4),
+                                                              (4, 2),
                                                               (5, 5);
 
 -- 23. Tabla: knowledge
 INSERT INTO knowledge (name, percentage, status) VALUES
                                                      ('Ser', 20, 'A'),
                                                      ('Hacer', 30, 'A'),
-                                                     ('Nose', 40, 'A'),
-                                                     ('test', 50, 'A'),
-                                                     ('a', 60, 'A');
+                                                     ('Saber', 20, 'A'),
+                                                     ('test', 10, 'A'),
+                                                     ('a', 10, 'A');
 -- 27. Tabla: subject_knowledge
 INSERT INTO subject_knowledge (id_subject, id_knowledge) VALUES
                                                              (1, 1),
                                                              (2, 2),
-                                                             (3, 3),
+                                                             (2, 3),
+                                                             (3, 4),
+                                                             (3, 2),
+                                                             (4, 3),
                                                              (4, 4),
                                                              (5, 5);
 
@@ -195,25 +201,28 @@ INSERT INTO subject_knowledge (id_subject, id_knowledge) VALUES
 INSERT INTO achievement_groups (subject_knowledge_id, achievement, group_id, period_id) VALUES
                                                                                     (1, 'Logro en teoría', 1, 1),
                                                                                     (2, 'Logro en práctica', 2, 2),
-                                                                                    (3, 'Logro en evaluación', 3, 3),
-                                                                                    (4, 'Logro en proyecto', 4, 4),
-                                                                                    (5, 'Logro en investigación', 5, 5);
+                                                                                    (3, 'Logro en evaluación', 4, 1),
+                                                                                    (4, 'Logro en proyecto', 4, 1),
+                                                                                    (5, 'Logro en investigación', 4, 1),
+                                                                                    (6, 'Logro en evaluación', 4, 1),
+                                                                                    (7, 'Logro en proyecto', 4, 1),
+                                                                                    (8, 'Logro en investigación',4 , 1);
 
 -- 25. Tabla: activity
 INSERT INTO activity (activity_name, description, achievement_groups_id, status) VALUES
-                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 1, 'A'),
-                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 2, 'A'),
-                                                                                             ('Laboratorio Ciencias', 'Experimento químico',  3, 'A'),
-                                                                                             ('Debate Lenguaje', 'Debate sobre literatura',  4, 'A'),
-                                                                                             ('Listening Inglés', 'Comprensión auditiva',  5, 'A');
+                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 3, 'A'),
+                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 4, 'A'),
+                                                                                             ('Laboratorio Ciencias', 'Experimento químico',  5, 'A'),
+                                                                                             ('Debate Lenguaje', 'Debate sobre literatura',  6, 'A'),
+                                                                                             ('Listening Inglés', 'Comprensión auditiva',  7, 'A');
 
 -- 26. Tabla: activity_group
 INSERT INTO activity_group (activity_id, group_id, start_date, end_date) VALUES
-                                                                             (1, 1, '2024-02-05', '2024-02-06'),
-                                                                             (2, 2, '2024-02-07', '2024-02-08'),
-                                                                             (3, 3, '2024-02-09', '2024-02-10'),
-                                                                             (4, 4, '2024-02-11', '2024-02-12'),
-                                                                             (5, 5, '2024-02-13', '2024-02-14');
+                                                                             (1, 4, '2025-02-05', '2024-02-06'),
+                                                                             (2, 4, '2025-02-07', '2024-02-08'),
+                                                                             (3, 4, '2025-02-09', '2024-02-10'),
+                                                                             (4, 4, '2025-02-11', '2024-02-12'),
+                                                                             (5, 4, '2025-02-13', '2024-02-14');
 
 -- 28. Tabla: activity_grade
 INSERT INTO activity_grade (student_id, activity_id, score, comment) VALUES
@@ -228,7 +237,10 @@ INSERT INTO subject_grade (subject_id, student_id, period_id, total_score, recov
                                                                                           (1, 1, 1, 4.2, 'N'),
                                                                                           (2, 2, 2, 3.6, 'N'),
                                                                                           (3, 3, 3, 4.0, 'N'),
-                                                                                          (4, 4, 4, 3.2, 'S'),
+                                                                                          (1, 4, 1, 1.0, 'S'),
+                                                                                          (2, 4, 1, 2.2, 'S'),
+                                                                                          (3, 4, 1, 3.2, 'S'),
+                                                                                          (4, 4, 1, 4.2, 'S'),
                                                                                           (5, 5, 5, 4.8, 'N');
 
 -- 30. Tabla: recovery_period

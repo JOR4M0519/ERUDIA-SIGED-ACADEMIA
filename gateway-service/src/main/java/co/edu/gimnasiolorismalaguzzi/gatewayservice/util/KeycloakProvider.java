@@ -35,6 +35,7 @@ public class KeycloakProvider {
         return keycloak.realm(REALM_NAME);
     }
 
+
     public String getToken(String username, String password) {
         try {
             // Construye un cliente Keycloak con el flujo de contraseña

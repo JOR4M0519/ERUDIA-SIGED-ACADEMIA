@@ -48,6 +48,13 @@ public class UserController {
         return ResponseEntity.ok(familyDomain);
     }
 
+    @GetMapping("/family/{relativeId}/students")
+    public ResponseEntity<?> findStudentsByRelatives(@PathVariable Integer relativeId){
+        List<FamilyDomain> familyDomain = persistenceFamilyPort.findStudentsByRelativeId(relativeId);
+        return ResponseEntity.ok(familyDomain);
+    }
+
+
     @PostMapping("/family/create/{id}")
     public ResponseEntity<FamilyDomain> createRelatives(@PathVariable Integer id, @RequestBody FamilyDomain familyDomain){
         FamilyDomain createdRelative = persistenceFamilyPort.saveById(id,familyDomain);

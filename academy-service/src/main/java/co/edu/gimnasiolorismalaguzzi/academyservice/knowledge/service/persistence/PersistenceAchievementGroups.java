@@ -6,5 +6,5 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.Achievement
 import java.util.List;
 
 public interface PersistenceAchievementGroups extends PersistencePort<AchievementGroupDomain, Integer> {
-    List<AchievementGroupDomain> getKnowledgeAchievementBySubjectId(Integer id, Integer groupid);
+    List<AchievementGroupDomain> getKnowledgeAchievementBySubjectId(Integer subjectId,Integer groupId,Integer periodId);
 }

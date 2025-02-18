@@ -79,7 +79,19 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
     @Override
     public List<FamilyDomain> findRelativesByStudent(Integer id) {
-        List<Family> relatives = familyCrudRepo.findRelativesByStudent(id);
+        List<Family> relatives = familyCrudRepo.findByStudent_Id(id);
+        //findRelativesByStudent()
+        return familyMapper.toDomains(relatives);
+    }
+
+    /**
+     * Devuelve la información del usuario de los estudiantes del familiar
+     * @param relativeId
+     * @return
+     */
+    @Override
+    public List<FamilyDomain> findStudentsByRelativeId(Integer relativeId) {
+        List<Family> relatives = familyCrudRepo.findByUser_Id(relativeId);
         return familyMapper.toDomains(relatives);
     }
 

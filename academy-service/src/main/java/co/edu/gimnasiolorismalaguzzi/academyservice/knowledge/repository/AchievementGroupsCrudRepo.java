@@ -6,7 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface AchievementGroupsCrudRepo extends JpaRepository<AchievementGroup, Integer> {
-    AchievementGroup findByGroup_Id(Integer id);
-
-    List<AchievementGroup> findByGroup_IdAndSubjectKnowledge_IdSubject_Id(Integer id, Integer id1);
+    List<AchievementGroup> findBySubjectKnowledge_IdSubject_IdAndGroup_IdAndPeriod_Id(Integer id, Integer id1, Integer id2);
 }
