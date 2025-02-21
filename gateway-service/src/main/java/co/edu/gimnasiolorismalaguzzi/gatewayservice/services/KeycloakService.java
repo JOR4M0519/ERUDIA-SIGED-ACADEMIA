@@ -9,6 +9,7 @@ import org.keycloak.admin.client.resource.GroupsResource;
 import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ import reactor.core.scheduler.Schedulers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -55,6 +57,33 @@ public class KeycloakService {
             }
         }).subscribeOn(Schedulers.boundedElastic()); // 🔥 Ejecuta en un hilo seguro para bloqueos
     }
+
+
+
+
+    public List<String> getUserGroupsByUsername(String username) {
+        keycloakProvider = new KeycloakProvider();
+        UsersResource usersResource = keycloakProvider.getUserResource();
+
+        // 🔥 Buscar usuario por username
+        List<UserRepresentation> users = usersResource.searchByUsername(username, true);
+
+        if (users.isEmpty()) {
+            throw new AppException("User not found: " + username, HttpStatus.NOT_FOUND);
+        }
+
+        String userId = users.get(0).getId(); // Obtener el ID del usuario
+
+        // 🔥 Obtener los grupos del usuario
+        UserResource userResource = usersResource.get(userId);
+        List<GroupRepresentation> userGroups = userResource.groups();
+
+        // 🔥 Extraer los nombres de los grupos como roles
+        return userGroups.stream()
+                .map(GroupRepresentation::getName) // Extraer solo los nombres de los grupos
+                .collect(Collectors.toList());
+    }
+
 
     public List<Map<String, String>> getUsersByGroup(String groupId) {
         keycloakProvider = new KeycloakProvider();
@@ -124,6 +153,36 @@ public class KeycloakService {
     }
 
 
+    public List<String> getUserRolesByUsername(String username) {
+        UserRepresentation user = getUsersByUsername(username);
+        String userId = user.getId(); // Obtenemos el ID del usuario
+
+        keycloakProvider = new KeycloakProvider();
+        UsersResource usersResource = keycloakProvider.getUserResource();
+        UserResource userResource = usersResource.get(userId);
+
+        // 1️⃣ Obtener roles efectivos del usuario (directos + heredados)
+        List<RoleRepresentation> effectiveRoles = userResource.roles().realmLevel().listEffective();
+        List<String> roles = new ArrayList<>(effectiveRoles.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+
+        // 2️⃣ Obtener los grupos del usuario
+        List<GroupRepresentation> userGroups = userResource.groups();
+
+        // 3️⃣ Obtener roles efectivos de los grupos
+        for (GroupRepresentation group : userGroups) {
+            List<RoleRepresentation> groupEffectiveRoles = keycloakProvider.getRealmResource()
+                    .groups()
+                    .group(group.getId())
+                    .roles()
+                    .realmLevel()
+                    .listEffective(); // 🔥 Cambiamos de listAll() a listEffective()
+
+            roles.addAll(groupEffectiveRoles.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
+        }
+
+        return roles;
+    }
+
 /*    public List<String> getGroupByUser(String username) {
         try {
 
@@ -141,10 +200,16 @@ public class KeycloakService {
         }
     }*/
 
-    public List<UserRepresentation> getUsersByUsername(String username) {
+    public UserRepresentation getUsersByUsername(String username) {
         keycloakProvider = new KeycloakProvider();
-        return keycloakProvider.getRealmResource()
+        List<UserRepresentation> users = keycloakProvider.getRealmResource()
                 .users()
-                .searchByUsername(username, true);
+                .searchByUsername(username, true); // true -> búsqueda exacta
+
+        if (users.isEmpty()) {
+            throw new AppException("User not found", HttpStatus.NOT_FOUND);
+        }
+        return users.get(0); // Retorna el primer usuario encontrado
     }
+
 }

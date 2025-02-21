@@ -27,9 +27,9 @@ public class PrivateController {
         return ResponseEntity.ok(keycloakService.getUsersByGroup(id));
     }
 
-/*    @GetMapping("/users/{uuid}/roles")
-    public ResponseEntity<?> getRolesUserByUuid(@PathVariable String uuid) {
-        return ResponseEntity.ok(keycloakService.getUserRoles(uuid));
-    }*/
+    @GetMapping("/users/{username}/roles")
+    public ResponseEntity<?> getRolesUserByUuid(@PathVariable String username) {
+        return ResponseEntity.ok(keycloakService.getUserGroupsByUsername(username));
+    }
 
 }
