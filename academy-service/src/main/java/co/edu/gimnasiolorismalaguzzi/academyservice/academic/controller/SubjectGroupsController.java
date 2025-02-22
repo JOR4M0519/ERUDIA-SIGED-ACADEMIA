@@ -1,6 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGroupPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,16 @@ public class SubjectGroupsController {
         SubjectGroupDomain subjectGroupDomain = subjectGroupPort.findById(id);
         return ResponseEntity.ok(subjectGroupDomain);
     }
+
+    @GetMapping("/teacher-groups/teacher/{id}/subjects")
+    public ResponseEntity<?> getAllSubjectByTeacherOfYear(
+            @PathVariable Integer id,
+            @RequestParam("year") Integer year) {
+
+        List<SubjectProfessorDomain> subjectTeacherDomains = subjectGroupPort.getAllSubjectByTeacher(id, year);
+        return ResponseEntity.ok(subjectTeacherDomains);
+    }
+
 
     @PostMapping
     public ResponseEntity<SubjectGroupDomain> createSubjectGroup(@RequestBody SubjectGroupDomain subjectGroupDomain){
