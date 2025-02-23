@@ -26,7 +26,7 @@ public class ActivityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityDomain> getEducationalLevelById(@PathVariable Integer id) {
+    public ResponseEntity<ActivityDomain> getActivityById(@PathVariable Integer id) {
         ActivityDomain activityDomain = persistenceActivityPort.findById(id);
         return ResponseEntity.ok(activityDomain);
     }

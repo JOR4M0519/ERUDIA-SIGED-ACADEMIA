@@ -9,6 +9,9 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectProfe
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGroupCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectProfessorCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGroupPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,6 +30,8 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
 
     private final SubjectProfessorMapper subjectProfessorMapper;
 
+    private final UserMapper userMapper;
+
 
     @Autowired
     private SubjectGroupCrudRepo subjectGroupCrudRepo;
@@ -34,9 +39,10 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     private SubjectProfessorCrudRepo subjectProfessorCrudRepo;
 
 
-    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, SubjectProfessorMapper subjectProfessorMapper) {
+    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, SubjectProfessorMapper subjectProfessorMapper, UserMapper userMapper) {
         this.subjectGroupMapper = subjectGroupMapper;
         this.subjectProfessorMapper = subjectProfessorMapper;
+        this.userMapper = userMapper;
     }
 
     @Override
@@ -50,10 +56,29 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findByGroups_Id(id));
     }
 
+    /**
+     * Obtiene todas las materias de un profesor con base en el id
+     * @param id
+     * @param year
+     * @return lista de materias
+     */
+
     @Override
     public List<SubjectProfessorDomain> getAllSubjectByTeacher(Integer id, Integer year) {
         List<SubjectProfessor> subjectProfessorList = this.subjectProfessorCrudRepo.getAllSubjectByTeacher(id,year);
         return this.subjectProfessorMapper.toDomains(subjectProfessorList);
+    }
+
+    /**
+     * Obtiene la lista de estudiante con base al id de uan materia
+     * @param id
+     * @return Lista de estudiantes
+     */
+
+    @Override
+    public List<UserDomain> getStudentListBySubjectId(Integer id) {
+        List<User> userList = this.subjectGroupCrudRepo.findBySubjectId(id);
+        return this.userMapper.toDomains(userList);
     }
 
     @Override

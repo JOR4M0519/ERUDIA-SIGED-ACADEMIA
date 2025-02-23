@@ -24,42 +24,18 @@ public class ActivityGradeController {
         return ResponseEntity.ok(ActivityGradeDomainList);
     }
 
-    /**
-     * Obtiene todas las actividades de un estudiante de un periodo especifico (Activas y finalizadas)
-     * @param periodId
-     * @param userId
-     * @return Lista de actividades.
-     */
-    //Se necesita agregar el pageable - Buscar como se usa
-
-    @GetMapping("/periods/{periodId}/users/{userId}")
-    public ResponseEntity<List<?>> getAllActivity_ByPeriodUser(@PathVariable Integer periodId,
-                                                               @PathVariable Integer userId){
-        List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.getAllActivity_ByPeriodUser(periodId, userId, "I");
-        return ResponseEntity.ok(ActivityGradeDomainList);
-    }
-
-    /**
-     * Las actividades de una materia, por el periodo de un estudiante (Activas y finalizadas)
-     * @param subjectId
-     * @param periodId
-     * @param userId
-     * @return Lista de actividades
-     */
-
-    @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{userId}")
-    public ResponseEntity<List<?>> getAllActivity_ByPeriodByStudentBySubject(@PathVariable Integer subjectId,
-                                                                                                @PathVariable Integer periodId,
-                                                                                                @PathVariable Integer userId ){
-        List<ActivityGradeDomain> ActivityGradeDomainList = persistanceActivityGradePort.getAllActivity_ByPeriod_Student_Subject(subjectId,periodId,userId,"I");
-        return ResponseEntity.ok(ActivityGradeDomainList);
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityGradeDomain> getActivityGroupById(@PathVariable Integer id){
+    public ResponseEntity<ActivityGradeDomain> getActivityGradeById(@PathVariable Integer id){
         ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.findById(id);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
+
+    @GetMapping("/activities/{id}")
+    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer id){
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityId(id);
+        return ResponseEntity.ok(ActivityGradeDomain);
+    }
+
 
     @PostMapping
     public ResponseEntity<ActivityGradeDomain> createActivityGroup(@RequestBody ActivityGradeDomain ActivityGradeDomain){

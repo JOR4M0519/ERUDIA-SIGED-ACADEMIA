@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGradeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityGroupPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
@@ -21,6 +22,37 @@ public class ActivityGroupController {
     public ResponseEntity<List<ActivityGroupDomain>> getAllActivity_Group(){
         List<ActivityGroupDomain> ActivityGroupDomainList = persistenceActivityGroupPort.findAll();
         return ResponseEntity.ok(ActivityGroupDomainList);
+    }
+
+    /**
+     * Obtiene todas las actividades de un estudiante de un periodo especifico (Activas y finalizadas)
+     * @param periodId
+     * @param userId
+     * @return Lista de actividades.
+     */
+    //Se necesita agregar el pageable - Buscar como se usa
+
+    @GetMapping("/periods/{periodId}/users/{userId}")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodUser(@PathVariable Integer periodId,
+                                                               @PathVariable Integer userId){
+        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriodUser(periodId, userId, "I");
+        return ResponseEntity.ok(activityGroupDomains);
+    }
+
+    /**
+     * Las actividades de una materia, por el periodo de un estudiante (Activas y finalizadas)
+     * @param subjectId
+     * @param periodId
+     * @param userId
+     * @return Lista de actividades
+     */
+
+    @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{userId}")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodByStudentBySubject(@PathVariable Integer subjectId,
+                                                                             @PathVariable Integer periodId,
+                                                                             @PathVariable Integer userId ){
+        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriod_Student_Subject(subjectId,periodId,userId,"I");
+        return ResponseEntity.ok(activityGroupDomains);
     }
 
     @GetMapping("/{id}")
