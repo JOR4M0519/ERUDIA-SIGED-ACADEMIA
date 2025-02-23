@@ -11,13 +11,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
 public class ActivityGradeAdapter implements PersistanceActivityGradePort {
-
+    List<ActivityGrade> storedGrades = new ArrayList<ActivityGrade>();
+    ActivityGrade storedGrade;
     private ActivityGradeCrudRepo activityGradeCrudRepo;
 
     @Autowired
@@ -69,7 +71,17 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
 
     @Override
-    public ActivityGradeDomain getGradeByActivityId(Integer id) {
+    public ActivityGradeDomain getGradeByActivityId(Integer id, ActivityGradeDomain activityGradeDomain) {
         return this.activityGradeMapper.toDomain(activityGradeCrudRepo.findByActivity_Id(id));
     }
+
+    @Override
+    public List<ActivityGradeDomain> gradeActivity(List<ActivityGradeDomain> activityGradeDomain) {
+        for (ActivityGradeDomain gradeDomain : activityGradeDomain) {
+            storedGrade = this.activityGradeCrudRepo.save(activityGradeMapper.toEntity(gradeDomain));
+            storedGrades.add(storedGrade);
+        }
+        return activityGradeMapper.toDomains(storedGrades);
+    }
 }
+

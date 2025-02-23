@@ -31,11 +31,16 @@ public class ActivityGradeController {
     }
 
     @GetMapping("/activities/{id}")
-    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer id){
-        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityId(id);
+    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer id, @RequestBody ActivityGradeDomain activityGradeDomain){
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityId(id, activityGradeDomain);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 
+    @PostMapping("/activity/student/grade")
+    public ResponseEntity<List<?>> gradeActivityByStudentId(@RequestBody List<ActivityGradeDomain> activityGradeDomain){
+        List<ActivityGradeDomain> activityGradeDomains = persistanceActivityGradePort.gradeActivity(activityGradeDomain);
+        return ResponseEntity.ok(activityGradeDomains);
+    }
 
     @PostMapping
     public ResponseEntity<ActivityGradeDomain> createActivityGroup(@RequestBody ActivityGradeDomain ActivityGradeDomain){
