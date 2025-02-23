@@ -8,4 +8,6 @@ import java.util.List;
 public interface ActivityGradeCrudRepo extends JpaRepository<ActivityGrade, Integer> {
 
     ActivityGrade findByActivity_Id(Integer id);
+
+    ActivityGrade findByActivity_IdAndStudent_Id(Integer id, Integer id1);
 }

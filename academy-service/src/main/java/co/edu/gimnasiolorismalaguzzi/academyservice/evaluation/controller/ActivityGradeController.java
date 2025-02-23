@@ -37,6 +37,12 @@ public class ActivityGradeController {
     }
 
 
+    @GetMapping("/activities/{activityId}/students/{studentId}")
+    public ResponseEntity<?> getGradeByActivityIdByStudentId(@PathVariable Integer activityId,@PathVariable Integer studentId){
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityIdByStudentId(activityId,studentId);
+        return ResponseEntity.ok(ActivityGradeDomain);
+    }
+
     @PostMapping
     public ResponseEntity<ActivityGradeDomain> createActivityGroup(@RequestBody ActivityGradeDomain ActivityGradeDomain){
         ActivityGradeDomain createdDimension = persistanceActivityGradePort.save(ActivityGradeDomain);
