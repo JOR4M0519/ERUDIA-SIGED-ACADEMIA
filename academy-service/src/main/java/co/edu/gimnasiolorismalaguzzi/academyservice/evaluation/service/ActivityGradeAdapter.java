@@ -21,49 +21,29 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     private ActivityGradeCrudRepo activityGradeCrudRepo;
 
     @Autowired
-    private ActivityGradeMapper gradeMapper;
+    private ActivityGradeMapper activityGradeMapper;
 
     public ActivityGradeAdapter(ActivityGradeCrudRepo activityGradeCrudRepo, ActivityGradeMapper gradeMapper){
-        this.gradeMapper = gradeMapper;
+        this.activityGradeMapper = gradeMapper;
         this.activityGradeCrudRepo = activityGradeCrudRepo;
     }
 
     @Override
     public List<ActivityGradeDomain> findAll() {
-        return gradeMapper.toDomains(activityGradeCrudRepo.findAll());
+        return activityGradeMapper.toDomains(activityGradeCrudRepo.findAll());
     }
 
-    @Override
-    public List<ActivityGradeDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String status) {
-        return gradeMapper.toDomains(activityGradeCrudRepo.findByActivity_Activity_AchievementGroup_Period_IdAndStudent_IdAndActivity_Activity_StatusNotLike(
-                periodId,
-                userId,
-                status
-        ));
-    }
-
-    @Override
-    public List<ActivityGradeDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId, String status) {
-        return gradeMapper.toDomains(
-                activityGradeCrudRepo.
-                        findByActivity_Activity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndActivity_Activity_AchievementGroup_Period_IdAndStudent_IdAndActivity_Activity_StatusNotLike(
-                                subjectId,
-                                periodId,
-                                userId,
-                                status
-                        ));
-    }
     @Override
     public ActivityGradeDomain findById(Integer integer) {
         Optional<ActivityGrade> activityGroup = this.activityGradeCrudRepo.findById(integer);
-        return activityGroup.map(gradeMapper::toDomain).orElse(null);
+        return activityGroup.map(activityGradeMapper::toDomain).orElse(null);
     }
 
     @Override
     public ActivityGradeDomain save(ActivityGradeDomain entity) {
-        ActivityGrade activityGroup = gradeMapper.toEntity(entity);
+        ActivityGrade activityGroup = activityGradeMapper.toEntity(entity);
         ActivityGrade savedActivityGroup = this.activityGradeCrudRepo.save(activityGroup);
-        return gradeMapper.toDomain(savedActivityGroup);
+        return activityGradeMapper.toDomain(savedActivityGroup);
     }
 
     @Override
@@ -76,7 +56,7 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
                 existingActivityGrade.get().setScore(entity.getScore());
                 existingActivityGrade.get().setComment(entity.getComment());
             }
-            return gradeMapper.toDomain(activityGradeCrudRepo.save(existingActivityGrade.get()));
+            return activityGradeMapper.toDomain(activityGradeCrudRepo.save(existingActivityGrade.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Relation Activity Grade with ID " + integer + " Not found!");
         }
@@ -88,4 +68,8 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     }
 
 
+    @Override
+    public ActivityGradeDomain getGradeByActivityId(Integer id) {
+        return this.activityGradeMapper.toDomain(activityGradeCrudRepo.findByActivity_Id(id));
+    }
 }

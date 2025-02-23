@@ -2,6 +2,8 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistenc
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 
 import java.util.List;
@@ -10,4 +12,6 @@ public interface PersistenceSubjectGroupPort extends PersistencePort<SubjectGrou
     List<SubjectGroupDomain> getAllSubjectGroupsByStudentsGroupsId(Integer id);
 
     List<SubjectProfessorDomain> getAllSubjectByTeacher(Integer id, Integer year);
+
+    List<?> getStudentListBySubjectId(Integer id);
 }

@@ -1,5 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityGroupMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
@@ -15,7 +18,6 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Optional;
 
-
 @PersistenceAdapter
 @Slf4j
 public class ActivityAdapter implements PersistenceActivityPort {
@@ -25,9 +27,13 @@ public class ActivityAdapter implements PersistenceActivityPort {
     @Autowired
     private final ActivityMapper activityMapper;
 
-    public ActivityAdapter(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper) {
+    @Autowired
+    private final ActivityGroupMapper activityGroupMapper;
+
+    public ActivityAdapter(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper, ActivityGroupMapper activityGroupMapper) {
         this.activityCrudRepo = activityCrudRepo;
         this.activityMapper = activityMapper;
+        this.activityGroupMapper = activityGroupMapper;
     }
 
     @Override
@@ -87,4 +93,5 @@ public class ActivityAdapter implements PersistenceActivityPort {
     public List<ActivityDomain> getAllActivitiesWithKnowledgesAchievements(Integer id) {
         return this.activityMapper.toDomains(this.activityCrudRepo.findAll());
     }
+
 }

@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface PersistenceActivityGroupPort extends PersistencePort<ActivityGroupDomain, Integer> {
     List<ActivityGroupDomain> findActivitiesByGroupId(Integer id, String status);
+
+    List<ActivityGroupDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String i);
+
+    List<ActivityGroupDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId, String i);
 }
