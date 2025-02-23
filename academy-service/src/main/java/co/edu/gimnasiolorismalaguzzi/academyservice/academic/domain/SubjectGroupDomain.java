@@ -8,4 +8,5 @@ public class SubjectGroupDomain {
     private Integer id;
     private SubjectProfessorDomain subjectProfessor;
     private GroupsDomain groups;
+    private AcademicPeriodDomain academicPeriod;
 }

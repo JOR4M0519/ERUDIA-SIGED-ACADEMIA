@@ -26,4 +26,9 @@ public class SubjectGroup {
     @JoinColumn(name = "group_students", nullable = false)
     private Groups groups;
 
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "academic_period_id", nullable = false)
+    private AcademicPeriod academicPeriod;
+
 }

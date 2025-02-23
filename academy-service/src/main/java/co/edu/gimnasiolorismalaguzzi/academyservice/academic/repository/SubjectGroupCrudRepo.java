@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGroup;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,6 +27,28 @@ WHERE s.id = :subjectId
     List<User> findBySubjectId(@Param("subjectId") Integer id);
 
     List<SubjectGroup> findByGroups_Id(Integer id);
+/***
+    SELECT sub_group.*
+    FROM subject_groups sub_group
+    JOIN subject_professors sub_prof on sub_prof.id = sub_group.subject_professor_id
+    JOIN academic_period ap ON sub_group.academic_period_id = ap.id
+    WHERE sub_prof.professor_id = 2
+    AND ap.start_date <= TO_DATE('2025-12-31', 'YYYY-MM-DD')
+    AND ap.end_date >= TO_DATE( '2025-01-01', 'YYYY-MM-DD')
+    AND ap.status IN ('A', 'F');
+ **/
+
+    @Query(value = "SELECT sub_group.* FROM subject_groups sub_group " +
+            "JOIN subject_professors sub_prof on sub_prof.id = sub_group.subject_professor_id " +
+            "JOIN academic_period ap ON sub_group.academic_period_id = ap.id " +
+            "WHERE sub_prof.professor_id = :teacherId " +
+            "  AND ap.start_date <= TO_DATE(:year || '-12-31', 'YYYY-MM-DD') " +
+            "  AND ap.end_date   >= TO_DATE(:year || '-01-01', 'YYYY-MM-DD') " +
+            "  AND ap.status IN ('A', 'F')",
+            nativeQuery = true)
+    List<SubjectGroup> getAllSubjectByTeacher(@Param("teacherId") Integer teacherId,
+                                                  @Param("year") Integer year);
+
 
 }
 
