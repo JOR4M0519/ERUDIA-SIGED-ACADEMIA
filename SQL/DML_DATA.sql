@@ -7,12 +7,12 @@ INSERT INTO id_type (name) VALUES
                                ('Registro Civil');
 
 -- 2. La tabla users ya contenía registros, no se modifica.
-INSERT INTO users (username, email, password, uuid, status) VALUES
-                                                                ('juanita.perez', 'jdramos10000@gmail.com', 'hashed_password', '47928edd-60b4-4b61-97c8-285e15d0c867', 'A'),
-                                                                ('nicolas.rodriguez', 'jdramos100@gmail.com', 'hashed_password', '8a00719b-f1ec-4332-b187-5826278addc6', 'A'),
-                                                                ('pepito.perez', 'jdramos1000@gmail.com', 'hashed_password', '13644306-4de2-440c-89bd-8cec1ee2ab41', 'A'),
-                                                                ('rectoria', 'soporteyopal@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'cf3fb2ce-5ed0-4f10-beda-2d40999e0138', 'A'),
-                                                                ('admin', 'admin@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'admin-uuid-001', 'A');
+INSERT INTO users (username, email, password, uuid, status,first_name, last_name) VALUES
+                                                                                      ('juanita.perez', 'jdramos10000@gmail.com', 'hashed_password', '47928edd-60b4-4b61-97c8-285e15d0c867', 'A','Juanita', 'Andrea'),
+                                                                                      ('nicolas.rodriguez', 'jdramos100@gmail.com', 'hashed_password', '8a00719b-f1ec-4332-b187-5826278addc6', 'A','Nicolás', 'Fernando'),
+                                                                                      ('pepito.perez', 'jdramos1000@gmail.com', 'hashed_password', '13644306-4de2-440c-89bd-8cec1ee2ab41', 'A','Pepito', 'José'),
+                                                                                      ('rectoria', 'soporteyopal@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'cf3fb2ce-5ed0-4f10-beda-2d40999e0138', 'A','Rectoría', NULL),
+                                                                                      ('admin', 'admin@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'admin-uuid-001', 'A','Admin', NULL);
 
 -- 3. Tabla: user_detail
 INSERT INTO user_detail (user_id, first_name, middle_name, last_name, second_last_name, address, phone_number, date_of_birth, dni, id_type_id, neighborhood, city, position_job)
@@ -105,11 +105,11 @@ INSERT INTO academic_period (setting_id, start_date, end_date, name, status) VAL
 
 -- 14. Tabla: groups
 INSERT INTO groups (level_id, group_code, group_name, mentor_id, status) VALUES
-                                                                             (1, 'G1A', 'Preescolar A', 1, 'A'),
-                                                                             (2, 'G2B', 'Primaria B', 2, 'A'),
-                                                                             (3, 'G3C', 'Secundaria C', 3, 'A'),
-                                                                             (4, 'G4D', 'Segundo B', 3, 'A'),
-                                                                             (5, 'G5E', 'Universitaria E', 5, 'A');
+                                                                             (1, 'G1A', 'Primero A', 1, 'A'),
+                                                                             (2, 'G2B', 'Segundo B', 2, 'A'),
+                                                                             (3, 'G3C', 'Tercero C', 3, 'A'),
+                                                                             (4, 'G4D', 'Cuarto D', 3, 'A'),
+                                                                             (5, 'G5E', 'Quinto E', 5, 'A');
 
 -- 15. Tabla: group_students
 INSERT INTO group_students (student_id, group_id) VALUES
@@ -268,12 +268,19 @@ INSERT INTO backup_history (backup_name, description, file_path, created_by) VAL
                                                                                  ('Backup 03', 'Copia de seguridad marzo', '/backups/backup03.sql', 3),
                                                                                  ('Backup 04', 'Copia de seguridad abril', '/backups/backup04.sql', 4),
                                                                                  ('Backup 05', 'Copia de seguridad mayo', '/backups/backup05.sql', 5);
+-- 33. Tabla: tracking_type
+INSERT INTO tracking_type (type) VALUES
+                                         ('1'),
+                                         ('2'),
+                                         ('3'),
+                                         ('4'),
+                                         ('2');
 
 
 -- 33. Tabla: student_tracking
-INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status) VALUES
-                                                                                                (1, 2, 'Falta a clases', 'Asistir puntualmente', 'Revisión semanal', 'A'),
-                                                                                                (2, 3, 'Bajo rendimiento', 'Estudio diario', 'Informe mensual', 'A'),
-                                                                                                (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario', 'A'),
-                                                                                                (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral', 'A'),
-                                                                                                (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico', 'A');
+INSERT INTO student_tracking (student, professor, situation, compromise, follow_up,period_id,tracking_type, status) VALUES
+                                                                                                (1, 2, 'Falta a clases', 'Asistir puntualmente', 'Revisión semanal',1,1, 'A'),
+                                                                                                (2, 3, 'Bajo rendimiento', 'Estudio diario', 'Informe mensual',1,5, 'A'),
+                                                                                                (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario',1,4, 'A'),
+                                                                                                (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral',1,3, 'A'),
+                                                                                                (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico',1,2, 'A');

@@ -10,6 +10,8 @@ CREATE TABLE users (
                        username VARCHAR(30) NOT NULL UNIQUE,
                        email VARCHAR(256) NOT NULL UNIQUE,
                        password VARCHAR(256) NOT NULL,
+                       first_name VARCHAR(40),
+                       last_name VARCHAR(40),
                        uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
