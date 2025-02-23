@@ -13,13 +13,6 @@ public interface SubjectProfessorCrudRepo extends JpaRepository<SubjectProfessor
     @Query(value = "SELECT * FROM subject_professors WHERE subject_id = :subjectId", nativeQuery = true)
     List<SubjectProfessor> findBySubjectId(@Param("subjectId") Integer subjectId);
 
-    @Query(value = "select sp.* from subject_professors sp " +
-            "join subject_grade sg on  sp.subject_id = sg.subject_id " +
-            "         join academic_period ap on ap.id = sg.period_id " +
-            "where sp.professor_id = :teacherId " +
-            "AND ap.year = :year ", nativeQuery = true)
-    List<SubjectProfessor> getAllSubjectByTeacher2(@Param("year") Integer year, @Param("teacherId") Integer teacherId);
-
     @Query(value = "SELECT DISTINCT sp.* FROM subject_professors sp " +
             "JOIN subject_grade sg ON sp.subject_id = sg.subject_id " +
             "JOIN academic_period ap ON ap.id = sg.period_id " +

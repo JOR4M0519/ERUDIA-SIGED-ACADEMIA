@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class SubjectGroupDomain {
     private Integer id;
-    private SubjectDomain subject;
+    private SubjectProfessorDomain subjectProfessor;
     private GroupsDomain groups;
 }

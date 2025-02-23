@@ -74,7 +74,7 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         try{
             Optional<SubjectGroup> existingSubjectGroupDomain = subjectGroupCrudRepo.findById(integer);
             if(existingSubjectGroupDomain.isPresent()){
-                existingSubjectGroupDomain.get().setSubject(subjectGroupMapper.toEntity(domain).getSubject());
+                existingSubjectGroupDomain.get().setSubjectProfessor(subjectGroupMapper.toEntity(domain).getSubjectProfessor());
                 existingSubjectGroupDomain.get().setGroups(subjectGroupMapper.toEntity(domain).getGroups());
             }
             return subjectGroupMapper.toDomain(subjectGroupCrudRepo.save(existingSubjectGroupDomain.get()));

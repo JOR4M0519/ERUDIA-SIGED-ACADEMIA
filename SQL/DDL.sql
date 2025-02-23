@@ -142,9 +142,16 @@ CREATE TABLE subject (
                          status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
 
+-- Table: subject_professors
+CREATE TABLE subject_professors (
+                                    id int primary key generated always as identity,
+                                    subject_id INT NOT NULL REFERENCES subject(id),
+                                    professor_id INT NOT NULL REFERENCES users(id)
+);
+
 CREATE TABLE subject_groups (
                                 id int not null primary key generated always as identity,
-                                subject_id int not null references subject(id),
+                                subject_professor_id int not null references subject_professors(id),
                                 group_students int not  null references groups(id)
 );
 
@@ -173,13 +180,6 @@ CREATE TABLE attendance (
                             attendance_date DATE NOT NULL,                       -- Date of attendance
                             status VARCHAR(2) NOT NULL,                          -- Attendance status ('Present', 'Absent', 'Late', etc.)
                             recorded_at TIMESTAMPTZ DEFAULT now()                -- Date and time of record
-);
-
--- Table: subject_professors
-CREATE TABLE subject_professors (
-                                    id int primary key generated always as identity,
-                                    subject_id INT NOT NULL REFERENCES subject(id),
-                                    professor_id INT NOT NULL REFERENCES users(id)
 );
 
 -- Table: knowledge
@@ -239,6 +239,7 @@ CREATE TABLE subject_grade (
                                subject_id INT NOT NULL REFERENCES subject(id),
                                student_id INT NOT NULL REFERENCES users(id),
                                period_id INT NOT NULL REFERENCES academic_period(id),
+                               comment varchar,
                                total_score NUMERIC (5,2) NOT NULL,
                                recovered VARCHAR(1)
 );
@@ -276,11 +277,18 @@ CREATE TABLE backup_history (
                                 created_by INT NOT NULL REFERENCES users(id)
 );
 
+CREATE TABLE tracking_type(
+                              id int primary key generated always as identity,
+                              type varchar(1)
+);
+
 -- Table: student_tracking
 CREATE TABLE student_tracking (
                                   id int primary key generated always as identity,
                                   student INT NOT NULL REFERENCES users(id),
                                   professor INT NOT NULL REFERENCES users(id),
+                                  period_id INT NOT NULL REFERENCES academic_period(id),
+                                  tracking_type INT NOT NULL REFERENCES tracking_type(id),
                                   situation TEXT NOT NULL, -- Behavior description
                                   compromise TEXT NOT NULL, -- Commitment
                                   follow_up TEXT NOT NULL, -- Follow-up

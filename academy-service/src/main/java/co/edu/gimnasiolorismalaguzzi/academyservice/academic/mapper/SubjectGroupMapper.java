@@ -13,7 +13,7 @@ import java.util.List;
 public interface SubjectGroupMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "subject", target = "subject"),
+            @Mapping(source = "subjectProfessor", target = "subjectProfessor"),
             @Mapping(source = "groups", target = "groups")
     })
     SubjectGroupDomain toDomain(SubjectGroup subjectGroup);

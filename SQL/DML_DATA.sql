@@ -135,8 +135,16 @@ INSERT INTO subject (subject_name, status) VALUES
                                                ('Historia', 'A'),
                                                ('Inglés', 'A');
 
+-- 22. Tabla: subject_professors
+INSERT INTO subject_professors (subject_id, professor_id) VALUES
+                                                              (1, 1),
+                                                              (2, 2),
+                                                              (3, 3),
+                                                              (4, 2),
+                                                              (5, 5);
+
 -- 18. Tabla: subject_groups
-INSERT INTO subject_groups (subject_id, group_students) VALUES
+INSERT INTO subject_groups (subject_professor_id, group_students) VALUES
                                                             (1, 1),
                                                             (2, 2),
                                                             (3, 3),
@@ -170,13 +178,7 @@ INSERT INTO attendance (student_id, schedule_id, attendance_date, status) VALUES
                                                                               (4, 4, '2024-02-01', 'P'),
                                                                               (5, 5, '2024-02-01', 'A');
 
--- 22. Tabla: subject_professors
-INSERT INTO subject_professors (subject_id, professor_id) VALUES
-                                                              (1, 1),
-                                                              (2, 2),
-                                                              (3, 3),
-                                                              (4, 2),
-                                                              (5, 5);
+
 
 -- 23. Tabla: knowledge
 INSERT INTO knowledge (name, percentage, status) VALUES
@@ -267,6 +269,7 @@ INSERT INTO backup_history (backup_name, description, file_path, created_by) VAL
                                                                                  ('Backup 04', 'Copia de seguridad abril', '/backups/backup04.sql', 4),
                                                                                  ('Backup 05', 'Copia de seguridad mayo', '/backups/backup05.sql', 5);
 
+
 -- 33. Tabla: student_tracking
 INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status) VALUES
                                                                                                 (1, 2, 'Falta a clases', 'Asistir puntualmente', 'Revisión semanal', 'A'),
@@ -274,4 +277,3 @@ INSERT INTO student_tracking (student, professor, situation, compromise, follow_
                                                                                                 (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario', 'A'),
                                                                                                 (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral', 'A'),
                                                                                                 (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico', 'A');
-
