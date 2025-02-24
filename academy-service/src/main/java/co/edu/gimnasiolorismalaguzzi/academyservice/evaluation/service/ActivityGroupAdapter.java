@@ -77,8 +77,17 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
         return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
     }
 
+
     @Override
-    public List<ActivityGroupDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId, String i) {
-        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(subjectId, periodId, userId, i));
+    public List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_Group_IdAndActivity_StatusNotLike(periodId,subjectId,groupId,statusNotLike));
     }
+
+
+    @Override
+    public ActivityGroupDomain getRangeDateActivityByActivityId(Integer activityId) {
+        Optional<ActivityGroup> activityGroup = Optional.ofNullable(activityGroupCrudRepo.findFirstByActivity_Id(activityId));
+        return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
+    }
+
 }

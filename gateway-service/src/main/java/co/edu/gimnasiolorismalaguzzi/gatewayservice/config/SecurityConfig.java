@@ -105,7 +105,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:5174"); // Permitir solicitudes desde este origen
+        configuration.addAllowedOrigin("http://localhost:5173"); // Permitir solicitudes desde este origen
         configuration.addAllowedHeader("*"); // Permitir todos los encabezados
         configuration.addAllowedMethod("*"); // Permitir todos los métodos HTTP
         configuration.setAllowCredentials(true); // Permitir el uso de credenciales (cookies, encabezados de autenticación)

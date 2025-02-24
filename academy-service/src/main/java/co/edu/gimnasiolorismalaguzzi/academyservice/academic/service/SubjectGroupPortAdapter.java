@@ -28,20 +28,16 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
 
     private final SubjectGroupMapper subjectGroupMapper;
 
-    private final SubjectProfessorMapper subjectProfessorMapper;
 
     private final UserMapper userMapper;
 
 
     @Autowired
     private SubjectGroupCrudRepo subjectGroupCrudRepo;
-    @Autowired
-    private SubjectProfessorCrudRepo subjectProfessorCrudRepo;
 
 
-    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, SubjectProfessorMapper subjectProfessorMapper, UserMapper userMapper) {
+    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, UserMapper userMapper) {
         this.subjectGroupMapper = subjectGroupMapper;
-        this.subjectProfessorMapper = subjectProfessorMapper;
         this.userMapper = userMapper;
     }
 
@@ -64,9 +60,9 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
      */
 
     @Override
-    public List<SubjectProfessorDomain> getAllSubjectByTeacher(Integer id, Integer year) {
-        List<SubjectProfessor> subjectProfessorList = this.subjectProfessorCrudRepo.getAllSubjectByTeacher(id,year);
-        return this.subjectProfessorMapper.toDomains(subjectProfessorList);
+    public List<SubjectGroupDomain> getAllSubjectByTeacher(Integer id, Integer year) {
+        List<SubjectGroup> subjectGroupDomains = this.subjectGroupCrudRepo.getAllSubjectByTeacher(id,year);
+        return this.subjectGroupMapper.toDomains(subjectGroupDomains);
     }
 
     /**

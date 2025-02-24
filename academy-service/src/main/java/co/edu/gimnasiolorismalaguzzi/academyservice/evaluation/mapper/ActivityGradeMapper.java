@@ -14,16 +14,15 @@ public interface ActivityGradeMapper {
 
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "student", target = "student"),
-            @Mapping(source = "activity", target = "activity"),
             @Mapping(source = "score", target = "score"),
             @Mapping(source = "comment", target = "comment"),
+            @Mapping(source = "student", target = "student"),
+            @Mapping(source = "activity", target = "activity", ignore = true)
     })
-
     ActivityGradeDomain toDomain(ActivityGrade activityGrade);
 
     @InheritInverseConfiguration
-    ActivityGrade toEntity (ActivityGradeDomain activityGradeDomain);
+    ActivityGrade toEntity(ActivityGradeDomain activityGradeDomain);
 
     List<ActivityGradeDomain> toDomains(List<ActivityGrade> activityGrades);
     List<ActivityGrade> toEntities(List<ActivityGradeDomain> activityGradeDomains);

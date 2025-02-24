@@ -10,6 +10,8 @@ CREATE TABLE users (
                        username VARCHAR(30) NOT NULL UNIQUE,
                        email VARCHAR(256) NOT NULL UNIQUE,
                        password VARCHAR(256) NOT NULL,
+                       first_name VARCHAR(40),
+                       last_name VARCHAR(40),
                        uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
@@ -152,7 +154,8 @@ CREATE TABLE subject_professors (
 CREATE TABLE subject_groups (
                                 id int not null primary key generated always as identity,
                                 subject_professor_id int not null references subject_professors(id),
-                                group_students int not  null references groups(id)
+                                group_students int not  null references groups(id),
+                                academic_period_id int not  null references academic_period(id)
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.

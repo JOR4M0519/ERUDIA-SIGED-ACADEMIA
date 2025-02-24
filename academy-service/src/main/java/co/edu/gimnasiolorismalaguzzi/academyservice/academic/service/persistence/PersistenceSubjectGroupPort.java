@@ -11,7 +11,7 @@ import java.util.List;
 public interface PersistenceSubjectGroupPort extends PersistencePort<SubjectGroupDomain, Integer> {
     List<SubjectGroupDomain> getAllSubjectGroupsByStudentsGroupsId(Integer id);
 
-    List<SubjectProfessorDomain> getAllSubjectByTeacher(Integer id, Integer year);
+    List<SubjectGroupDomain> getAllSubjectByTeacher(Integer id, Integer year);
 
     List<?> getStudentListBySubjectId(Integer id);
 }

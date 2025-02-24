@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 public class AchievementGroupDomain {
     private Integer id;
-    private SubjectKnowledgeDomain subjectKnowledgeDomain;
+    private SubjectKnowledgeDomain subjectKnowledge;
     private String achievement;
     private GroupsDomain group;
     private AcademicPeriodDomain period;

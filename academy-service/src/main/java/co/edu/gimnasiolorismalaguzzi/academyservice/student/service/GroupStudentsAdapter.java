@@ -45,6 +45,11 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
     }
 
     @Override
+    public List<GroupStudentsDomain> getGroupsStudentByGroupId(Integer groupId, String statusNotLike) {
+        return this.groupStudentsMapper.toDomains(groupStudentsCrudRepo.findByGroup_IdAndGroup_StatusNotLike(groupId,statusNotLike));
+    }
+
+    @Override
     public GroupStudentsDomain save(GroupStudentsDomain domain) {
         GroupStudent groupStudent = groupStudentsMapper.toEntity(domain);
         GroupStudent savedGroupStudent = this.groupStudentsCrudRepo.save(groupStudent);

@@ -34,7 +34,7 @@ public class SubjectGroupsController {
      * @return Materias de los estudiantes
      */
 
-    @GetMapping("/students-groups/{id}")
+    @GetMapping("/students-groups/students/{id}")
     public ResponseEntity<List<?>> getAllSubjectGroupsByStudentsGroupsId(@PathVariable Integer id){
         List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectGroupsByStudentsGroupsId(id);
         return ResponseEntity.ok(subjectGroupDomains);
@@ -51,8 +51,8 @@ public class SubjectGroupsController {
             @PathVariable Integer id,
             @RequestParam("year") Integer year) {
 
-        List<SubjectProfessorDomain> subjectTeacherDomains = subjectGroupPort.getAllSubjectByTeacher(id, year);
-        return ResponseEntity.ok(subjectTeacherDomains);
+        List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectByTeacher(id, year);
+        return ResponseEntity.ok(subjectGroupDomains);
     }
 
 

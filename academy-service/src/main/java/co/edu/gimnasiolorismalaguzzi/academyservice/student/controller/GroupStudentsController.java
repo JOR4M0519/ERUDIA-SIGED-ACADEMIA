@@ -30,11 +30,17 @@ public class GroupStudentsController {
         return ResponseEntity.ok(groupStudentsDomain);
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/users/{id}")
     public ResponseEntity<?> getGroupsStudentByUsername(@PathVariable Integer id){
         List<GroupStudentsDomain> groupStudentsList = groupStudentPort.getGroupsStudentById(id,"A");
         return ResponseEntity.ok(groupStudentsList);
     }
+    @GetMapping("/groups/{groupId}/users")
+    public ResponseEntity<?> getGroupsStudentByGroupId(@PathVariable Integer groupId){
+        List<GroupStudentsDomain> groupStudentsList = groupStudentPort.getGroupsStudentByGroupId(groupId,"I");
+        return ResponseEntity.ok(groupStudentsList);
+    }
+
 
     @PostMapping()
     public ResponseEntity<GroupStudentsDomain> createGroupStudent(@RequestBody GroupStudentsDomain groupStudentsDomain){

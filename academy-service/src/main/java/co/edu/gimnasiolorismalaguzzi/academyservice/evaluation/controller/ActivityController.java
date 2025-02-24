@@ -26,7 +26,7 @@ public class ActivityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityDomain> getActivityById(@PathVariable Integer id) {
+    public ResponseEntity<?> getActivityById(@PathVariable Integer id) {
         ActivityDomain activityDomain = persistenceActivityPort.findById(id);
         return ResponseEntity.ok(activityDomain);
     }
@@ -37,7 +37,7 @@ public class ActivityController {
      * @return
      */
 
-    @GetMapping("knowledges/{id}")
+    @GetMapping("/knowledges/{id}")
     public ResponseEntity<List<?>> getAllActivitiesWithKnowledgesAchievements(@PathVariable Integer id) {
         List<ActivityDomain> activityDomains = persistenceActivityPort.getAllActivitiesWithKnowledgesAchievements(id);
         return ResponseEntity.ok(activityDomains);

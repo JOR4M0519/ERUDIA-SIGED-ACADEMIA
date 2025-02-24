@@ -10,5 +10,7 @@ public interface ActivityGroupCrudRepo extends JpaRepository<ActivityGroup, Inte
     
     List<ActivityGroup> findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(Integer id, Integer id1, String status);
 
-    List<ActivityGroup> findByActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(Integer id, Integer id1, Integer id2, String status);
+    List<ActivityGroup> findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_Group_IdAndActivity_StatusNotLike(Integer id, Integer id1, Integer id2, String status);
+
+    ActivityGroup findFirstByActivity_Id(Integer id);
 }
