@@ -115,9 +115,9 @@ INSERT INTO groups (level_id, group_code, group_name, mentor_id, status) VALUES
 INSERT INTO group_students (student_id, group_id) VALUES
                                                       (3, 1),
                                                       (1, 2),
-                                                      (2, 3),
+                                                      (2, 2),
                                                       (4, 4),
-                                                      (5, 5);
+                                                      (5, 4);
 
 -- 16. Tabla: dimensions
 INSERT INTO dimensions (name, description) VALUES
@@ -144,15 +144,15 @@ INSERT INTO subject_professors (subject_id, professor_id) VALUES
                                                               (5, 5);
 
 -- 18. Tabla: subject_groups
-INSERT INTO subject_groups (subject_professor_id, group_students) VALUES
-                                                            (1, 1),
-                                                            (2, 2),
-                                                            (3, 3),
-                                                            (1, 4),
-                                                            (2, 4),
-                                                            (3, 4),
-                                                            (4, 4),
-                                                            (5, 5);
+INSERT INTO subject_groups (subject_professor_id, group_students,academic_period_id) VALUES
+                                                            (1, 1,1),
+                                                            (2, 2,1),
+                                                            (3, 3,1),
+                                                            (1, 4,1),
+                                                            (2, 4,1),
+                                                            (3, 4,1),
+                                                            (4, 4,1),
+                                                            (5, 5,1);
 
 -- 19. Tabla: subject_dimension
 INSERT INTO subject_dimension (dimension_id, subject_id) VALUES

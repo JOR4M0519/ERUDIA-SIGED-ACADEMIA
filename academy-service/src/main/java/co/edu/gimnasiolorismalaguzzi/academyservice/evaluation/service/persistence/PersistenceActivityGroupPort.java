@@ -10,5 +10,7 @@ public interface PersistenceActivityGroupPort extends PersistencePort<ActivityGr
 
     List<ActivityGroupDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String i);
 
-    List<ActivityGroupDomain> getAllActivity_ByPeriod_Student_Subject(Integer subjectId, Integer periodId, Integer userId, String i);
+    List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike);
+
+    ActivityGroupDomain getRangeDateActivityByActivityId(Integer activityId);
 }

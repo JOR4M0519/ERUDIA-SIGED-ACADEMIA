@@ -40,24 +40,30 @@ public class ActivityGroupController {
     }
 
     /**
-     * Las actividades de una materia, por el periodo de un estudiante (Activas y finalizadas)
+     * Las actividades de una materia, por el periodo de un grupo de estudiantes (Activas y finalizadas)
      * @param subjectId
      * @param periodId
      * @param userId
      * @return Lista de actividades
      */
 
-    @GetMapping("/subjects/{subjectId}/periods/{periodId}/users/{userId}")
-    public ResponseEntity<List<?>> getAllActivity_ByPeriodByStudentBySubject(@PathVariable Integer subjectId,
+    @GetMapping("/periods/{periodId}/subjects/{subjectId}/groups/{groupId}")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodSubjectGroup(@PathVariable Integer subjectId,
                                                                              @PathVariable Integer periodId,
-                                                                             @PathVariable Integer userId ){
-        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriod_Student_Subject(subjectId,periodId,userId,"I");
+                                                                             @PathVariable Integer groupId ){
+        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriodSubjectGroup(subjectId,periodId,groupId,"I");
         return ResponseEntity.ok(activityGroupDomains);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ActivityGroupDomain> getActivityGroupById(@PathVariable Integer id){
         ActivityGroupDomain ActivityGroupDomain = persistenceActivityGroupPort.findById(id);
+        return ResponseEntity.ok(ActivityGroupDomain);
+    }
+
+    @GetMapping("/activities/{activityId}")
+    public ResponseEntity<ActivityGroupDomain> getRangeDateActivityByActivityId(@PathVariable Integer activityId){
+        ActivityGroupDomain ActivityGroupDomain = persistenceActivityGroupPort.getRangeDateActivityByActivityId(activityId);
         return ResponseEntity.ok(ActivityGroupDomain);
     }
 

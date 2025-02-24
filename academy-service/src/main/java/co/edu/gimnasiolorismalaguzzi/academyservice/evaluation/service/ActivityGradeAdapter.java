@@ -69,8 +69,8 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
 
     @Override
-    public ActivityGradeDomain getGradeByActivityId(Integer id) {
-        return this.activityGradeMapper.toDomain(activityGradeCrudRepo.findByActivity_Id(id));
+    public List<ActivityGradeDomain> getGradeByActivityIdGroupId(Integer id, Integer groupId) {
+        return this.activityGradeMapper.toDomains(activityGradeCrudRepo.findByActivity_IdAndActivity_Group_Id(id,groupId));
     }
 
     @Override

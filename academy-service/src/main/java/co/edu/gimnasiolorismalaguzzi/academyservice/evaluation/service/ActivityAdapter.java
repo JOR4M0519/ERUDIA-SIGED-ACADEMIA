@@ -27,13 +27,11 @@ public class ActivityAdapter implements PersistenceActivityPort {
     @Autowired
     private final ActivityMapper activityMapper;
 
-    @Autowired
-    private final ActivityGroupMapper activityGroupMapper;
 
-    public ActivityAdapter(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper, ActivityGroupMapper activityGroupMapper) {
+    public ActivityAdapter(ActivityCrudRepo activityCrudRepo, ActivityMapper activityMapper) {
         this.activityCrudRepo = activityCrudRepo;
         this.activityMapper = activityMapper;
-        this.activityGroupMapper = activityGroupMapper;
+
     }
 
     @Override
@@ -44,6 +42,14 @@ public class ActivityAdapter implements PersistenceActivityPort {
     @Override
     public ActivityDomain findById(Integer integer) {
         Optional<Activity> activityOptional = this.activityCrudRepo.findById(integer);
+
+        // Imprime los datos para verificar
+        activityOptional.ifPresent(activity -> {
+            System.out.println("Activity ID: " + activity.getId());
+            System.out.println("AchievementGroup ID: " + activity.getAchievementGroup().getId());
+            System.out.println("SubjectKnowledge: " + activity.getAchievementGroup().getSubjectKnowledge());
+        });
+
         return activityOptional.map(activityMapper::toDomain).orElse(null);
     }
 

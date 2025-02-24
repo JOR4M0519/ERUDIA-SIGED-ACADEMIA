@@ -154,7 +154,8 @@ CREATE TABLE subject_professors (
 CREATE TABLE subject_groups (
                                 id int not null primary key generated always as identity,
                                 subject_professor_id int not null references subject_professors(id),
-                                group_students int not  null references groups(id)
+                                group_students int not  null references groups(id),
+                                academic_period_id int not  null references academic_period(id)
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.

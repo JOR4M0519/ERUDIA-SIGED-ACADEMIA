@@ -30,9 +30,9 @@ public class ActivityGradeController {
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 
-    @GetMapping("/activities/{id}")
-    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer id){
-        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityId(id);
+    @GetMapping("/activities/{activityId}/groups/{groupId}")
+    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer activityId,@PathVariable Integer groupId){
+        List<ActivityGradeDomain> ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityIdGroupId(activityId,groupId);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 

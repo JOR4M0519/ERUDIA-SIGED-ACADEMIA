@@ -12,6 +12,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 @Data
 @Entity
 @Builder
@@ -43,7 +46,8 @@ public class Activity {
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-//    @OneToMany(mappedBy = "activity")
-//    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+
 
 }
