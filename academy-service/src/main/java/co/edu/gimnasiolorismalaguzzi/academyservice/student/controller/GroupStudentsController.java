@@ -41,6 +41,12 @@ public class GroupStudentsController {
         return ResponseEntity.ok(groupStudentsList);
     }
 
+    @GetMapping("/mentor/{mentorId}/users")
+    public ResponseEntity<?> getListByMentorId(@PathVariable Integer mentorId){
+        List<GroupStudentsDomain> groupStudentsList = groupStudentPort.getListByMentorId(mentorId);
+        return ResponseEntity.ok(groupStudentsList);
+    }
+
 
     @PostMapping()
     public ResponseEntity<GroupStudentsDomain> createGroupStudent(@RequestBody GroupStudentsDomain groupStudentsDomain){
