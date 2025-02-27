@@ -9,4 +9,6 @@ public interface PersistenceStudentTrackingPort extends PersistencePort<StudentT
     List<StudentTrackingDomain> getTrackingByStudentId(Integer id);
 
     List<StudentTrackingDomain> getTrackinListStudentsCreatedByteacher(Integer teacherId);
+
+    StudentTrackingDomain getFinalObservationByStudentId(Integer id1, Integer id2);
 }

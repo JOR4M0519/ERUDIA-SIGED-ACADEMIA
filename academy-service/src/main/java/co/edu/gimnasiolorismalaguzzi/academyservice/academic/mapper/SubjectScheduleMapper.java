@@ -11,13 +11,13 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface SubjectScheduleMapper {
-    @Mappings({
-        @Mapping(source = "id", target = "id"),
-        @Mapping(source = "subjectGroup", target = "subjectGroup"),
-        @Mapping(source = "dayOfWeek", target = "dayOfWeek"),
-        @Mapping(source = "startTime", target = "startTime"),
-        @Mapping(source = "endTime", target = "endTime"),
-        @Mapping(source = "status", target = "status")
+    @Mappings(value = {
+            @Mapping(source = "id", target = "id"),
+            @Mapping(source = "subjectGroup", target = "subjectGroup", ignore = true),
+            @Mapping(source = "dayOfWeek", target = "dayOfWeek"),
+            @Mapping(source = "startTime", target = "startTime"),
+            @Mapping(source = "endTime", target = "endTime"),
+            @Mapping(source = "status", target = "status")
     })
     SubjectScheduleDomain toDomain(SubjectSchedule subjectSchedule);
 

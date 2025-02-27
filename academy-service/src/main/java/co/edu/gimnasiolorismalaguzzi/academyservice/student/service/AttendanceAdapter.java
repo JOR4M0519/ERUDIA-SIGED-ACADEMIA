@@ -18,38 +18,38 @@ import java.util.Optional;
 @Slf4j
 public class AttendanceAdapter implements PersistenceAttendancePort {
 
-    private final AttendanceCrudRepo crudRepo;
+    private final AttendanceCrudRepo attendanceCrudRepo;
 
     @Autowired
-    private final AttendanceMapper mapper;
+    private final AttendanceMapper attendanceMapper;
 
-    public AttendanceAdapter(AttendanceCrudRepo crudRepo, AttendanceMapper mapper) {
-        this.crudRepo = crudRepo;
-        this.mapper = mapper;
+    public AttendanceAdapter(AttendanceCrudRepo attendanceCrudRepo, AttendanceMapper attendanceMapper) {
+        this.attendanceCrudRepo = attendanceCrudRepo;
+        this.attendanceMapper = attendanceMapper;
     }
 
     @Override
     public List<AttendanceDomain> findAll() {
-        return mapper.toDomains(crudRepo.findAll());
+        return attendanceMapper.toDomains(attendanceCrudRepo.findAll());
     }
 
     @Override
     public AttendanceDomain findById(Integer integer) {
-        Optional<Attendance> attendance = this.crudRepo.findById(integer);
-        return attendance.map(mapper::toDomain).orElse(null);
+        Optional<Attendance> attendance = this.attendanceCrudRepo.findById(integer);
+        return attendance.map(attendanceMapper::toDomain).orElse(null);
     }
 
     @Override
     public AttendanceDomain save(AttendanceDomain attendanceDomain) {
-        Attendance attendance = mapper.toEntity(attendanceDomain);
-        Attendance savedAttendance = this.crudRepo.save(attendance);
-        return mapper.toDomain(savedAttendance);
+        Attendance attendance = attendanceMapper.toEntity(attendanceDomain);
+        Attendance savedAttendance = this.attendanceCrudRepo.save(attendance);
+        return attendanceMapper.toDomain(savedAttendance);
     }
 
     @Override
     public AttendanceDomain update(Integer integer, AttendanceDomain attendanceDomain) {
         try{
-            Optional<Attendance> existingAttendance = crudRepo.findById(integer);
+            Optional<Attendance> existingAttendance = attendanceCrudRepo.findById(integer);
             if(existingAttendance.isPresent()){
                 existingAttendance.get().setStudent(attendanceDomain.getStudent());
                 existingAttendance.get().setSchedule(attendanceDomain.getSchedule());
@@ -57,7 +57,7 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
                 existingAttendance.get().setStatus(attendanceDomain.getStatus());
                 existingAttendance.get().setRecordedAt(attendanceDomain.getRecordedAt());
             }
-            return mapper.toDomain(crudRepo.save(existingAttendance.get()));
+            return attendanceMapper.toDomain(attendanceCrudRepo.save(existingAttendance.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Attendance with ID " + integer + " Not found!");
         }
@@ -66,5 +66,10 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
     @Override
     public HttpStatus delete(Integer integer) {
         return null;
+    }
+
+    @Override
+    public List<AttendanceDomain> getHistoricalAttendance(Integer groupId, Integer subjectId, Integer periodId) {
+        return attendanceMapper.toDomains(attendanceCrudRepo.getHistoricalAttendance(groupId,subjectId,periodId));
     }
 }
