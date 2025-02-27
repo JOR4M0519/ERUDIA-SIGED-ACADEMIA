@@ -84,4 +84,9 @@ public class StudentTrackingAdapter implements PersistenceStudentTrackingPort {
     public List<StudentTrackingDomain> getTrackingByStudentId(Integer id) {
         return studentTrackingMapper.toDomains(studentTrackingCrudRepo.findByStudent_Id(id));
     }
+
+    @Override
+    public List<StudentTrackingDomain> getTrackinListStudentsCreatedByteacher(Integer teacherId) {
+        return studentTrackingMapper.toDomains(studentTrackingCrudRepo.findByProfessor_Id(teacherId));
+    }
 }
