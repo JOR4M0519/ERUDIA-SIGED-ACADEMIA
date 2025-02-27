@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PersistenceStudentTrackingPort extends PersistencePort<StudentTrackingDomain, Integer> {
     List<StudentTrackingDomain> getTrackingByStudentId(Integer id);
+
+    List<StudentTrackingDomain> getTrackinListStudentsCreatedByteacher(Integer teacherId);
 }

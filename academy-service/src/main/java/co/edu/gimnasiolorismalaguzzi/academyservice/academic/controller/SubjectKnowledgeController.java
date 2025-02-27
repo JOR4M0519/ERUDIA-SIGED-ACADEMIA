@@ -25,6 +25,13 @@ public class SubjectKnowledgeController {
         return ResponseEntity.ok(SubjectKnowledgeDomains);
     }
 
+    @GetMapping("/periods/{periodId}/subjects/{subjectId}")
+    public ResponseEntity<?> getAllKnowledgesBySubjectIdByPeriodId(@PathVariable Integer periodId,@PathVariable Integer subjectId){
+        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains = subjectKnowledgePort.getAllKnowledgesBySubjectIdByPeriodId(subjectId,periodId);
+        return ResponseEntity.ok(SubjectKnowledgeDomains);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<SubjectKnowledgeDomain> getKnowledgeById(@PathVariable Integer id) {
         SubjectKnowledgeDomain Knowledge = subjectKnowledgePort.findById(id);

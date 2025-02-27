@@ -74,4 +74,9 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
             throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @Override
+    public List<SubjectKnowledgeDomain> getAllKnowledgesBySubjectIdByPeriodId(Integer subjectId,Integer periodId) {
+        return this.mapper.toDomains(this.crudRepo.findKnowledgesBySubjectId(subjectId,periodId));
+    }
 }
