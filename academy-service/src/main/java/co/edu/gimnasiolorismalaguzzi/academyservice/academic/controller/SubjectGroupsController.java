@@ -46,7 +46,12 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomain);
     }
 
-    @GetMapping("/teacher-groups/teacher/{id}/subjects")
+    /**
+     * Obtiene las materias de que tienen los profesores asignadas con base un id del profesor
+     * @param id
+     * @return Materias de los Profesores
+     */
+    @GetMapping("/teacher-groups/teachers/{id}/subjects")
     public ResponseEntity<?> getAllSubjectByTeacherOfYear(
             @PathVariable Integer id,
             @RequestParam("year") Integer year) {
@@ -55,6 +60,12 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomains);
     }
 
+
+    /**
+     * Obtiene la lista de estudiantes por el id de la materia
+     * @param id
+     * @return Lista de estudiantes
+     */
     @GetMapping("/students/lists/{id}")
     public ResponseEntity<?> getStudentListBySubjectId(@PathVariable Integer id){
         List<?> userList = subjectGroupPort.getStudentListBySubjectId(id);

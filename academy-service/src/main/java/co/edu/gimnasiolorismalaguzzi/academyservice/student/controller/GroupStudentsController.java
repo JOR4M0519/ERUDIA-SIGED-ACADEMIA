@@ -3,6 +3,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupStudentPort;
+import jakarta.ws.rs.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,6 +42,18 @@ public class GroupStudentsController {
         return ResponseEntity.ok(groupStudentsList);
     }
 
+    /**
+     * Trae la lista de estudiantes del grupo de un profesor
+     * @param mentorId
+     * @return
+     */
+    @GetMapping("/mentors/{mentorId}/students") //?year={year}
+    public ResponseEntity<?> getListByMentorIdByYear(@PathVariable Integer mentorId
+                                              // ,@RequestParam("year") Integer year
+    ){
+        List<GroupStudentsDomain> groupStudentsList = groupStudentPort.getListByMentorIdByYear(mentorId,2025);
+        return ResponseEntity.ok(groupStudentsList);
+    }
 
     @PostMapping()
     public ResponseEntity<GroupStudentsDomain> createGroupStudent(@RequestBody GroupStudentsDomain groupStudentsDomain){
