@@ -48,8 +48,8 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
 
 
     @Override
-    public List<SubjectGroupDomain> getAllSubjectGroupsByStudentsGroupsId(Integer id) {
-        return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findByGroups_Id(id));
+    public List<SubjectGroupDomain> getAllSubjectGroupsByStudentId(Integer studentId, String year) {
+        return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findSubjectGroupsByStudentIdAndAcademicYear(studentId,year));
     }
 
     /**
@@ -65,16 +65,19 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return this.subjectGroupMapper.toDomains(subjectGroupDomains);
     }
 
-    /**
-     * Obtiene la lista de estudiante con base al id de uan materia
-     * @param id
-     * @return Lista de estudiantes
-     */
 
+    /**
+     * Obtinee la lsita de estudiantes de una materia
+     * @param groupId
+     * @param subjectId
+     * @param teacherId
+     * @param periodId
+     * @return
+     */
     @Override
-    public List<UserDomain> getStudentListBySubjectId(Integer id) {
-        List<User> userList = this.subjectGroupCrudRepo.findBySubjectId(id);
-        return this.userMapper.toDomains(userList);
+    public List<SubjectGroupDomain> getStudentListByGroupTeacherPeriod(Integer groupId,Integer subjectId,Integer teacherId,Integer periodId) {
+        List<SubjectGroup> subjectGroupDomains = subjectGroupCrudRepo.findByGroups_IdAndSubjectProfessor_Subject_IdAndSubjectProfessor_Professor_IdAndAcademicPeriod_Id(groupId,subjectId,teacherId,periodId);
+        return this.subjectGroupMapper.toDomains(subjectGroupDomains);
     }
 
     @Override

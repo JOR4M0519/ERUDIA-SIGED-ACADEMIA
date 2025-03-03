@@ -49,6 +49,20 @@ WHERE s.id = :subjectId
     List<SubjectGroup> getAllSubjectByTeacher(@Param("teacherId") Integer teacherId,
                                                   @Param("year") Integer year);
 
+    List<SubjectGroup> findByGroups_IdAndSubjectProfessor_Professor_IdAndAcademicPeriod_Id(Integer id, Integer id1, Integer id2);
 
+    List<SubjectGroup> findByGroups_IdAndSubjectProfessor_Subject_IdAndSubjectProfessor_Professor_IdAndAcademicPeriod_Id(Integer id, Integer id1, Integer id2, Integer id3);
+
+
+    @Query(value = "SELECT sg.* FROM subject_groups sg " +
+            "JOIN groups g ON sg.group_students = g.id " +
+            "JOIN group_students gs ON g.id = gs.group_id " +
+            "JOIN academic_period ap ON sg.academic_period_id = ap.id " +
+            "WHERE gs.student_id = :studentId " +
+            "AND ap.id IN (SELECT id FROM get_academic_periods(:year))",
+            nativeQuery = true)
+    List<SubjectGroup> findSubjectGroupsByStudentIdAndAcademicYear(
+            @Param("studentId") Integer studentId,
+            @Param("year") String year);;
 }
 
