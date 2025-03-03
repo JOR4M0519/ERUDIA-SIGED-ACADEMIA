@@ -34,9 +34,9 @@ public class SubjectGroupsController {
      * @return Materias de los estudiantes
      */
 
-    @GetMapping("/students-groups/students/{id}")
-    public ResponseEntity<List<?>> getAllSubjectGroupsByStudentsGroupsId(@PathVariable Integer id){
-        List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectGroupsByStudentsGroupsId(id);
+    @GetMapping("/students-groups/students/{studentId}")
+    public ResponseEntity<List<?>> getAllSubjectGroupsByStudentsGroupsId(@PathVariable Integer studentId,@RequestParam String year){
+        List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.getAllSubjectGroupsByStudentId(studentId,year);
         return ResponseEntity.ok(subjectGroupDomains);
     }
 
@@ -46,7 +46,12 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomain);
     }
 
-    @GetMapping("/teacher-groups/teacher/{id}/subjects")
+    /**
+     * Obtiene las materias de que tienen los profesores asignadas con base un id del profesor
+     * @param id
+     * @return Materias de los Profesores
+     */
+    @GetMapping("/teacher-groups/teachers/{id}/subjects")
     public ResponseEntity<?> getAllSubjectByTeacherOfYear(
             @PathVariable Integer id,
             @RequestParam("year") Integer year) {
@@ -57,13 +62,18 @@ public class SubjectGroupsController {
 
 
     /**
-     * Obtiene la lista de estudiantes por el id de la materia
-     * @param id
-     * @return Lista de estudiantes
+     * Obtiene la lista de estudiantes de una materia !!!ELIMINAR!!!
+     * @param groupId
+     * @param teacherId
+     * @param periodId
+     * @return
      */
-    @GetMapping("/students/lists/{id}")
-    public ResponseEntity<?> getStudentListBySubjectId(@PathVariable Integer id){
-        List<?> userList = subjectGroupPort.getStudentListBySubjectId(id);
+    @GetMapping("/groups/{groupId}/subjects/{subjectId}/teachers/{teacherId}/periods/{periodId}/students")
+    public ResponseEntity<?> getStudentListBySubjectId(@PathVariable Integer groupId,
+                                                       @PathVariable Integer subjectId,
+                                                       @PathVariable Integer teacherId,
+                                                       @PathVariable Integer periodId){
+        List<?> userList = subjectGroupPort.getStudentListByGroupTeacherPeriod(groupId,subjectId,teacherId,periodId);
         return ResponseEntity.ok(userList);
     }
 

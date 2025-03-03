@@ -9,9 +9,9 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 import java.util.List;
 
 public interface PersistenceSubjectGroupPort extends PersistencePort<SubjectGroupDomain, Integer> {
-    List<SubjectGroupDomain> getAllSubjectGroupsByStudentsGroupsId(Integer id);
+    List<SubjectGroupDomain> getAllSubjectGroupsByStudentId(Integer studentId, String year);
 
     List<SubjectGroupDomain> getAllSubjectByTeacher(Integer id, Integer year);
 
-    List<?> getStudentListBySubjectId(Integer id);
+    List<SubjectGroupDomain> getStudentListByGroupTeacherPeriod(Integer groupId,Integer subjectId, Integer teacherId,Integer periodId);
 }

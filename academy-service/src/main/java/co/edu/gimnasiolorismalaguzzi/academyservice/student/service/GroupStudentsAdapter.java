@@ -50,7 +50,7 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
     }
 
     @Override
-    public List<GroupStudentsDomain> getListByMentorId(Integer mentorId) {
+    public List<GroupStudentsDomain> getListByMentorIdByYear(Integer mentorId, Integer year) {
         return groupStudentsMapper.toDomains(groupStudentsCrudRepo.findByGroup_Mentor_Id(mentorId));
     }
 
