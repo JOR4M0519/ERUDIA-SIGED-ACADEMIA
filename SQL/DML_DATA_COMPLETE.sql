@@ -35,7 +35,7 @@ VALUES
     (5, 'Admin', NULL, 'Gimnasio', 'Admin', 'Sede Administrativa', '6018765432', '1999-12-25', '888888888', 5, 'Suba', 'Bogotá', 'administrador');
 
 -- Creación de detalles de usuarios para los estudiantes
-INSERT INTO user_detail (user_id, first_name, middle_name, last_name, second_last_name, address, phone_number, date_of_birth, dni, id_type_id, neighborhood, city) VALUES
+INSERT INTO user_detail(user_id, first_name, middle_name, last_name, second_last_name, address, phone_number, date_of_birth, dni, id_type_id, neighborhood, city) VALUES
                                                                                                                                                                        (6, 'Carlos', 'Andrés', 'Gómez', 'Pérez', 'Calle 456', '3102345678', '2019-05-15', '234567891', 1, 'Santa Fe', 'Bogotá'),
                                                                                                                                                                        (7, 'María', 'José', 'Rodríguez', 'López', 'Calle 567', '3153456789', '2019-03-20', '345678912', 1, 'Chapinero', 'Bogotá'),
                                                                                                                                                                        (8, 'Juan', 'David', 'Martínez', 'García', 'Calle 678', '3164567890', '2018-07-10', '456789123', 1, 'Suba', 'Bogotá'),
