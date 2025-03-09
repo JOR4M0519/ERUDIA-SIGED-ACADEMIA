@@ -3,6 +3,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceAttendancePort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -47,4 +48,36 @@ public class AttendanceController {
         AttendanceDomain updatedDimension = attendancePort.update(id,AttendanceDomain);
         return ResponseEntity.ok(updatedDimension);
     }
+
+    @PostMapping("/groups/{groupId}/subjects/{subjectId}/professors/{professorId}/periods/{periodId}/batch")
+    public ResponseEntity<List<AttendanceDomain>> saveAttendances(
+            @RequestBody List<AttendanceDomain> attendances,
+            @PathVariable Integer groupId,
+            @PathVariable Integer subjectId,
+            @PathVariable Integer professorId,
+            @PathVariable Integer periodId) {
+
+        List<AttendanceDomain> createdAttendances = attendancePort.saveAll(attendances, groupId, subjectId, professorId, periodId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdAttendances);
+    }
+
+    /*@PostMapping("/batch")
+    public ResponseEntity<List<AttendanceDomain>> createAttendances(@RequestBody List<AttendanceDomain> attendances) {
+        List<AttendanceDomain> createdAttendances = attendancePort.saveAll(attendances);
+        return ResponseEntity.ok(createdAttendances);
+    }*/
+
+    @PutMapping("/batch")
+    public ResponseEntity<List<AttendanceDomain>> updateAttendances(@RequestBody List<AttendanceDomain> attendances) {
+        List<AttendanceDomain> updatedAttendances = attendancePort.updateAll(attendances);
+        return ResponseEntity.ok(updatedAttendances);
+    }
+
+    @DeleteMapping("/batch")
+    public ResponseEntity<Void> deleteAttendances(@RequestBody List<Integer> ids) {
+        HttpStatus status = attendancePort.deleteAll(ids);
+        return ResponseEntity.status(status).build();
+    }
+
+
 }
