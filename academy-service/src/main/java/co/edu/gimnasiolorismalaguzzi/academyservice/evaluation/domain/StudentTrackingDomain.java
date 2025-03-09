@@ -4,6 +4,8 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeri
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 public class StudentTrackingDomain {
     private Integer id;
@@ -13,6 +15,7 @@ public class StudentTrackingDomain {
     private TrackingTypeDomain trackingType;
     private String situation;
     private String compromise;
+    private LocalDate date;
     private String followUp;
     private String status;
 }

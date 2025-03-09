@@ -11,4 +11,6 @@ public interface PersistenceGroupStudentPort extends PersistencePort<GroupStuden
     List<GroupStudentsDomain> getGroupsStudentByGroupId(Integer groupId, String statusNotLike);
 
     List<GroupStudentsDomain> getListByMentorIdByYear(Integer mentorId, Integer year);
+
+    List<GroupStudentsDomain> getGroupListByStatus(String status);
 }

@@ -48,6 +48,11 @@ public class UserController {
         return ResponseEntity.ok(familyDomain);
     }
 
+    /**
+     * Devuelve una lista de los estudiantes de un familiar
+     * @param relativeId
+     * @return
+     */
     @GetMapping("/family/{relativeId}/students")
     public ResponseEntity<?> findStudentsByRelatives(@PathVariable Integer relativeId){
         List<FamilyDomain> familyDomain = persistenceFamilyPort.findStudentsByRelativeId(relativeId);

@@ -50,9 +50,11 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     public ActivityGradeDomain update(Integer integer, ActivityGradeDomain entity) {
         try{
             Optional<ActivityGrade> existingActivityGrade = activityGradeCrudRepo.findById(integer);
+            ActivityGrade activityGrade = activityGradeMapper.toEntity(entity);
+
             if(existingActivityGrade.isPresent()){
                 existingActivityGrade.get().setStudent(entity.getStudent());
-                existingActivityGrade.get().setActivity(entity.getActivity());
+                existingActivityGrade.get().setActivity(activityGrade.getActivity());
                 existingActivityGrade.get().setScore(entity.getScore());
                 existingActivityGrade.get().setComment(entity.getComment());
             }
@@ -70,7 +72,7 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
     @Override
     public List<ActivityGradeDomain> getGradeByActivityIdGroupId(Integer id, Integer groupId) {
-        return this.activityGradeMapper.toDomains(activityGradeCrudRepo.findByActivity_IdAndActivity_Group_Id(id,groupId));
+        return this.activityGradeMapper.toDomains(activityGradeCrudRepo.findByActivityAndGroupId(id,groupId));
     }
 
     @Override

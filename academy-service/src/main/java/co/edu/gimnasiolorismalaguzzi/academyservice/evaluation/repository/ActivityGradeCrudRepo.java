@@ -3,6 +3,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGrade;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -12,7 +13,14 @@ public interface ActivityGradeCrudRepo extends JpaRepository<ActivityGrade, Inte
 
     ActivityGrade findByActivity_IdAndStudent_Id(Integer id, Integer id1);
 
-    List<ActivityGrade> findByActivity_IdAndActivity_Group_Id(Integer id, Integer id1);
+    @Query("SELECT act_grd FROM ActivityGrade act_grd " +
+            "JOIN act_grd.activity act_grp " +
+            "JOIN act_grp.activity act " +
+            "JOIN act_grp.group grp_studnt " +
+            "WHERE act.id = :activityId " +
+            "AND grp_studnt.group.id = :groupId")
+    List<ActivityGrade> findByActivityAndGroupId(@Param("activityId") Integer activityId, @Param("groupId") Integer groupId);
+
 
     /*@Query(value = """
         SELECT act_grd.*

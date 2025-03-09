@@ -4,8 +4,10 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.AcademicPeri
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Knowledge;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
+import lombok.Builder;
 import lombok.Data;
 
+@Builder
 @Data
 public class ActivityDomain {
     private Integer id;

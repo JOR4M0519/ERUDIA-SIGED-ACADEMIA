@@ -18,6 +18,7 @@ public interface StudentTrackingMapper {
             @Mapping(source = "trackingType", target = "trackingType"),
             @Mapping(source = "situation", target = "situation"),
             @Mapping(source = "compromise", target = "compromise"),
+            @Mapping(source = "date", target = "date"),
             @Mapping(source = "followUp", target = "followUp"),
             @Mapping(source = "status", target = "status")
     })

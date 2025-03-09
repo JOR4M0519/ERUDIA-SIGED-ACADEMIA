@@ -13,8 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @PersistenceAdapter
 @Slf4j
@@ -78,11 +77,44 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     }
 
     @Override
-    public List<FamilyDomain> findRelativesByStudent(Integer id) {
-        List<Family> relatives = familyCrudRepo.findByStudent_Id(id);
-        //findRelativesByStudent()
-        return familyMapper.toDomains(relatives);
+    public List<FamilyDomain> findRelativesByStudent(Integer userId) {
+        List<Family> familyRelations = new ArrayList<>();
+
+        // Primero buscamos si el usuario es un estudiante y tiene familiares asociados
+        List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userId);
+        familyRelations.addAll(relativesOfStudent);
+
+        // Luego buscamos si el usuario es un familiar y está asociado a estudiantes
+        List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userId);
+
+        // Agregamos los estudiantes asociados al familiar
+        familyRelations.addAll(studentsOfRelative);
+
+        // Si encontramos que el usuario es un familiar con estudiantes asociados,
+        // necesitamos obtener también los otros familiares de esos estudiantes
+        if (!studentsOfRelative.isEmpty()) {
+            // Conjunto para evitar duplicados
+            Set<Family> otherRelatives = new HashSet<>();
+
+            for (Family relation : studentsOfRelative) {
+                // Obtenemos el ID del estudiante asociado a este familiar
+                Integer studentId = relation.getStudent().getId();
+
+                // Buscamos todos los familiares de este estudiante (excepto el usuario actual)
+                List<Family> studentRelatives = familyCrudRepo.findByStudent_IdAndUserIdNot(
+                        studentId, userId);
+
+                // Agregamos estos familiares al conjunto
+                otherRelatives.addAll(studentRelatives);
+            }
+
+            // Agregamos los familiares encontrados a la lista principal
+            familyRelations.addAll(otherRelatives);
+        }
+
+        return familyMapper.toDomains(familyRelations);
     }
+
 
     /**
      * Devuelve la información del usuario de los estudiantes del familiar

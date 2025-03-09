@@ -233,7 +233,7 @@ CREATE TABLE activity_grade (
                                 id int primary key generated always as identity,
                                 student_id INT NOT NULL REFERENCES users(id),
                                 activity_id INT NOT NULL REFERENCES activity_group(id),
-                                score NUMERIC(5, 2) NOT NULL,
+                                score NUMERIC(5, 2),
                                 comment TEXT
 );
 
@@ -292,6 +292,7 @@ CREATE TABLE student_tracking (
                                   professor INT NOT NULL REFERENCES users(id),
                                   period_id INT NOT NULL REFERENCES academic_period(id),
                                   tracking_type INT NOT NULL REFERENCES tracking_type(id),
+                                  date DATE NOT NULL DEFAULT now(),
                                   situation TEXT NOT NULL, -- Behavior description
                                   compromise TEXT NOT NULL, -- Commitment
                                   follow_up TEXT NOT NULL, -- Follow-up

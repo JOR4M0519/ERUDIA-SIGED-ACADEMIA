@@ -16,5 +16,6 @@ public interface StudentTrackingCrudRepo extends JpaRepository<StudentTracking, 
 
     List<StudentTracking> findByStudent_Id(Integer id);
 
-    List<StudentTracking> findByProfessor_Id(Integer id);
+
+    List<StudentTracking> findByProfessor_IdAndStatusNotLike(Integer id, String status);
 }

@@ -15,4 +15,6 @@ public interface FamilyCrudRepo extends JpaRepository<Family, Integer> {
     List<Family> findByUser_Id(Integer id);
 
     List<Family> findByStudent_Id(Integer id);
+
+    List<Family> findByStudent_IdAndUserIdNot(Integer studentId, Integer userId);
 }

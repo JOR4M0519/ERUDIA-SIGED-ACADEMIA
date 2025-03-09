@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @Entity
@@ -49,6 +51,10 @@ public class StudentTracking {
     @NotNull
     @Column(name = "follow_up", nullable = false, length = Integer.MAX_VALUE)
     private String followUp;
+
+    @NotNull
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
 
     @Size(max = 1)
     @NotNull

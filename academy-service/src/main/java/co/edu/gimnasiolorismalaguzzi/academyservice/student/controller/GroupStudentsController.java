@@ -25,6 +25,13 @@ public class GroupStudentsController {
         return ResponseEntity.ok(groupStudentsDomains);
     }
 
+    @GetMapping("/active")
+    public ResponseEntity<List<GroupStudentsDomain>> getAllStudentsInGroupsByStatus(){
+        String status = "A";
+        List<GroupStudentsDomain> groupStudentsDomains = groupStudentPort.getGroupListByStatus(status);
+        return ResponseEntity.ok(groupStudentsDomains);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GroupStudentsDomain> getGroupStudentById(@PathVariable Integer id){
         GroupStudentsDomain groupStudentsDomain = groupStudentPort.findById(id);
