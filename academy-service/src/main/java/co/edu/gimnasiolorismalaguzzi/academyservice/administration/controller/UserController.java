@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceFamilyPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
@@ -64,6 +65,11 @@ public class UserController {
     public ResponseEntity<FamilyDomain> createRelatives(@PathVariable Integer id, @RequestBody FamilyDomain familyDomain){
         FamilyDomain createdRelative = persistenceFamilyPort.saveById(id,familyDomain);
         return ResponseEntity.ok(createdRelative);
+    }
+
+    @GetMapping("/families/report")
+    public ResponseEntity<List<FamilyReportDomain>> getAllFamilyReports() {
+        return ResponseEntity.ok(persistenceFamilyPort.getAllFamilyReports());
     }
 
     @PutMapping("/{id}")

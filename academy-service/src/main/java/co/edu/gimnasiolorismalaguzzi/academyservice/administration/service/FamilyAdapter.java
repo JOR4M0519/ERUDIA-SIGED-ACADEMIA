@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Family;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.FamilyMapper;
@@ -125,6 +126,48 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     public List<FamilyDomain> findStudentsByRelativeId(Integer relativeId) {
         List<Family> relatives = familyCrudRepo.findByUser_Id(relativeId);
         return familyMapper.toDomains(relatives);
+    }
+
+    @Override
+    public List<FamilyReportDomain> getAllFamilyReports() {
+        try {
+            List<Object[]> results = familyCrudRepo.getFamilyReports();
+            List<FamilyReportDomain> reports = new ArrayList<>();
+
+            for (Object[] result : results) {
+                FamilyReportDomain report = new FamilyReportDomain();
+
+                report.setCode((String) result[0]);
+                report.setFamilyName((String) result[1]);
+
+                // Convertir a Long si es necesario
+                report.setTotalMembers(result[2] instanceof Long ?
+                    (Long) result[2] :
+                    Long.valueOf(((Number) result[2]).longValue()));
+                report.setActiveStudents(result[3] instanceof Long ?
+                    (Long) result[3] :
+                    Long.valueOf(((Number) result[3]).longValue()));
+
+                // Manejar el array de IDs de estudiantes
+                if (result[4] instanceof java.sql.Array) {
+                    try {
+                    java.sql.Array sqlArray = (java.sql.Array) result[4];
+                    Integer[] studentIdsArray = (Integer[]) sqlArray.getArray();
+                    report.setStudentIds(Arrays.asList(studentIdsArray));
+        } catch (Exception e) {
+                        log.error("Error al convertir array de IDs de estudiantes: {}", e.getMessage());
+                        report.setStudentIds(new ArrayList<>());
+        }
+    }
+
+                reports.add(report);
+            }
+
+            return reports;
+        } catch (Exception e) {
+            log.error("Error al obtener el reporte de familias: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener el reporte de familias", e);
+        }
     }
 
     @Override

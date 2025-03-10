@@ -4,4 +4,5 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.Instit
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 
 public interface PersistenceInstitutionPort extends PersistencePort<InstitutionDomain, Integer> {
+    InstitutionDomain findByNit(String nit);
 }
