@@ -8,9 +8,12 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.Us
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -23,8 +26,6 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
 
     private final UserDetailCrudRepo userDetailCrudRepo;
 
-    @Autowired
-    private UserAdapter userAdapter;
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -49,17 +50,40 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     }
 
     @Override
-    public UserDetailDomain save(UserDetailDomain entity) {
-        return null;
+    @Transactional
+    public UserDetailDomain save(UserDetailDomain userDetailDomain) {
+        try {
+            log.debug("Saving user detail: {}", userDetailDomain);
+
+            // Validaciones
+            if (userDetailDomain == null) {
+                throw new AppException("UserDetailDomain cannot be null", HttpStatus.BAD_REQUEST);
+            }
+            if (userDetailDomain.getUser() == null) {
+                throw new AppException("User reference cannot be null", HttpStatus.BAD_REQUEST);
+            }
+
+            // Convertir a entidad
+            UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
+
+            // Guardar
+            UserDetail savedUserDetail = userDetailCrudRepo.save(userDetail);
+
+            // Convertir resultado a domain y retornar
+            UserDetailDomain savedDomain = userDetailMapper.toDomain(savedUserDetail);
+            log.debug("Successfully saved user detail with ID: {}", savedDomain.getId());
+
+            return savedDomain;
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error saving user detail - duplicate entry", e);
+            throw new AppException("Duplicate entry found in user detail", HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            log.error("Error saving user detail", e);
+            throw new AppException("Error saving user detail: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @Override
-    public UserDetailDomain saveDetailUser(String uuid, UserDetailDomain userDetailDomain) {
-        userDetailDomain.setUser(userAdapter.searchUserByUuid(uuid));
-        UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
-        UserDetail savedUserDetail = this.userDetailCrudRepo.save(userDetail);
-        return userDetailMapper.toDomain(savedUserDetail);
-    }
 
 
     @Override
@@ -102,6 +126,11 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
             throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }*/
         return HttpStatus.OK;
+    }
+
+    @Override
+    public UserDetailDomain saveDetailUser(String uuid, UserDetailDomain user) {
+        return null;
     }
 
     @Override

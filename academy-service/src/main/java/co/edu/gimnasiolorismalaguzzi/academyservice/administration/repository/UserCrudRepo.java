@@ -18,4 +18,11 @@ public interface UserCrudRepo extends JpaRepository<User, Integer> {
     @Query("select u from User u where u.uuid = ?1")
     User findByUuid(String uuid);
 
+    // Agregar este método a la interfaz existente
+
+    @Transactional
+    @Modifying
+    @Query("update User u set u.promotionStatus = ?1 where u.id = ?2")
+    int updatePromotionStatusById(String promotionStatus, Integer id);
+
 }

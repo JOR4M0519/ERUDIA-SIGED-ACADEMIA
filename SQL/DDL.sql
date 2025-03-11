@@ -31,6 +31,7 @@ CREATE TABLE user_detail (
                              id_type_id INT NOT NULL REFERENCES id_type(id),
                              neighborhood VARCHAR(20) NOT NULL,
                              city VARCHAR(20) NOT NULL,
+                             promotionStatus VARCHAR(2) DEFAULT "A",
                              position_job VARCHAR(40)
 );
 

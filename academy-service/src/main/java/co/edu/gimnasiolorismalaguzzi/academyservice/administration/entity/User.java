@@ -49,6 +49,11 @@ public class User {
     @Size(max = 256)
     @Column(name = "uuid", length = 256)
     private String uuid;
+    @Size(max = 2)
+    @NotNull
+    @Column(name = "promotion_status", length = 2)
+    private String promotionStatus;
+
 
     /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
