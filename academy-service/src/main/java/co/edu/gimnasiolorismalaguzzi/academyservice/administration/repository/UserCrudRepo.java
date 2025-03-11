@@ -25,4 +25,5 @@ public interface UserCrudRepo extends JpaRepository<User, Integer> {
     @Query("update User u set u.promotionStatus = ?1 where u.id = ?2")
     int updatePromotionStatusById(String promotionStatus, Integer id);
 
+
 }
