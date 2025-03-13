@@ -1,11 +1,13 @@
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.3'
+	id 'jacoco'
 
 }
 
 group = 'co.edu.gimnasiolorismalaguzzi'
 version = '0.0.1-SNAPSHOT'
+
 
 java {
 	toolchain {
@@ -48,6 +50,21 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'*/
 }
 
+
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // Genera el reporte después de los tests
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required.set(true)  // Para SonarQube
+        csv.required.set(false)
+        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+    }
 }

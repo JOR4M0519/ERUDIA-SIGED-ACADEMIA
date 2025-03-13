@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-
+@Builder
 public class SubjectDimensionDomain {
     private Integer id;
     private Dimension dimension;
