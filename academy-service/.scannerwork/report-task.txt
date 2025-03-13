@@ -1,0 +1,6 @@
+projectKey=Erudia:-Academy-Service
+serverUrl=http://localhost:9000
+serverVersion=25.3.0.104237
+dashboardUrl=http://localhost:9000/dashboard?id=Erudia%3A-Academy-Service
+ceTaskId=a2caf7b2-bd0c-4f7d-8a14-91be98ba1c64
+ceTaskUrl=http://localhost:9000/api/ce/task?id=a2caf7b2-bd0c-4f7d-8a14-91be98ba1c64
