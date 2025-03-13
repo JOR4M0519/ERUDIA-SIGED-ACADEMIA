@@ -37,6 +37,11 @@ public class InstitutionAdapter implements PersistenceInstitutionPort {
         Optional<Institution> institutionOptional = this.institutionCrudRepo.findById(id);
         return institutionOptional.map(institutionMapper::toDomain).orElse(null);
     }
+    @Override
+    public InstitutionDomain findByNit(String nit) {
+        Optional<Institution> institutionOptional = Optional.ofNullable(institutionCrudRepo.findByNit(nit));
+        return institutionOptional.map(institutionMapper::toDomain).orElse(null);
+    }
 
     @Override
     public InstitutionDomain save(InstitutionDomain institutionDomain) {
@@ -77,4 +82,6 @@ public class InstitutionAdapter implements PersistenceInstitutionPort {
     public HttpStatus delete(Integer integer) {
         return null;
     }
+
+
 }

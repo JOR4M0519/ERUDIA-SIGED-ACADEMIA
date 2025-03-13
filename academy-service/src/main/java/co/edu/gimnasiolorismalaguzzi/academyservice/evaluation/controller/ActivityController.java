@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.CreateActivityFront;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityDomain;
@@ -44,19 +45,19 @@ public class ActivityController {
     }
 
     @PostMapping()
-    public ResponseEntity<ActivityDomain> createEducationalLevel(@RequestBody ActivityDomain ActivityDomain) {
-        ActivityDomain createdActivity = persistenceActivityPort.save(ActivityDomain);
+    public ResponseEntity<ActivityDomain> createActivity(@RequestBody CreateActivityFront ActivityDomainFront) {
+        ActivityDomain createdActivity = persistenceActivityPort.createActivityAndGroup(ActivityDomainFront);
         return ResponseEntity.ok(createdActivity);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ActivityDomain> updateEducationalLevel(@PathVariable Integer id, @RequestBody ActivityDomain ActivityDomain) {
-        ActivityDomain updatedActivity = persistenceActivityPort.update(id, ActivityDomain);
+    public ResponseEntity<ActivityDomain> updateActivity(@PathVariable Integer id, @RequestBody CreateActivityFront ActivityDomainFront) {
+        ActivityDomain updatedActivity = persistenceActivityPort.updateActivityAndGroup(id, ActivityDomainFront);
         return ResponseEntity.ok(updatedActivity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEducationalLevel(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteActivity(@PathVariable Integer id) {
         persistenceActivityPort.delete(id);
         return ResponseEntity.noContent().build();
     }

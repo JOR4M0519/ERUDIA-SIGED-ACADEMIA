@@ -45,7 +45,8 @@ public class StudentTrackingController {
 
     @GetMapping("/teachers/{teacherId}")
     public ResponseEntity<?> getTrackingListStudentsByTeacherId(@PathVariable Integer teacherId){
-        List<StudentTrackingDomain> StudentTrackingDomains = persistenceStudentTrackingPort.getTrackinListStudentsCreatedByteacher(teacherId);
+        String status = "I";
+        List<StudentTrackingDomain> StudentTrackingDomains = persistenceStudentTrackingPort.getTrackingListStudentsCreatedByteacher(teacherId,status);
         return ResponseEntity.ok(StudentTrackingDomains);
     }
 

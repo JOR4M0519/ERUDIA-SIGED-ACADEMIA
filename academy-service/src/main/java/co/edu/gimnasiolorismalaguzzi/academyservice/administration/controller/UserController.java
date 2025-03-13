@@ -1,11 +1,15 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.*;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceFamilyPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupStudentPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +22,10 @@ public class UserController {
 
     private final PersistenceUserDetailPort persistenceUserDetailPort;
     private final PersistenceFamilyPort persistenceFamilyPort;
+    private final PersistenceUserPort persistenceUserPort;
 
-    public UserController(PersistenceUserDetailPort persistenceUserDetailPort, PersistenceFamilyPort persistenceFamilyPort) {
+    public UserController(PersistenceUserDetailPort persistenceUserDetailPort, PersistenceUserPort persistenceUserPort, PersistenceFamilyPort persistenceFamilyPort) {
+        this.persistenceUserPort = persistenceUserPort;
         this.persistenceUserDetailPort = persistenceUserDetailPort;
         this.persistenceFamilyPort = persistenceFamilyPort;
     }
@@ -48,17 +54,26 @@ public class UserController {
         return ResponseEntity.ok(familyDomain);
     }
 
+    /**
+     * Devuelve una lista de los estudiantes de un familiar
+     * @param relativeId
+     * @return
+     */
     @GetMapping("/family/{relativeId}/students")
     public ResponseEntity<?> findStudentsByRelatives(@PathVariable Integer relativeId){
         List<FamilyDomain> familyDomain = persistenceFamilyPort.findStudentsByRelativeId(relativeId);
         return ResponseEntity.ok(familyDomain);
     }
 
-
     @PostMapping("/family/create/{id}")
     public ResponseEntity<FamilyDomain> createRelatives(@PathVariable Integer id, @RequestBody FamilyDomain familyDomain){
         FamilyDomain createdRelative = persistenceFamilyPort.saveById(id,familyDomain);
         return ResponseEntity.ok(createdRelative);
+    }
+
+    @GetMapping("/families/report")
+    public ResponseEntity<List<FamilyReportDomain>> getAllFamilyReports() {
+        return ResponseEntity.ok(persistenceFamilyPort.getAllFamilyReports());
     }
 
     @PutMapping("/{id}")
@@ -71,6 +86,25 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id ) {
         persistenceUserDetailPort.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/students/register")
+    public ResponseEntity<?> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
+        UserDetailDomain result = persistenceUserPort.registerByGroupinStudentUser(registrationDomain);
+        return ResponseEntity.ok(result);
+    }
+    @PatchMapping("/{id}/promotion-status")
+    public ResponseEntity<?> updatePromotionStatus(
+            @PathVariable Integer id,
+            @RequestParam String promotionStatus) {
+        persistenceUserPort.updatePromotionStatus(id, promotionStatus);
+        return ResponseEntity.ok().body("Promotion status updated successfully");
+    }
+
+    @PatchMapping("/bulk-promotion-status")
+    public ResponseEntity<?> updateBulkPromotionStatus(@RequestBody List<UserDomain> users) {
+        persistenceUserPort.updateBulkPromotionStatus(users);
+        return ResponseEntity.ok().body("Bulk promotion status updated successfully");
     }
 
 }

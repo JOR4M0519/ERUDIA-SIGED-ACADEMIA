@@ -11,15 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @PersistenceAdapter
 @Slf4j
 public class ActivityGradeAdapter implements PersistanceActivityGradePort {
-    List<ActivityGrade> storedGrades = new ArrayList<ActivityGrade>();
-    ActivityGrade storedGrade;
+
     private ActivityGradeCrudRepo activityGradeCrudRepo;
 
     @Autowired
@@ -52,9 +50,11 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     public ActivityGradeDomain update(Integer integer, ActivityGradeDomain entity) {
         try{
             Optional<ActivityGrade> existingActivityGrade = activityGradeCrudRepo.findById(integer);
+            ActivityGrade activityGrade = activityGradeMapper.toEntity(entity);
+
             if(existingActivityGrade.isPresent()){
                 existingActivityGrade.get().setStudent(entity.getStudent());
-                existingActivityGrade.get().setActivity(entity.getActivity());
+                existingActivityGrade.get().setActivity(activityGrade.getActivity());
                 existingActivityGrade.get().setScore(entity.getScore());
                 existingActivityGrade.get().setComment(entity.getComment());
             }
@@ -71,17 +71,12 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
 
     @Override
-    public ActivityGradeDomain getGradeByActivityId(Integer id, ActivityGradeDomain activityGradeDomain) {
-        return this.activityGradeMapper.toDomain(activityGradeCrudRepo.findByActivity_Id(id));
+    public List<ActivityGradeDomain> getGradeByActivityIdGroupId(Integer id, Integer groupId) {
+        return this.activityGradeMapper.toDomains(activityGradeCrudRepo.findByActivityAndGroupId(id,groupId));
     }
 
     @Override
-    public List<ActivityGradeDomain> gradeActivity(List<ActivityGradeDomain> activityGradeDomain) {
-        for (ActivityGradeDomain gradeDomain : activityGradeDomain) {
-            storedGrade = this.activityGradeCrudRepo.save(activityGradeMapper.toEntity(gradeDomain));
-            storedGrades.add(storedGrade);
-        }
-        return activityGradeMapper.toDomains(storedGrades);
+    public ActivityGradeDomain getGradeByActivityIdByStudentId(Integer activityId, Integer studentId) {
+        return this.activityGradeMapper.toDomain(activityGradeCrudRepo.findByActivity_IdAndStudent_Id(activityId,studentId));
     }
 }
-

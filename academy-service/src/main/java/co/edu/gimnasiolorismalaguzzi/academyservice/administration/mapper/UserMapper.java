@@ -21,7 +21,8 @@ public interface UserMapper {
             //@Mapping(source = "createdAt", target = "createdAt"),
             // @Mapping(source = "lastLogin", target = "lastLogin"),
             //@Mapping(source = "attemptedFailedLogin", target = "attemptedFailedLogin"),
-            @Mapping(source = "status", target = "status")
+            @Mapping(source = "status", target = "status"),
+            @Mapping(source = "promotionStatus", target = "promotionStatus")
     })
     UserDomain toDomain(User user);
 

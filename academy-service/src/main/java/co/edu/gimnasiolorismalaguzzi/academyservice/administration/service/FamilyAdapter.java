@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.FamilyReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Family;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.FamilyMapper;
@@ -13,8 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @PersistenceAdapter
 @Slf4j
@@ -78,11 +78,44 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     }
 
     @Override
-    public List<FamilyDomain> findRelativesByStudent(Integer id) {
-        List<Family> relatives = familyCrudRepo.findByStudent_Id(id);
-        //findRelativesByStudent()
-        return familyMapper.toDomains(relatives);
+    public List<FamilyDomain> findRelativesByStudent(Integer userId) {
+        List<Family> familyRelations = new ArrayList<>();
+
+        // Primero buscamos si el usuario es un estudiante y tiene familiares asociados
+        List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userId);
+        familyRelations.addAll(relativesOfStudent);
+
+        // Luego buscamos si el usuario es un familiar y está asociado a estudiantes
+        List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userId);
+
+        // Agregamos los estudiantes asociados al familiar
+        familyRelations.addAll(studentsOfRelative);
+
+        // Si encontramos que el usuario es un familiar con estudiantes asociados,
+        // necesitamos obtener también los otros familiares de esos estudiantes
+        if (!studentsOfRelative.isEmpty()) {
+            // Conjunto para evitar duplicados
+            Set<Family> otherRelatives = new HashSet<>();
+
+            for (Family relation : studentsOfRelative) {
+                // Obtenemos el ID del estudiante asociado a este familiar
+                Integer studentId = relation.getStudent().getId();
+
+                // Buscamos todos los familiares de este estudiante (excepto el usuario actual)
+                List<Family> studentRelatives = familyCrudRepo.findByStudent_IdAndUserIdNot(
+                        studentId, userId);
+
+                // Agregamos estos familiares al conjunto
+                otherRelatives.addAll(studentRelatives);
+            }
+
+            // Agregamos los familiares encontrados a la lista principal
+            familyRelations.addAll(otherRelatives);
+        }
+
+        return familyMapper.toDomains(familyRelations);
     }
+
 
     /**
      * Devuelve la información del usuario de los estudiantes del familiar
@@ -93,6 +126,48 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     public List<FamilyDomain> findStudentsByRelativeId(Integer relativeId) {
         List<Family> relatives = familyCrudRepo.findByUser_Id(relativeId);
         return familyMapper.toDomains(relatives);
+    }
+
+    @Override
+    public List<FamilyReportDomain> getAllFamilyReports() {
+        try {
+            List<Object[]> results = familyCrudRepo.getFamilyReports();
+            List<FamilyReportDomain> reports = new ArrayList<>();
+
+            for (Object[] result : results) {
+                FamilyReportDomain report = new FamilyReportDomain();
+
+                report.setCode((String) result[0]);
+                report.setFamilyName((String) result[1]);
+
+                // Convertir a Long si es necesario
+                report.setTotalMembers(result[2] instanceof Long ?
+                    (Long) result[2] :
+                    Long.valueOf(((Number) result[2]).longValue()));
+                report.setActiveStudents(result[3] instanceof Long ?
+                    (Long) result[3] :
+                    Long.valueOf(((Number) result[3]).longValue()));
+
+                // Manejar el array de IDs de estudiantes
+                if (result[4] instanceof java.sql.Array) {
+                    try {
+                    java.sql.Array sqlArray = (java.sql.Array) result[4];
+                    Integer[] studentIdsArray = (Integer[]) sqlArray.getArray();
+                    report.setStudentIds(Arrays.asList(studentIdsArray));
+        } catch (Exception e) {
+                        log.error("Error al convertir array de IDs de estudiantes: {}", e.getMessage());
+                        report.setStudentIds(new ArrayList<>());
+        }
+    }
+
+                reports.add(report);
+            }
+
+            return reports;
+        } catch (Exception e) {
+            log.error("Error al obtener el reporte de familias: {}", e.getMessage());
+            throw new RuntimeException("Error al obtener el reporte de familias", e);
+        }
     }
 
     @Override

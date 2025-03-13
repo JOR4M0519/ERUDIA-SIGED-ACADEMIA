@@ -8,7 +8,5 @@ import java.util.List;
 public interface PersistenceStudentTrackingPort extends PersistencePort<StudentTrackingDomain, Integer> {
     List<StudentTrackingDomain> getTrackingByStudentId(Integer id);
 
-    List<StudentTrackingDomain> getTrackinListStudentsCreatedByteacher(Integer teacherId);
-
-    StudentTrackingDomain getFinalObservationByStudentId(Integer id1, Integer id2);
+    List<StudentTrackingDomain> getTrackingListStudentsCreatedByteacher(Integer teacherId,String status);
 }

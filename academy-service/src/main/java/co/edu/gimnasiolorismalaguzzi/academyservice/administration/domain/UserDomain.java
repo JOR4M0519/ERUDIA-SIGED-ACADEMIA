@@ -18,6 +18,7 @@ public class UserDomain implements Serializable {
     private String password;
     private Set<String> roles;
     private String status;
+    private String promotionStatus;
 
     public UserDomain(Integer id) {
         this.id = id;

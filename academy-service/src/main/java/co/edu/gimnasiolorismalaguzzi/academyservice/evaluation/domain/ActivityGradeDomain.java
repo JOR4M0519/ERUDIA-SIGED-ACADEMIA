@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 public class ActivityGradeDomain {
     private Integer id;
     private User student;
-    private ActivityGroup activity;
+    private ActivityGroupDomain activity;
     private BigDecimal score;
     private String comment;
 }

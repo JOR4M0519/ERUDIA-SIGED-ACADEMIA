@@ -12,6 +12,8 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ActivityMapper {
 
+
+
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "activityName", target = "activityName"),
@@ -21,6 +23,8 @@ public interface ActivityMapper {
     })
 
     ActivityDomain toDomain(Activity activity);
+
+
 
     @InheritInverseConfiguration
     Activity toEntity (ActivityDomain activityDomain);

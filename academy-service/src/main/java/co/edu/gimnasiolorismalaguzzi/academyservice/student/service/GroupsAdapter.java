@@ -2,8 +2,11 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.RepeatingStudentsGroupReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.ReportGroupsStatusDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.GroupsMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.GroupsCrudRepo;
 //import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserCrudRepo;
@@ -12,7 +15,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +26,9 @@ import java.util.Optional;
 public class GroupsAdapter implements PersistenceGroupsPort {
 
     private final GroupsCrudRepo groupsCrudRepo; // Repositorio JPA
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
 
     @Autowired
     private GroupsMapper groupsMapper;
@@ -32,6 +40,11 @@ public class GroupsAdapter implements PersistenceGroupsPort {
     @Override
     public List<GroupsDomain> findAll() {
         return this.groupsMapper.toDomains(this.groupsCrudRepo.findAll());
+    }
+
+    @Override
+    public List<GroupsDomain> findByStatus(String status) {
+        return this.groupsMapper.toDomains(groupsCrudRepo.findByStatus("A"));
     }
 
     @Override
@@ -77,4 +90,56 @@ public class GroupsAdapter implements PersistenceGroupsPort {
             throw new AppException("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    @Override
+    public List<ReportGroupsStatusDomain> getAcademicLevelReport() {
+        List<Object[]> results = groupsCrudRepo.getAcademicLevelReport();
+        List<ReportGroupsStatusDomain> reportList = new ArrayList<>();
+
+        for (Object[] result : results) {
+            ReportGroupsStatusDomain report = new ReportGroupsStatusDomain();
+            report.setGroupId((Integer) result[0]);
+            report.setLevelName((String) result[1]);
+            report.setGroupName((String) result[2]);
+            report.setStatusName((String) result[3]);
+            report.setStudentsTotal((Long) result[4]);
+            reportList.add(report);
+        }
+
+        return reportList;
+    }
+
+    @Override
+    public List<AttendanceReportDomain> getAttendanceReport() {
+        return jdbcTemplate.query(
+                "SELECT * FROM get_attendance_report()",
+                (rs, rowNum) -> new AttendanceReportDomain(
+                        rs.getInt("group_id"),
+                        rs.getString("level_name"),
+                        rs.getString("group_name"),
+                        rs.getString("section_name"),
+                        rs.getLong("total_active"),
+                        rs.getLong("present_count"),
+                        rs.getLong("absent_count"),
+                        rs.getLong("late_count"),
+                        rs.getTimestamp("last_record") != null ?
+                                rs.getTimestamp("last_record").toLocalDateTime() : null
+                )
+        );
+    }
+
+    @Override
+    public List<RepeatingStudentsGroupReportDomain> getRepeatingStudentsByGroupReport() {
+        return jdbcTemplate.query(
+                "SELECT * FROM get_repeating_students_report_by_group()",
+                (rs, rowNum) -> new RepeatingStudentsGroupReportDomain(
+                        rs.getInt("group_id"),
+                        rs.getString("group_name"),
+                        rs.getString("level_name"),
+                        rs.getLong("repeating_count")
+                )
+        );
+    }
+
+
+
 }

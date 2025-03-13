@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.StudentPromotionDTO;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupStudentPort;
 import jakarta.ws.rs.PathParam;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,13 @@ public class GroupStudentsController {
     @GetMapping
     public ResponseEntity<List<GroupStudentsDomain>> getAllStudentsInGroups(){
         List<GroupStudentsDomain> groupStudentsDomains = groupStudentPort.findAll();
+        return ResponseEntity.ok(groupStudentsDomains);
+    }
+
+    @GetMapping("/active")
+    public ResponseEntity<List<GroupStudentsDomain>> getAllStudentsInGroupsByStatus(){
+        String status = "A";
+        List<GroupStudentsDomain> groupStudentsDomains = groupStudentPort.getGroupListByStatus(status);
         return ResponseEntity.ok(groupStudentsDomains);
     }
 
@@ -65,6 +73,12 @@ public class GroupStudentsController {
     public ResponseEntity<GroupStudentsDomain> updateGroupStudent(@PathVariable Integer id, @RequestBody GroupStudentsDomain groupStudentsDomain){
         GroupStudentsDomain updated = groupStudentPort.update(id,groupStudentsDomain);
         return ResponseEntity.ok(updated);
+    }
+
+    @PostMapping("/promote")
+    public ResponseEntity<?> promoteStudents(@RequestBody StudentPromotionDTO promotionDTO) {
+        List<GroupStudentsDomain> promotedStudents = groupStudentPort.promoteStudents(promotionDTO);
+        return ResponseEntity.ok(promotedStudents);
     }
 
     @DeleteMapping("/{id}")

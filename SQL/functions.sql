@@ -26,3 +26,33 @@ WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- 🔹 Inicia
   AND ap.status IN ('A', 'F');
 END;
 $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_subject_schedules(
+    p_group_id INT,
+    p_period_id INT,
+    p_subject_id INT,
+    p_professor_id INT
+)
+RETURNS SETOF subject_schedule AS $$
+BEGIN
+RETURN QUERY
+SELECT
+    ss.*
+FROM
+    subject_schedule ss
+        JOIN
+    subject_groups sg ON ss.subject_group_id = sg.id
+        JOIN
+    groups g ON sg.group_students = g.id
+WHERE
+    g.id = p_group_id
+  AND sg.academic_period_id = p_period_id
+  AND sg.subject_professor_id = (
+    SELECT sp.id
+    FROM subject_professors sp
+    WHERE sp.subject_id = p_subject_id
+      AND sp.professor_id = p_professor_id
+);
+END;
+$$ LANGUAGE plpgsql;
