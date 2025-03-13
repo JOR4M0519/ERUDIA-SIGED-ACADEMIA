@@ -47,3 +47,7 @@ dependencies {
 	/*compileOnly 'org.projectlombok:lombok:1.18.28'  // Versión más reciente de Lombok
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'*/
 }
+
+test {
+	useJUnitPlatform()
+}

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @PersistenceAdapter
@@ -62,8 +63,8 @@ public class SubjectProfessorAdapter implements PersistenceSubjectProfessorPort 
                 existingSubjectProfessor.get().setSubject(existingSubjectProfessor.get().getSubject());
             }
             return mapper.toDomain(crudRepo.save(existingSubjectProfessor.get()));
-        } catch (EntityNotFoundException e){
-            throw new EntityNotFoundException("Subject Professor with ID " + integer + "Not found!");
+        } catch (NoSuchElementException e){
+            throw new NoSuchElementException("Subject Professor with ID " + integer + "Not found!");
         }
     }
 
