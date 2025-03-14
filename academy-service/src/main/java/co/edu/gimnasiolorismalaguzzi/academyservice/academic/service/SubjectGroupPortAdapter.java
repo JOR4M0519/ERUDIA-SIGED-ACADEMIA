@@ -29,16 +29,14 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     private final SubjectGroupMapper subjectGroupMapper;
 
 
-    private final UserMapper userMapper;
 
 
     @Autowired
     private SubjectGroupCrudRepo subjectGroupCrudRepo;
 
 
-    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, UserMapper userMapper) {
+    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper) {
         this.subjectGroupMapper = subjectGroupMapper;
-        this.userMapper = userMapper;
     }
 
     @Override

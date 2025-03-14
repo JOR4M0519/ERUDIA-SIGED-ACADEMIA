@@ -26,11 +26,11 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
 
     private final GroupStudentsCrudRepo groupStudentsCrudRepo;
 
-    @Autowired
     private GroupStudentsMapper groupStudentsMapper;
 
-    public GroupStudentsAdapter(GroupStudentsCrudRepo groupStudentsCrudRepo) {
+    public GroupStudentsAdapter(GroupStudentsCrudRepo groupStudentsCrudRepo, GroupStudentsMapper groupStudentsMapper) {
         this.groupStudentsCrudRepo = groupStudentsCrudRepo;
+        this.groupStudentsMapper = groupStudentsMapper;
     }
 
     @Override
@@ -106,15 +106,16 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
                 }
 
                 // 2. Crear nueva asignación de grupo
-                GroupStudentsDomain newAssignment = new GroupStudentsDomain();
+                GroupStudentsDomain newAssignment = GroupStudentsDomain.builder().build();
 
                 // Configurar estudiante
                 UserDomain student = new UserDomain(studentId);
                 newAssignment.setStudent(student);
 
                 // Configurar grupo destino
-                GroupsDomain targetGroup = new GroupsDomain();
-                targetGroup.setId(promotionDTO.getTargetGroupId());
+                GroupsDomain targetGroup = GroupsDomain.builder()
+                        .id(promotionDTO.getTargetGroupId())
+                        .build();
                 newAssignment.setGroup(targetGroup);
 
                 // 3. Guardar la nueva asignación

@@ -20,17 +20,17 @@ import java.util.Optional;
 @PersistenceAdapter
 @Slf4j
 public class AttendanceAdapter implements PersistenceAttendancePort {
-    @Autowired
-    private SubjectScheduleCrudRepo subjectScheduleCrudRepo;
-
+    private final SubjectScheduleCrudRepo subjectScheduleCrudRepo;
     private final AttendanceCrudRepo attendanceCrudRepo;
-
-    @Autowired
     private final AttendanceMapper attendanceMapper;
 
-    public AttendanceAdapter(AttendanceCrudRepo attendanceCrudRepo, AttendanceMapper attendanceMapper) {
+    @Autowired
+    public AttendanceAdapter(AttendanceCrudRepo attendanceCrudRepo,
+                        AttendanceMapper attendanceMapper,
+                        SubjectScheduleCrudRepo subjectScheduleCrudRepo) {
         this.attendanceCrudRepo = attendanceCrudRepo;
         this.attendanceMapper = attendanceMapper;
+        this.subjectScheduleCrudRepo = subjectScheduleCrudRepo;
     }
 
     @Override

@@ -30,8 +30,9 @@ public class SubjectGroupsController {
 
     /**
      * Obtiene las materias de los estudiante con base en un id del estudiante
-     * @param id
-     * @return Materias de los estudiantes
+     * @param studentId
+     * @param year
+     * @return
      */
 
     @GetMapping("/students-groups/students/{studentId}")

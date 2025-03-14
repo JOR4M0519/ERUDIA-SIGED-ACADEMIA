@@ -21,11 +21,11 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
 
     private final KnowledgeCrudRepo knowledgeCrudRepo;
 
-    @Autowired
     private KnowledgeMapper knowledgeMapper;
 
-    public KnowledgeAdapter(KnowledgeCrudRepo knowledgeCrudRepo) {
+    public KnowledgeAdapter(KnowledgeCrudRepo knowledgeCrudRepo, KnowledgeMapper knowledgeMapper) {
         this.knowledgeCrudRepo = knowledgeCrudRepo;
+        this.knowledgeMapper = knowledgeMapper;
     }
 
     @Override

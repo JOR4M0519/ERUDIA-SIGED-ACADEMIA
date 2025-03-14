@@ -195,10 +195,10 @@ public class UserAdapter implements PersistenceUserPort {
 
             // 3. Crear la relación en GroupStudent
             log.debug("Creating group student relation");
-            GroupStudentsDomain groupStudentsDomain = new GroupStudentsDomain();
+            GroupStudentsDomain groupStudentsDomain = GroupStudentsDomain.builder().build();
             groupStudentsDomain.setStudent(savedUserDomain);
 
-            GroupsDomain groupsDomain = new GroupsDomain();
+            GroupsDomain groupsDomain = GroupsDomain.builder().build();
             groupsDomain.setId(registrationDomain.getGroupId());
             groupStudentsDomain.setGroup(groupsDomain);
 

@@ -25,16 +25,17 @@ import java.util.Optional;
 @Slf4j
 public class GroupsAdapter implements PersistenceGroupsPort {
 
-    private final GroupsCrudRepo groupsCrudRepo; // Repositorio JPA
+    private final GroupsCrudRepo groupsCrudRepo;
+    private final JdbcTemplate jdbcTemplate;
+    private final GroupsMapper groupsMapper;
+
     @Autowired
-    private JdbcTemplate jdbcTemplate;
-
-
-    @Autowired
-    private GroupsMapper groupsMapper;
-
-    public GroupsAdapter(GroupsCrudRepo groupsCrudRepo) {
+    public GroupsAdapter(GroupsCrudRepo groupsCrudRepo,
+                         JdbcTemplate jdbcTemplate,
+                         GroupsMapper groupsMapper) {
         this.groupsCrudRepo = groupsCrudRepo;
+        this.jdbcTemplate = jdbcTemplate;
+        this.groupsMapper = groupsMapper;
     }
 
     @Override

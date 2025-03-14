@@ -1,13 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.domain;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@NoArgsConstructor
+
 @Data
+@Builder
 public class GroupStudentsDomain {
     private Integer id;
     private UserDomain student;

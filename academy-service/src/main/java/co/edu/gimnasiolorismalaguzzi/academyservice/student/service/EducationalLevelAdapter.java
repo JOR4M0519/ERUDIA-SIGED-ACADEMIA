@@ -21,11 +21,11 @@ public class EducationalLevelAdapter implements PersistenceEducationalLevelPort 
 
     private final EduLevelCrudRepo EduLevelCrudRepo; // Repositorio JPA
 
-    @Autowired
     private EducationalLevelMapper EducationalLevelMapper;
 
-    public EducationalLevelAdapter(EduLevelCrudRepo EduLevelCrudRepo) {
+    public EducationalLevelAdapter(EduLevelCrudRepo EduLevelCrudRepo, EducationalLevelMapper EducationalLevelMapper) {
         this.EduLevelCrudRepo = EduLevelCrudRepo;
+        this.EducationalLevelMapper = EducationalLevelMapper;
     }
 
     @Override
