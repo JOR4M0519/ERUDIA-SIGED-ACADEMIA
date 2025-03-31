@@ -61,10 +61,51 @@ jacoco {
 }
 
 jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required.set(true)  // Para SonarQube
-        csv.required.set(false)
-        html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-    }
+	dependsOn test
+	reports {
+		xml.required.set(true)  // Para SonarQube
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, includes: [
+					// Incluir solo los servicios que te interesan
+					'co/edu/gimnasiolorismalaguzzi/academyservice/academic/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/administration/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/evaluation/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/knowledge/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/student/service/**'
+			], excludes: [
+					// Excluir explícitamente los mappers y otras clases que no quieres incluir
+					'**/*Mapper*',
+					'**/*Controller*',
+					'**/*Entity*',
+					'**/*Repository*',
+					'**/*Domain*',
+					'**/*Exception*',
+					'**/*Config*'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'CLASS'
+			includes = [
+					'co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.student.service.*'
+			]
+			limit {
+				counter = 'LINE'
+				minimum = 0.80 // Puedes ajustar este valor según tus necesidades
+			}
+		}
+	}
 }

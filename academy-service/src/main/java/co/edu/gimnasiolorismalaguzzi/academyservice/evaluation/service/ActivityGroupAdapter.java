@@ -1,5 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectGroupPortAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,12 +22,14 @@ import java.util.Optional;
 public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
     private ActivityGroupCrudRepo activityGroupCrudRepo;
+    private final SubjectGroupPortAdapter persistenceSubjectGroupPort;
 
     @Autowired
     private ActivityGroupMapper activityGroupMapper;
 
-    public ActivityGroupAdapter(ActivityGroupCrudRepo activityGroupCrudRepo, ActivityGroupMapper activityGroupMapper){
+    public ActivityGroupAdapter(ActivityGroupCrudRepo activityGroupCrudRepo, SubjectGroupPortAdapter persistenceSubjectGroupPort, ActivityGroupMapper activityGroupMapper){
         this.activityGroupCrudRepo = activityGroupCrudRepo;
+        this.persistenceSubjectGroupPort = persistenceSubjectGroupPort;
         this.activityGroupMapper = activityGroupMapper;
     }
 
@@ -74,7 +79,17 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
     @Override
     public List<ActivityGroupDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String i) {
-        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
+
+        List<ActivityGroupDomain> activityGroupDomainListFinal = new ArrayList<>();
+
+        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+
+        for (SubjectGroupDomain domain :subjectGroupDomainList){
+            activityGroupDomainListFinal.addAll(getAllActivity_ByPeriodSubjectGroup(domain.getSubjectProfessor().getSubject().getId(),periodId,domain.getGroups().getId(),"I"));
+        }
+
+        return activityGroupDomainListFinal;
+       // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
     }
 
 

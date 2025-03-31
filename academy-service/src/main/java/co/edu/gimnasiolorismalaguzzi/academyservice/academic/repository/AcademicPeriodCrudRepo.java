@@ -19,6 +19,11 @@ public interface AcademicPeriodCrudRepo extends JpaRepository<AcademicPeriod, In
     @Transactional
     @Modifying
     @Query(value = "SELECT * FROM get_academic_periods(:year)", nativeQuery = true)
+    List<AcademicPeriod> getActivePeriodsByYear(@Param("year") String year);
+
+    @Transactional
+    @Modifying
+    @Query(value = "SELECT * FROM get_all_academic_periods(:year)", nativeQuery = true)
     List<AcademicPeriod> getPeriodsByYear(@Param("year") String year);
 
     List<AcademicPeriod> findByStatus(String status);

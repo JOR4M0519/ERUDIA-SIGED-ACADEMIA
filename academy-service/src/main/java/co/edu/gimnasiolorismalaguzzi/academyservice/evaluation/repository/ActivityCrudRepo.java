@@ -19,4 +19,6 @@ public interface ActivityCrudRepo extends JpaRepository<Activity, Integer> {
 
     @Override
     Optional<Activity> findById(Integer integer);
+
+    List<Activity> findByAchievementGroup_Id(Integer id);
 }

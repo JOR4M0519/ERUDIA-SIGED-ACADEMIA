@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.GradeSetting;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -40,6 +41,14 @@ public class AcademicPeriod {
     @NotNull
     @Column(name = "status", nullable = false, length = 1)
     private String status;
+
+    @Column(name = "percentage")
+    private Integer percentage;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "setting_id", nullable = false)
+    private GradeSetting setting;
 
 //    @OneToMany(mappedBy = "period")
 //    private Set<Activity> activities = new LinkedHashSet<>();

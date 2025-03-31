@@ -1,10 +1,12 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserDetail;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserRole;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserDetailMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.IdTypeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserDetailCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserRoleCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
@@ -12,10 +14,12 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.App
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,6 +29,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
 
 
     private final UserDetailCrudRepo userDetailCrudRepo;
+    private final UserRoleCrudRepo userRoleCrudRepo;
 
     @Autowired
     private UserMapper userMapper;
@@ -34,8 +39,11 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     @Autowired
     private IdTypeMapper typeMapper;
 
-    public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo) {
+
+
+    public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo, UserRoleCrudRepo userRoleCrudRepo) {
         this.userDetailCrudRepo = userDetailCrudRepo;
+        this.userRoleCrudRepo = userRoleCrudRepo;
     }
 
     @Override
@@ -43,11 +51,37 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         return this.userDetailMapper.toDomains(this.userDetailCrudRepo.findAll());
     }
 
-    @Override
+    /*@Override
     public UserDetailDomain findById(Integer uuid) {
         Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Id(uuid));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
+*/
+    @Override
+    @Transactional
+    public UserDetailDomain findById(Integer id) {
+        try {
+            // Modificar para usar una consulta que cargue los roles
+            UserDetail userDetail = userDetailCrudRepo.findById(id)
+                    .orElseThrow(() -> new EntityNotFoundException("UserDetail not found with id: " + id));
+
+            // Si el usuario existe, cargar explícitamente sus roles
+            if (userDetail.getUser() != null) {
+                // Obtener los roles directamente desde el repositorio
+                List<UserRole> userRoles = userRoleCrudRepo.findByUserId(userDetail.getUser().getId());
+                userDetail.getUser().setUserRoles(new LinkedHashSet<>(userRoles));
+            }
+
+            return userDetailMapper.toDomain(userDetail);
+        } catch (EntityNotFoundException e) {
+            log.error("Error getting UserDetail by id: {}", id, e);
+            throw new AppException(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Error getting UserDetail by id: {}", id, e);
+            throw new AppException("Error getting UserDetail by id: " + id, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     @Override
     @Transactional

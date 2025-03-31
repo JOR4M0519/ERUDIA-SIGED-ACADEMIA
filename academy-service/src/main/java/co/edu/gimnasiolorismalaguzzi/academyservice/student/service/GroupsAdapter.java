@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @PersistenceAdapter
 @Slf4j
@@ -141,6 +142,20 @@ public class GroupsAdapter implements PersistenceGroupsPort {
         );
     }
 
+    // Añadir este método a GroupsAdapter.java
+
+    public List<GroupsDomain> getGroupsByLevelAndStatus(String levelId, String status) {
+        try {
+            // Convertir levelId de String a Integer antes de pasarlo al repositorio
+            Integer levelIdInt = Integer.parseInt(levelId);
+            List<Groups> groups = groupsCrudRepo.findByLevelIdAndStatus(levelIdInt, status);
+            return groupsMapper.toDomains(groups);
+        } catch (NumberFormatException e) {
+            throw new AppException("El ID del nivel debe ser un número válido", HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            throw new AppException("Error al obtener grupos por nivel y estado: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 }

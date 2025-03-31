@@ -38,8 +38,8 @@ public class PublicController {
 
     @PostMapping("/login")
     public Mono<ResponseEntity<Map<String, Object>>> login(@RequestBody Login request) {
-        return keycloakService.getToken(request.getUsername(), request.getPassword())  // 🔥 Llamada reactiva para el token
-                .flatMap(token -> userService.getDetailUser(request.getUsername())  // 🔥 Llamada reactiva para los detalles del usuario
+        return keycloakService.getToken(request.getUsername(), request.getPassword())  //  Llamada reactiva para el token
+                .flatMap(token -> userService.getDetailUser(request.getUsername())  //  Llamada reactiva para los detalles del usuario
                         .map(userDetail -> {
                             Map<String, Object> response = new HashMap<>();
                             response.put("token", token);

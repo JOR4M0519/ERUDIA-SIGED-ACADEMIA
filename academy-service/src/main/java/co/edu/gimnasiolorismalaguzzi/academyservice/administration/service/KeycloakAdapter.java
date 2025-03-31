@@ -101,7 +101,7 @@ public class KeycloakAdapter implements PersistenceUserKeycloakPort {
                         .stream()
                         .filter(role -> userDomain.getRoles()
                                 .stream()
-                                .anyMatch(roleName -> roleName.equalsIgnoreCase(role.getName())))
+                                .anyMatch(roleName -> roleName.getRole().getRoleName().equalsIgnoreCase(role.getName())))
                         .toList();
             }
 

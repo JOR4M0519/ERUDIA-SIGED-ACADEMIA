@@ -10,7 +10,7 @@ import java.util.List;
 
 @WebAdapter
 @RestController
-@RequestMapping("/api/admin/grade-settings")
+@RequestMapping("/api/academy/grade-settings")
 public class GradeSettingController {
     private final PersistenceGradeSettingPort persistenceGradeSettingPort;
 

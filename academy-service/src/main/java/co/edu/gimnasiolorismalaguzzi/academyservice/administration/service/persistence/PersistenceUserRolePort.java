@@ -11,4 +11,7 @@ import java.util.List;
 
 public interface PersistenceUserRolePort extends PersistencePort<UserRoleDomain,Integer> {
 
+    List<UserDomain> getStudents();
+
+    List<UserDomain> getAdministrativeUsers();
 }

@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface AchievementGroupsCrudRepo extends JpaRepository<AchievementGroup, Integer> {
     List<AchievementGroup> findBySubjectKnowledge_IdSubject_IdAndGroup_IdAndPeriod_Id(Integer id, Integer id1, Integer id2);
+
+    List<AchievementGroup> findByGroup_IdAndPeriod_Id(Integer id, Integer id1);
 }

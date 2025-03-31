@@ -16,7 +16,9 @@ public interface AcademicPeriodMapper {
             @Mapping(source = "startDate", target = "startDate"),
             @Mapping(source = "endDate", target = "endDate"),
             @Mapping(source = "name", target = "name"),
-            @Mapping(source = "status", target = "status")
+            @Mapping(source = "status", target = "status"),
+            @Mapping(source = "percentage", target = "percentage"),
+            @Mapping(source = "setting", target = "gradeSetting")
     })
     AcademicPeriodDomain toDomain(AcademicPeriod academicPeriod);
 

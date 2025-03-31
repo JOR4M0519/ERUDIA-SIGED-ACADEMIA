@@ -14,4 +14,6 @@ public interface PersistenceSubjectGroupPort extends PersistencePort<SubjectGrou
     List<SubjectGroupDomain> getAllSubjectByTeacher(Integer id, Integer year);
 
     List<SubjectGroupDomain> getStudentListByGroupTeacherPeriod(Integer groupId,Integer subjectId, Integer teacherId,Integer periodId);
+
+    List<SubjectGroupDomain> getAllSubjectGRoupsByPeriodAndLevel(Integer periodId, Integer levelId);
 }

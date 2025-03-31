@@ -199,6 +199,11 @@ public class ActivityAdapter implements PersistenceActivityPort {
         return this.activityMapper.toDomains(this.activityCrudRepo.findAll());
     }
 
+    @Override
+    public List<ActivityDomain> getAllActivitiesByAchievementGroupId(Integer id) {
+        return this.activityMapper.toDomains(activityCrudRepo.findByAchievementGroup_Id(id));
+    }
+
 
 
 }

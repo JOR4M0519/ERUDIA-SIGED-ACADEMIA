@@ -41,8 +41,22 @@ public class AcademicPeriodController {
      * @return Lista de periodos académicos
      */
     @GetMapping("/active/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getActivePeriodsByYear(@PathVariable String year){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getActivePeriodsByYear(year);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    @GetMapping("/years/{year}")
     public ResponseEntity<List<AcademicPeriodDomain>> getPeriodsByYear(@PathVariable String year){
         List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getPeriodsByYear(year);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    @GetMapping("/settings/{settingId}/active/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getPeriodsByYearAndSetting(
+            @PathVariable String year,
+            @PathVariable Integer settingId){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getPeriodsBySettingsAndYear(settingId,year);
         return ResponseEntity.ok(AcademicPeriodDomains);
     }
 

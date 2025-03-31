@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.StudentTracking;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceStudentTrackingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
@@ -21,8 +22,13 @@ public class StudentTrackingAdapter implements PersistenceStudentTrackingPort {
 
     private final StudentTrackingCrudRepo studentTrackingCrudRepo;
 
+
+
     @Autowired
     private StudentTrackingMapper studentTrackingMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     public StudentTrackingAdapter(StudentTrackingCrudRepo studentTrackingCrudRepo) {
         this.studentTrackingCrudRepo = studentTrackingCrudRepo;
@@ -51,8 +57,8 @@ public class StudentTrackingAdapter implements PersistenceStudentTrackingPort {
         try{
             Optional<StudentTracking> existingTracking = studentTrackingCrudRepo.findById(integer);
             if(existingTracking.isPresent()){
-                existingTracking.get().setStudent(studentTrackingDomain.getStudent());
-                existingTracking.get().setProfessor(studentTrackingDomain.getProfessor());
+                existingTracking.get().setStudent(userMapper.toEntity(studentTrackingDomain.getStudent()));
+                existingTracking.get().setProfessor(userMapper.toEntity(studentTrackingDomain.getProfessor()));
                 existingTracking.get().setPeriod(studentTrackingMapper.toEntity(studentTrackingDomain).getPeriod());
                 existingTracking.get().setTrackingType(studentTrackingMapper.toEntity(studentTrackingDomain).getTrackingType());
                 existingTracking.get().setSituation(studentTrackingDomain.getSituation());

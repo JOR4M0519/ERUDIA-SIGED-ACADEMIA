@@ -43,7 +43,7 @@ public class ActivityGroupController {
      * Las actividades de una materia, por el periodo de un grupo de estudiantes (Activas y finalizadas)
      * @param subjectId
      * @param periodId
-     * @param userId
+     * @param
      * @return Lista de actividades
      */
 

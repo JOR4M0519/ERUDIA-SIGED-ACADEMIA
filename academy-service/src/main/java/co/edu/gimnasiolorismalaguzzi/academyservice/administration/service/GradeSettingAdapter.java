@@ -51,6 +51,8 @@ public class GradeSettingAdapter implements PersistenceGradeSettingPort {
             Optional<GradeSetting> existingSetting = crudRepo.findById(integer);
             if(existingSetting.isPresent()){
                 existingSetting.get().setLevelId(entity.getLevelId());
+                existingSetting.get().setName(entity.getName());
+                existingSetting.get().setDescription(entity.getDescription());
                 existingSetting.get().setMaximumGrade(entity.getMaximumGrade());
                 existingSetting.get().setMinimumGrade(entity.getMinimumGrade());
                 existingSetting.get().setPassGrade(entity.getPassGrade());

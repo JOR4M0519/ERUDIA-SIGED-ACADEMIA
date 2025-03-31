@@ -13,4 +13,6 @@ public interface UserRoleCrudRepo extends JpaRepository<UserRole,Integer> {
 
     @Query("SELECT DISTINCT ur.user FROM UserRole ur WHERE ur.role.roleName = 'estudiantes'")
     List<User> findAllStudents();
+
+    List<UserRole> findByUserId(Integer userId);
 }

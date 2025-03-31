@@ -15,6 +15,8 @@ public interface GradeSettingMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "levelId", target = "levelId"),
+            @Mapping(source = "name", target = "name"),
+            @Mapping(source = "description", target = "description"),
             @Mapping(source = "minimumGrade", target = "minimumGrade"),
             @Mapping(source = "passGrade", target = "passGrade"),
             @Mapping(source = "maximumGrade", target = "maximumGrade")

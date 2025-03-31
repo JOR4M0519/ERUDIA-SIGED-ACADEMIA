@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import lombok.Data;
 
@@ -9,8 +10,8 @@ import java.time.LocalDate;
 @Data
 public class StudentTrackingDomain {
     private Integer id;
-    private User student;
-    private User professor;
+    private UserDomain student;
+    private UserDomain professor;
     private AcademicPeriodDomain period;
     private TrackingTypeDomain trackingType;
     private String situation;

@@ -1,9 +1,5 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
+package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Role;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

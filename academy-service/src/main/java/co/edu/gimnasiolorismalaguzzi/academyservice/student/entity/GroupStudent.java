@@ -3,14 +3,13 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.student.entity;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @Entity
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "group_students")
 public class GroupStudent {
     @Id

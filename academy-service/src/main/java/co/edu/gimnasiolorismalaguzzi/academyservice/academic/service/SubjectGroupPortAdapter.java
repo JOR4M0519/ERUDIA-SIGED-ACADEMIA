@@ -79,6 +79,13 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     }
 
     @Override
+    public List<SubjectGroupDomain> getAllSubjectGRoupsByPeriodAndLevel(Integer periodId, Integer levelId) {
+        List<SubjectGroup> subjectGroupEntity = subjectGroupCrudRepo.
+                findByAcademicPeriod_IdAndGroups_StatusAndGroups_Level_Id(periodId,"A",levelId);
+        return this.subjectGroupMapper.toDomains(subjectGroupEntity);
+    }
+
+    @Override
     public SubjectGroupDomain findById(Integer integer) {
         Optional<SubjectGroup> subjectGradeDomain = subjectGroupCrudRepo.findById(integer);
         return subjectGradeDomain.map(subjectGroupMapper::toDomain).orElse(null);

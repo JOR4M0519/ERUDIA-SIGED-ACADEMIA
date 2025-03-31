@@ -5,6 +5,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.AcademicPeri
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGrade;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectGradeMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.RecoveryPeriodCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGradeCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectGradeAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
@@ -31,6 +32,8 @@ public class SubjectGradeAdapterTest {
 
     @Mock
     private SubjectGradeCrudRepo subjectGradeCrudRepo;
+    @Mock
+    private RecoveryPeriodCrudRepo recoveryPeriodCrudRepo;
 
     @Mock
     private SubjectGradeMapper subjectGradeMapper;
@@ -48,7 +51,7 @@ public class SubjectGradeAdapterTest {
     @BeforeEach
     void setUp() {
         // Crear la instancia con el constructor
-        subjectGradeAdapter = new SubjectGradeAdapter(subjectGradeCrudRepo);
+        subjectGradeAdapter = new SubjectGradeAdapter(subjectGradeCrudRepo,recoveryPeriodCrudRepo);
 
         // Inyectar manualmente el mapper usando ReflectionTestUtils
         ReflectionTestUtils.setField(subjectGradeAdapter, "subjectGradeMapper", subjectGradeMapper);

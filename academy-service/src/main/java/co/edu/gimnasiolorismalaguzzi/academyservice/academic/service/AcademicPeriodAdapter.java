@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @PersistenceAdapter
 @Slf4j
@@ -71,9 +72,24 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     }
 
     @Override
+    public List<AcademicPeriodDomain> getActivePeriodsByYear(String year){
+        List<AcademicPeriodDomain> academicPeriodDomain = this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.getActivePeriodsByYear(year));
+        return academicPeriodDomain;
+    }
+
+    @Override
     public List<AcademicPeriodDomain> getPeriodsByYear(String year){
         List<AcademicPeriodDomain> academicPeriodDomain = this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.getPeriodsByYear(year));
         return academicPeriodDomain;
+    }
+
+    @Override
+    public List<AcademicPeriodDomain> getPeriodsBySettingsAndYear(Integer settingId, String year) {
+        List<AcademicPeriodDomain> academicPeriodDomain = this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.getPeriodsByYear(year));
+
+        return academicPeriodDomain.stream()
+                .filter(period -> period.getGradeSetting().getId().equals(settingId))
+                .collect(Collectors.toList());
     }
 
     @Override

@@ -17,4 +17,6 @@ public interface PersistenceActivityPort extends PersistencePort<ActivityDomain,
     List<ActivityDomain> getAllActivitiesWithKnowledgesAchievements(Integer id);
 
     ActivityDomain updateActivityAndGroup(Integer id, CreateActivityFront activityDomainFront);
+
+    List<ActivityDomain> getAllActivitiesByAchievementGroupId(Integer id);
 }

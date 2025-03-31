@@ -39,7 +39,7 @@ public class ActivityGradeController {
 
     @GetMapping("/activities/{activityId}/students/{studentId}")
     public ResponseEntity<?> getGradeByActivityIdByStudentId(@PathVariable Integer activityId,@PathVariable Integer studentId){
-        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityIdByStudentId(activityId,studentId);
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityGroupIdByStudentId(activityId,studentId);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 

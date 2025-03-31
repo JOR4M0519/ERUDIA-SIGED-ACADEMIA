@@ -64,5 +64,7 @@ WHERE s.id = :subjectId
     List<SubjectGroup> findSubjectGroupsByStudentIdAndAcademicYear(
             @Param("studentId") Integer studentId,
             @Param("year") String year);;
+
+    List<SubjectGroup> findByAcademicPeriod_IdAndGroups_StatusAndGroups_Level_Id(Integer id, String status, Integer id1);
 }
 

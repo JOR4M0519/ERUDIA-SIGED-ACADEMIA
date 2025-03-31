@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +19,16 @@ public class GradeSetting {
     @NotNull
     @Column(name = "level_id", nullable = false)
     private Integer levelId;
+
+    @Size(max = 20)
+    @NotNull
+    @Column(name = "name", nullable = false, length = 20)
+    private String name;
+
+    @Size(max = 400)
+    @NotNull
+    @Column(name = "description", length = 400)
+    private String description;
 
     @Column(name = "minimum_grade")
     private Integer minimumGrade;

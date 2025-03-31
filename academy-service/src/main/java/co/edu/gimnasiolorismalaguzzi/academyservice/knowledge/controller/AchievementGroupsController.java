@@ -31,8 +31,19 @@ public class AchievementGroupsController {
     }
 
     @GetMapping("/periods/{periodId}/subjects/{subjectId}/groups/{groupId}")
-    public ResponseEntity<List<AchievementGroupDomain>> getKnowledgeAchievementBySubjectId(@PathVariable Integer subjectId, @PathVariable Integer groupId,@PathVariable Integer periodId){
+    public ResponseEntity<List<AchievementGroupDomain>> getKnowledgeAchievementByPeriodAndSubjectAndGroupId(
+            @PathVariable Integer periodId,
+            @PathVariable Integer subjectId,
+            @PathVariable Integer groupId){
         List<AchievementGroupDomain> achievementGroupDomains = achievementGroups.getKnowledgeAchievementBySubjectId(subjectId, groupId, periodId);
+        return ResponseEntity.ok(achievementGroupDomains);
+    }
+    @GetMapping("/periods/{periodId}/groups/{groupId}")
+    public ResponseEntity<List<AchievementGroupDomain>> getKnowledgeAchievementByPeriodAndGroupId(
+            @PathVariable Integer periodId,
+            @PathVariable Integer groupId){
+        List<AchievementGroupDomain> achievementGroupDomains = achievementGroups.
+                getKnowledgeAchievementListByPeriodAndGroupId(periodId, groupId);
         return ResponseEntity.ok(achievementGroupDomains);
     }
 

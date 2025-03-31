@@ -19,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @PersistenceAdapter
 @Slf4j
@@ -32,6 +33,15 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
         this.groupStudentsCrudRepo = groupStudentsCrudRepo;
         this.groupStudentsMapper = groupStudentsMapper;
     }
+
+    // Añadir este método a GroupStudentsAdapter.java
+    public List<GroupStudentsDomain> getStudentsByGroupId(Integer groupId) {
+        return groupStudentsCrudRepo.findByGroupId(groupId)
+                .stream()
+                .map(groupStudentsMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
 
     @Override
     public List<GroupStudentsDomain> findAll() {

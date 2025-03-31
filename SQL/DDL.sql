@@ -98,7 +98,10 @@ CREATE TABLE grade_settings(
                                level_id int not null references educational_level (id),
                                minimum_grade int,
                                pass_grade int,
-                               maximum_grade int
+                               maximum_grade int,
+                               name VARCHAR(20),
+                               description VARCHAR(400)
+
 );
 
 -- Table: academic_period
@@ -108,6 +111,7 @@ CREATE TABLE academic_period (
                                  start_date DATE NOT NULL,
                                  end_date DATE NOT NULL,
                                  name VARCHAR(8) NOT NULL,
+                                 percentage INT ,
                                  status varchar(1) NOT NULL
 );
 

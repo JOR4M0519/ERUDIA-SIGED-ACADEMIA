@@ -1,7 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserRoleDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserRole;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.RoleMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserRoleMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserRoleCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserRolePort;
@@ -19,12 +23,17 @@ import java.util.Optional;
 public class UserRoleAdapter implements PersistenceUserRolePort {
 
     private final UserRoleCrudRepo userRoleCrudRepo;
-
-    @Autowired
     private UserRoleMapper userRoleMapper;
+    private UserMapper userMapper;
 
-    public UserRoleAdapter(UserRoleCrudRepo userRoleCrudRepo) {
+    private final RoleMapper roleMapper;
+
+
+    public UserRoleAdapter(UserRoleCrudRepo userRoleCrudRepo, UserRoleMapper userRoleMapper, UserMapper userMapper, RoleMapper roleMapper) {
         this.userRoleCrudRepo = userRoleCrudRepo;
+        this.userRoleMapper = userRoleMapper;
+        this.userMapper = userMapper;
+        this.roleMapper = roleMapper;
     }
 
     @Override
@@ -51,8 +60,8 @@ public class UserRoleAdapter implements PersistenceUserRolePort {
             Optional<UserRole> existingUserRole = userRoleCrudRepo.findById(integer);
             if (existingUserRole.isPresent()) {
                 UserRole userRole = existingUserRole.get();
-                userRole.setUser(userRoleDomain.getUser());
-                userRole.setRole(userRoleDomain.getRole());
+                userRole.setUser(User.builder().id(userRoleDomain.getId()).build());
+                userRole.setRole(roleMapper.toEntity(userRoleDomain.getRole()));
                 return userRoleMapper.toDomain(userRoleCrudRepo.save(userRole));
             }
             throw new EntityNotFoundException("UserRole with id: " + integer + " not found!");
@@ -69,5 +78,15 @@ public class UserRoleAdapter implements PersistenceUserRolePort {
         } catch (Exception e) {
             return HttpStatus.CONFLICT;
         }
+    }
+
+    @Override
+    public List<UserDomain> getStudents() {
+        return userMapper.toDomains(this.userRoleCrudRepo.findAllStudents());
+    }
+
+    @Override
+    public List<UserDomain> getAdministrativeUsers() {
+        return userMapper.toDomains(this.userRoleCrudRepo.findAllAdministrativeUsers());
     }
 }

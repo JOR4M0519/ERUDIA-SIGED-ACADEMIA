@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = {FamilyMapper.class}
+        uses = {UserMapper.class, IdTypeMapper.class, FamilyMapper.class}
 )
 public interface UserDetailMapper {
 

@@ -1,6 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectScheduleMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectScheduleCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Attendance;
@@ -23,6 +25,12 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
     private final SubjectScheduleCrudRepo subjectScheduleCrudRepo;
     private final AttendanceCrudRepo attendanceCrudRepo;
     private final AttendanceMapper attendanceMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private SubjectScheduleMapper subjectScheduleMapper;
 
     @Autowired
     public AttendanceAdapter(AttendanceCrudRepo attendanceCrudRepo,
@@ -61,8 +69,8 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
         try{
             Optional<Attendance> existingAttendance = attendanceCrudRepo.findById(integer);
             if(existingAttendance.isPresent()){
-                existingAttendance.get().setStudent(attendanceDomain.getStudent());
-                existingAttendance.get().setSchedule(attendanceDomain.getSchedule());
+                existingAttendance.get().setStudent(userMapper.toEntity(attendanceDomain.getStudent()));
+                existingAttendance.get().setSchedule(subjectScheduleMapper.toEntity(attendanceDomain.getSchedule()));
                 existingAttendance.get().setAttendanceDate(attendanceDomain.getAttendanceDate());
                 existingAttendance.get().setStatus(attendanceDomain.getStatus());
                 existingAttendance.get().setRecordedAt(attendanceDomain.getRecordedAt());
@@ -123,11 +131,11 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
 
             if (matchingSchedule != null) {
                 // Asignar el horario encontrado a la asistencia
-                attendance.setSchedule(matchingSchedule);
+                attendance.setSchedule(subjectScheduleMapper.toDomain(matchingSchedule));
             } else {
                 // Usar el primer horario disponible si no hay coincidencia exacta
                 if (!possibleSchedules.isEmpty()) {
-                    attendance.setSchedule(possibleSchedules.getFirst());
+                    attendance.setSchedule(subjectScheduleMapper.toDomain(possibleSchedules.getFirst()));
                     log.info("No se encontró un horario exacto para la asistencia en {}. Usando el primer horario disponible.", recordTime);
                 } else {
                     log.error("No hay horarios disponibles para asignar a la asistencia en: {}", recordTime);
@@ -154,8 +162,8 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
                     Optional<Attendance> existingAttendance = attendanceCrudRepo.findById(attendance.getId());
                     if (existingAttendance.isPresent()) {
                         Attendance current = existingAttendance.get();
-                        current.setStudent(attendance.getStudent());
-                        current.setSchedule(attendance.getSchedule());
+                        current.setStudent(userMapper.toEntity(attendance.getStudent()));
+                        current.setSchedule(subjectScheduleMapper.toEntity(attendance.getSchedule()));
                         current.setAttendanceDate(attendance.getAttendanceDate());
                         current.setStatus(attendance.getStatus());
                         current.setRecordedAt(attendance.getRecordedAt());

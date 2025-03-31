@@ -21,6 +21,7 @@ public interface ActivityGradeCrudRepo extends JpaRepository<ActivityGrade, Inte
             "AND grp_studnt.group.id = :groupId")
     List<ActivityGrade> findByActivityAndGroupId(@Param("activityId") Integer activityId, @Param("groupId") Integer groupId);
 
+    ActivityGrade findByStudent_IdAndActivity_Activity_Id(Integer id, Integer id1); 
 
     /*@Query(value = """
         SELECT act_grd.*

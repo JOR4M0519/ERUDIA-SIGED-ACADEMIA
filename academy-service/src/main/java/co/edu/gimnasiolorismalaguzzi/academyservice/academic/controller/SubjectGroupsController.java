@@ -61,6 +61,22 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(subjectGroupDomains);
     }
 
+    /**
+     * Obtiene las materias de cada grupo de estudiantes de un periodo
+     * @param periodId
+     * @param levelId
+     * @return Materias de los Profesores
+     */
+    @GetMapping("/periods/{periodId}/edu-level/{levelId}")
+    public ResponseEntity<?> getAllSubjectGRoupsByPeriodAndLevel(
+            @PathVariable Integer periodId,
+            @PathVariable Integer levelId) {
+
+        List<SubjectGroupDomain> subjectGroupDomains = subjectGroupPort.
+                getAllSubjectGRoupsByPeriodAndLevel(periodId,levelId);
+        return ResponseEntity.ok(subjectGroupDomains);
+    }
+
 
     /**
      * Obtiene la lista de estudiantes de una materia !!!ELIMINAR!!!

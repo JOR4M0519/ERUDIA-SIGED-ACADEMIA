@@ -7,4 +7,7 @@ import java.util.List;
 
 public interface PersistenceAchievementGroups extends PersistencePort<AchievementGroupDomain, Integer> {
     List<AchievementGroupDomain> getKnowledgeAchievementBySubjectId(Integer subjectId,Integer groupId,Integer periodId);
+
+    List<AchievementGroupDomain> getKnowledgeAchievementListByPeriodAndGroupId(Integer groupId,Integer periodId);
+
 }

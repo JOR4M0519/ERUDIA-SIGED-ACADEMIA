@@ -230,7 +230,7 @@ public class AcademicPeriodAdapterTest {
         when(academicPeriodMapper.toDomains(academicPeriods)).thenReturn(academicPeriodDomains);
 
         // Act
-        List<AcademicPeriodDomain> result = academicPeriodAdapter.getPeriodsByYear(year);
+        List<AcademicPeriodDomain> result = academicPeriodAdapter.getActivePeriodsByYear(year);
 
         // Assert
         assertEquals(academicPeriodDomains, result);

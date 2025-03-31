@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeSettingDomain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +16,6 @@ public class AcademicPeriodDomain {
     private LocalDate endDate;
     private String name;
     private String status;
-
+    private Integer percentage;
+    private GradeSettingDomain gradeSetting;
 }
