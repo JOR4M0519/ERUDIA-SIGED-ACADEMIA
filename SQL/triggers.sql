@@ -29,3 +29,11 @@ CREATE TRIGGER after_activity_group_insert
     AFTER INSERT ON activity_group
     FOR EACH ROW
     EXECUTE FUNCTION insert_activity_grades();
+
+-- auto-generated definition
+create trigger after_activity_grade_change
+    after insert or update
+                        on activity_grade
+                        for each row
+                        execute procedure update_subject_grade_after_activity_grade();
+
