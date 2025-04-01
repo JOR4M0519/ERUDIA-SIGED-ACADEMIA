@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDimensionDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGradeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowledgeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectDimension;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGrade;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectDimensionMapper;
@@ -29,9 +30,15 @@ public class SubjectDimensionAdapter implements PersistenceSubjectDimensionPort 
     public SubjectDimensionAdapter(SubjectDimensionCrudRepo subjectDimensionCrudRepo) {
         this.subjectDimensionCrudRepo = subjectDimensionCrudRepo;
     }
+
     @Override
     public List<SubjectDimensionDomain> findAll() {
         return this.subjectDimensionMapper.toDomains(this.subjectDimensionCrudRepo.findAll());
+    }
+
+    @Override
+    public List<SubjectDimensionDomain> getAllByDimensionId(Integer dimensionId) {
+        return this.subjectDimensionMapper.toDomains(subjectDimensionCrudRepo.findByDimension_Id(dimensionId));
     }
 
     @Override
@@ -63,8 +70,17 @@ public class SubjectDimensionAdapter implements PersistenceSubjectDimensionPort 
 
     @Override
     public HttpStatus delete(Integer integer) {
-        //No hay necesidad de borrar una nota
-        return HttpStatus.I_AM_A_TEAPOT;
+        try{
+            Optional<SubjectDimension> existingSubjectGrade = subjectDimensionCrudRepo.findById(integer);
+            if(existingSubjectGrade.isPresent()){
+                subjectDimensionCrudRepo.deleteById(integer);
+                return HttpStatus.OK;
+            }
+            return HttpStatus.NOT_FOUND;
+        } catch (Exception e) {
+            throw new EntityNotFoundException("SubjectGrade with id " + integer + "not found!");
+        }
+
     }
 
 
