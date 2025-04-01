@@ -9,4 +9,6 @@ public interface PersistenceSubjectKnowledgePort extends PersistencePort<Subject
     List<SubjectKnowledgeDomain> getAllKnowledgesBySubjectIdByPeriodId(Integer subjectId,Integer periodId);
 
     List<SubjectKnowledgeDomain> getAllSubjectKnowledgeByKnowledgeId(Integer knowledgeId);
+
+    List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectId(Integer knowledgeId);
 }
