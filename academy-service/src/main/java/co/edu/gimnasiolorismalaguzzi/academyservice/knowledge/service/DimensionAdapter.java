@@ -1,7 +1,10 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectDimensionPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.DimensionDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Dimension;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.mapper.DimensionMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.repository.DimensionCrudRepo;
@@ -18,14 +21,19 @@ import java.util.Optional;
 @Slf4j
 public class DimensionAdapter implements PersistenceDimensionPort {
 
+
     private final DimensionCrudRepo dimensionCrudRepo;
 
     @Autowired
     private final DimensionMapper dimensionMapper;
 
-    public DimensionAdapter(DimensionCrudRepo dimensionCrudRepo, DimensionMapper dimensionMapper) {
+    @Autowired
+    private final PersistenceSubjectDimensionPort subjectDimensionPort;
+
+    public DimensionAdapter(DimensionCrudRepo dimensionCrudRepo, DimensionMapper dimensionMapper, PersistenceSubjectDimensionPort subjectDimensionPort) {
         this.dimensionCrudRepo = dimensionCrudRepo;
         this.dimensionMapper = dimensionMapper;
+        this.subjectDimensionPort = subjectDimensionPort;
     }
 
     @Override
@@ -61,8 +69,27 @@ public class DimensionAdapter implements PersistenceDimensionPort {
     }
 
     @Override
-    public HttpStatus delete(Integer integer) {
-        //No creo que sea necesario borrar una dimension :v
-        return null;
+    public HttpStatus delete(Integer id) {
+
+        DimensionDomain dimension = findById(id);
+
+        // Verificar si existe la dimension
+        if (dimension.equals(null)) {
+            throw new AppException("La dimension no existe", HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar si el saber está siendo utilizado
+        boolean usedInSubjectDimension = !subjectDimensionPort.getAllByDimensionId(id).isEmpty();
+
+        // Si está siendo utilizado, lanzar excepción
+        if (usedInSubjectDimension) {
+            throw new AppException(
+                    "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
+                    HttpStatus.CONFLICT);
+        }
+
+        dimensionCrudRepo.deleteById(id);
+        return HttpStatus.OK;
     }
+
 }
