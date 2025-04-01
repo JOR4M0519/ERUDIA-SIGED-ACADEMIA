@@ -34,4 +34,6 @@ public interface GroupsCrudRepo extends JpaRepository<Groups, Integer> {
     List<Groups> findByLevelIdAndStatus(Integer levelId, String status);
 
     List<Groups> findByStatus(String status);
+
+    List<Groups> findByLevel_Id(Integer id);
 }

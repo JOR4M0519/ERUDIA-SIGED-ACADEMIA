@@ -94,6 +94,22 @@ public class SubjectGroupsController {
         return ResponseEntity.ok(userList);
     }
 
+    /**
+     * Obtiene la lista de registros por grupo de estudiante y periodo
+     * @param groupId
+     * @param periodId
+     * @return
+     */
+    @GetMapping("/groups/{groupId}/periods/{periodId}")
+    public ResponseEntity<?> getSubjectsByGroupIdAndPeriodId(
+            @PathVariable Integer groupId,
+            @PathVariable Integer periodId){
+        List<SubjectGroupDomain> subjectGroupDomainList = subjectGroupPort.getSubjectsByGroupIdAndPeriodId(
+                groupId,periodId
+        );
+        return ResponseEntity.ok(subjectGroupDomainList);
+    }
+
     @PostMapping
     public ResponseEntity<SubjectGroupDomain> createSubjectGroup(@RequestBody SubjectGroupDomain subjectGroupDomain){
         SubjectGroupDomain created = subjectGroupPort.save(subjectGroupDomain);

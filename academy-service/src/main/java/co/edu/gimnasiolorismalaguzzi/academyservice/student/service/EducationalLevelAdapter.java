@@ -1,12 +1,17 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeSettingDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.GradeSetting;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceGradeSettingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.EducationalLevelDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.EducationalLevel;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.EducationalLevelMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.EduLevelCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceEducationalLevelPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupsPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +27,12 @@ public class EducationalLevelAdapter implements PersistenceEducationalLevelPort 
     private final EduLevelCrudRepo EduLevelCrudRepo; // Repositorio JPA
 
     private EducationalLevelMapper EducationalLevelMapper;
+
+    @Autowired
+    private PersistenceGroupsPort groupsPort;
+
+    @Autowired
+    private PersistenceGradeSettingPort gradeSettingPort;
 
     public EducationalLevelAdapter(EduLevelCrudRepo EduLevelCrudRepo, EducationalLevelMapper EducationalLevelMapper) {
         this.EduLevelCrudRepo = EduLevelCrudRepo;
@@ -70,18 +81,30 @@ public class EducationalLevelAdapter implements PersistenceEducationalLevelPort 
 
     @Override
     public HttpStatus delete(Integer integer) {
+        // Verificar si el nivel está siendo usado en otras tablas
+        List<GroupsDomain> groupsDomainList = groupsPort.findByLevelId(integer);
+        List<GradeSettingDomain> gradeSettingList = gradeSettingPort.findByLevelId(integer);
 
-        //Check if there are  some register in other table
-        //table
-         try{
-            if (this.EduLevelCrudRepo.existsById(integer)) {
-                EduLevelCrudRepo.updateStatusById("I",integer);
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("User ID doesnt exist", HttpStatus.NOT_FOUND);
+        try {
+            if (!this.EduLevelCrudRepo.existsById(integer)) {
+                throw new AppException("El nivel educativo no existe", HttpStatus.NOT_FOUND);
             }
-        }catch(Exception e){
-            throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+
+            // Verificar si está siendo utilizado
+            if (!groupsDomainList.isEmpty() || !gradeSettingList.isEmpty()) {
+                throw new AppException(
+                        "No es posible eliminar el nivel educativo porque está siendo utilizado por grupos o esquemas de calificación",
+                        HttpStatus.IM_USED);
+            }
+
+            // Si no está siendo utilizado, actualizar el estado a inactivo
+            EduLevelCrudRepo.updateStatusById("I", integer);
+            return HttpStatus.OK;
+        } catch (AppException e) {
+            throw e; // Relanzar excepciones de la aplicación
+        } catch (Exception e) {
+            throw new AppException("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 }

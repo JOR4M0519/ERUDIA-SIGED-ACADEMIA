@@ -27,4 +27,6 @@ public interface AcademicPeriodCrudRepo extends JpaRepository<AcademicPeriod, In
     List<AcademicPeriod> getPeriodsByYear(@Param("year") String year);
 
     List<AcademicPeriod> findByStatus(String status);
+
+    List<AcademicPeriod> findBySetting_Id(Integer id);
 }

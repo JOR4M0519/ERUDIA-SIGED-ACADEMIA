@@ -19,4 +19,6 @@ public interface SubjectKnowledgeCrudRepo extends JpaRepository<SubjectKnowledge
     """, nativeQuery = true)
     List<SubjectKnowledge> findKnowledgesBySubjectId(@Param("subjectId") Integer subjectId,
                                                      @Param("periodId") Integer periodId);
+
+    List<SubjectKnowledge> findByIdKnowledge_Id(Integer id);
 }

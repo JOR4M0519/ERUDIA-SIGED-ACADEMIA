@@ -10,4 +10,6 @@ public interface PersistenceAchievementGroups extends PersistencePort<Achievemen
 
     List<AchievementGroupDomain> getKnowledgeAchievementListByPeriodAndGroupId(Integer groupId,Integer periodId);
 
+    List<AchievementGroupDomain> getAllBySubjectKnowledgeId(Integer subjectKnowledgeId);
+
 }

@@ -3,6 +3,8 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.administration.controller;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeSettingDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceGradeSettingPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,4 +44,18 @@ public class GradeSettingController {
         GradeSettingDomain updatedSetting = persistenceGradeSettingPort.update(id, gradeSettingDomain);
         return ResponseEntity.ok(updatedSetting);
     }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteSetting(@PathVariable Integer id) {
+        try {
+            HttpStatus status = persistenceGradeSettingPort.delete(id);
+            return ResponseEntity.ok("Se eliminó correctamente el registro");
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.IM_USED) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            }
+            throw e;
+        }
+    }
+
 }

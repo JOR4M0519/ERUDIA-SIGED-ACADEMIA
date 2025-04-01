@@ -1,8 +1,10 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceKnowledgePort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,8 +46,20 @@ public class KnowledgeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteKnowledge(@PathVariable Integer id) {
-        knowledgeServicePort.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteKnowledge(@PathVariable Integer id) {
+        try {
+            knowledgeServicePort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
     }
 }

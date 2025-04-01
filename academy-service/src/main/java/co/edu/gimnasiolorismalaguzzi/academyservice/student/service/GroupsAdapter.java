@@ -54,6 +54,10 @@ public class GroupsAdapter implements PersistenceGroupsPort {
         Optional<Groups> groupStudentOptional = this.groupsCrudRepo.findById(id);
         return groupStudentOptional.map(groupsMapper::toDomain).orElse(null);
     }
+    @Override
+    public List<GroupsDomain> findByLevelId(Integer levelId) {
+        return this.groupsMapper.toDomains(groupsCrudRepo.findByLevel_Id(levelId));
+    }
 
     @Override
     public GroupsDomain save(GroupsDomain groupsDomain) {
@@ -92,6 +96,9 @@ public class GroupsAdapter implements PersistenceGroupsPort {
             throw new AppException("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
+
     @Override
     public List<ReportGroupsStatusDomain> getAcademicLevelReport() {
         List<Object[]> results = groupsCrudRepo.getAcademicLevelReport();

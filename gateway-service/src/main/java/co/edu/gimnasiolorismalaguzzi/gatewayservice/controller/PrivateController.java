@@ -1,12 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.controller;
 
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserRegistrationDomain;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +25,14 @@ public class PrivateController {
     public ResponseEntity<?> getUsersByGroup(@PathVariable String id) {
         return ResponseEntity.ok(keycloakService.getUsersByGroup(id));
     }
+
+    @PostMapping("/users/students/register")
+    public ResponseEntity<?> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
+        UserDetailDomain result = keycloakService.registerByGroupinStudentUser(registrationDomain);
+        return ResponseEntity.ok(result);
+    }
+
+
 
     @GetMapping("/users/{username}/roles")
     public ResponseEntity<?> getRolesUserByUuid(@PathVariable String username) {

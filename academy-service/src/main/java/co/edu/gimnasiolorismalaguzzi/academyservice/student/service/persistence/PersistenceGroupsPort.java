@@ -9,6 +9,8 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.ReportGroupsS
 import java.util.List;
 
 public interface PersistenceGroupsPort extends PersistencePort<GroupsDomain, Integer> {
+
+    List<GroupsDomain> findByLevelId(Integer levelId);
     List<ReportGroupsStatusDomain> getAcademicLevelReport();
 
     List<AttendanceReportDomain> getAttendanceReport();

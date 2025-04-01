@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PersistenceSubjectKnowledgePort extends PersistencePort<SubjectKnowledgeDomain, Integer> {
     List<SubjectKnowledgeDomain> getAllKnowledgesBySubjectIdByPeriodId(Integer subjectId,Integer periodId);
+
+    List<SubjectKnowledgeDomain> getAllSubjectKnowledgeByKnowledgeId(Integer knowledgeId);
 }

@@ -1,5 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowledgeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectKnowledge;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectKnowledgePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDomain;
@@ -20,6 +23,9 @@ import java.util.Optional;
 public class KnowledgeAdapter implements PersistenceKnowledgePort {
 
     private final KnowledgeCrudRepo knowledgeCrudRepo;
+
+    @Autowired
+    private PersistenceSubjectKnowledgePort subjectKnowledgePort;
 
     private KnowledgeMapper knowledgeMapper;
 
@@ -48,29 +54,55 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
 
     @Override
     public KnowledgeDomain update(Integer integer, KnowledgeDomain entity) {
-        try{
+        try {
             Optional<Knowledge> existingKnowledge = knowledgeCrudRepo.findById(integer);
-            if(existingKnowledge.isPresent()) {
+            if (existingKnowledge.isPresent()) {
                 existingKnowledge.get().setName(entity.getName());
                 existingKnowledge.get().setStatus(entity.getStatus());
             }
             return knowledgeMapper.toDomain(knowledgeCrudRepo.save(existingKnowledge.get()));
-        } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e) {
+            throw new EntityNotFoundException("Knowledge with ID " + integer + "not found!");
+        }
+    }
+
+    public KnowledgeDomain updateStatusById(Integer integer, KnowledgeDomain entity) {
+        try {
+            Optional<Knowledge> existingKnowledge = knowledgeCrudRepo.findById(integer);
+            if (existingKnowledge.isPresent()) {
+                existingKnowledge.get().setName(entity.getName());
+                existingKnowledge.get().setStatus(entity.getStatus());
+            }
+            return knowledgeMapper.toDomain(knowledgeCrudRepo.save(existingKnowledge.get()));
+        } catch (EntityNotFoundException e) {
             throw new EntityNotFoundException("Knowledge with ID " + integer + "not found!");
         }
     }
 
     @Override
-    public HttpStatus delete(Integer integer) {
-        try{
-            if(this.knowledgeCrudRepo.existsById(integer)){
-                knowledgeCrudRepo.updateStatusById("I", integer);
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("Knowledge with ID does exist! ", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e){
-            throw new AppException("Interal Error! ", HttpStatus.INTERNAL_SERVER_ERROR);
+    public HttpStatus delete(Integer id) {
+
+        KnowledgeDomain knowledge = findById(id);
+
+        // Verificar si existe el saber
+        if (knowledge.equals(null)) {
+            throw new AppException("El saber no existe", HttpStatus.NOT_FOUND);
         }
+
+        // Verificar si el saber está siendo utilizado en logros
+        boolean usedInAchievements = !subjectKnowledgePort.getAllSubjectKnowledgeByKnowledgeId(id).isEmpty();
+
+        // Si está siendo utilizado, lanzar excepción
+        if (usedInAchievements) {
+            throw new AppException(
+                    "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
+                    HttpStatus.CONFLICT);
+        }
+
+        knowledge.setStatus("I");
+        // Si no está siendo utilizado, actualizar el estado a inactivo
+        updateStatusById(id, knowledge);
+        return HttpStatus.OK;
     }
+
 }
