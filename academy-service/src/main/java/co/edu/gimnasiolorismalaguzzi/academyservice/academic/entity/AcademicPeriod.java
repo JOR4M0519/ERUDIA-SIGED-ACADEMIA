@@ -32,9 +32,9 @@ public class AcademicPeriod {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Size(max = 8)
+    @Size(max = 30)
     @NotNull
-    @Column(name = "name", nullable = false, length = 8)
+    @Column(name = "name", nullable = false, length = 30)
     private String name;
 
     @Size(max = 1)

@@ -273,8 +273,7 @@ INSERT INTO tracking_type (type) VALUES
                                          ('1'),
                                          ('2'),
                                          ('3'),
-                                         ('4'),
-                                         ('2');
+                                         ('4');
 
 
 -- 33. Tabla: student_tracking
