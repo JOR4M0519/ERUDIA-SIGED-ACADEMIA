@@ -36,7 +36,7 @@ public class SubjectKnowledgeController {
     @GetMapping("/subjects/{subjectId}")
     public ResponseEntity<?> getAllKnowledgeBySubjectId(@PathVariable Integer subjectId){
         List<SubjectKnowledgeDomain> SubjectKnowledgeDomains =
-                subjectKnowledgePort.getAllSubjectKnowledgeByKnowledgeId(subjectId);
+                subjectKnowledgePort.getAllSubjectKnowledgeBySubjectId(subjectId);
         return ResponseEntity.ok(SubjectKnowledgeDomains);
     }
 

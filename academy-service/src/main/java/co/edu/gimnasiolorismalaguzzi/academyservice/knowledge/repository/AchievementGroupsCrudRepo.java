@@ -11,4 +11,6 @@ public interface AchievementGroupsCrudRepo extends JpaRepository<AchievementGrou
     List<AchievementGroup> findByGroup_IdAndPeriod_Id(Integer id, Integer id1);
 
     List<AchievementGroup> findBySubjectKnowledge_Id(Integer id);
+
+    List<AchievementGroup> findByPeriod_IdAndGroup_Id(Integer id, Integer id1);
 }

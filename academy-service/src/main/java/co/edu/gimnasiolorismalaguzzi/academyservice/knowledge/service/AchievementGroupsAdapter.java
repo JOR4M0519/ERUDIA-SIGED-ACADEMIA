@@ -73,8 +73,8 @@ public class AchievementGroupsAdapter implements PersistenceAchievementGroups {
     }
 
     @Override
-    public List<AchievementGroupDomain> getKnowledgeAchievementListByPeriodAndGroupId(Integer groupId, Integer periodId) {
-        return this.achievementGroupsMapper.toDomains(achievementGroupsCrudRepo.findByGroup_IdAndPeriod_Id(groupId,periodId));
+    public List<AchievementGroupDomain> getKnowledgeAchievementListByPeriodAndGroupId(Integer periodId, Integer groupId) {
+        return this.achievementGroupsMapper.toDomains(achievementGroupsCrudRepo.findByPeriod_IdAndGroup_Id(periodId,groupId));
     }
 
     @Override

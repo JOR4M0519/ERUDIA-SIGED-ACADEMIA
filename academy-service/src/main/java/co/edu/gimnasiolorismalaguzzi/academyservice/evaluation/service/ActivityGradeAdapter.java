@@ -106,7 +106,7 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
             // Obtener la lista de achievementGroups
             List<AchievementGroupDomain> achievementGroupDomainList =
-                    achievementGroupsPort.getKnowledgeAchievementListByPeriodAndGroupId(groupId, academicPeriodId);
+                    achievementGroupsPort.getKnowledgeAchievementListByPeriodAndGroupId(academicPeriodId, groupId);
 
             // Agrupar los achievementGroups por subjectId
             Map<Integer, List<AchievementGroupDomain>> achievementsBySubject = new HashMap<>();
