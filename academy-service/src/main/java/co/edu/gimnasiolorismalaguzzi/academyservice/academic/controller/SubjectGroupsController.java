@@ -7,6 +7,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -106,6 +107,22 @@ public class SubjectGroupsController {
             @PathVariable Integer periodId){
         List<SubjectGroupDomain> subjectGroupDomainList = subjectGroupPort.getSubjectsByGroupIdAndPeriodId(
                 groupId,periodId
+        );
+        return ResponseEntity.ok(subjectGroupDomainList);
+    }
+
+    /**
+     * Obtiene la lista de de estudiantes de una materia para el grupo
+     * @param periodId  a
+     * @param subjectId a
+     * @return
+     */
+    @GetMapping("/periods/{periodId}/subjects/{subjectId}")
+    public ResponseEntity<?> getGroupsStudentsByPeriodIdAndSubjectId(
+            @PathVariable Integer periodId,
+            @PathVariable Integer subjectId){
+        List<GroupStudentsDomain> subjectGroupDomainList= subjectGroupPort.getGroupsStudentsByPeriodIdAndSubjectId(
+                periodId,subjectId
         );
         return ResponseEntity.ok(subjectGroupDomainList);
     }
