@@ -2,10 +2,13 @@ package co.edu.gimnasiolorismalaguzzi.gatewayservice.controller;
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserRegistrationDomain;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.KeycloakService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -27,11 +30,20 @@ public class PrivateController {
     }
 
     @PostMapping("/users/students/register")
-    public ResponseEntity<?> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
-        UserDetailDomain result = keycloakService.registerByGroupinStudentUser(registrationDomain);
-        return ResponseEntity.ok(result);
+    public Mono<ResponseEntity<UserDetailDomain>> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
+        return keycloakService.registerByGroupinStudentUser(registrationDomain)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    if (e instanceof AppException) {
+                        return Mono.just(ResponseEntity
+                                .status(((AppException) e).getCode())
+                                .body(null));
+                    }
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(null));
+                });
     }
-
 
 
     @GetMapping("/users/{username}/roles")

@@ -408,6 +408,8 @@ $$;
 
 alter function obtener_familias() owner to postgres;
 
+------------
+
 create function update_subject_grade_after_activity_grade() returns trigger
     language plpgsql
 as
@@ -496,3 +498,96 @@ END;
 $$;
 
 alter function update_subject_grade_after_activity_grade() owner to postgres;
+
+------
+---- v2
+create function update_subject_grade_after_activity_grade() returns trigger
+    language plpgsql
+as
+$$
+DECLARE
+student_id_val INT;
+    rec RECORD;
+BEGIN
+    student_id_val := NEW.student_id;
+
+    -- Para todas las materias afectadas por la calificación
+FOR rec IN (
+        WITH activity_scores AS (
+            -- Paso 1: Obtener todas las calificaciones con sus relaciones completas
+            SELECT
+                ag.student_id,
+                ag.score,
+                sk.id_subject,
+                achg.period_id,
+                sk.id_knowledge,
+                k.percentage  -- Ahora confirmado que existe en la tabla knowledge
+            FROM
+                activity_grade ag
+                    JOIN activity_group agr ON ag.activity_id = agr.id
+                    JOIN activity a ON agr.activity_id = a.id
+                    JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                    JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                    JOIN knowledge k ON sk.id_knowledge = k.id
+            WHERE
+                ag.student_id = student_id_val
+        ),
+
+             -- Paso 2: Calcular el promedio por cada conocimiento
+             knowledge_averages AS (
+                 SELECT
+                     id_subject,
+                     period_id,
+                     id_knowledge,
+                     percentage,
+                     AVG(score) AS avg_knowledge_score
+                 FROM
+                     activity_scores
+                 GROUP BY
+                     id_subject, period_id, id_knowledge, percentage
+             ),
+
+             -- Paso 3: Calcular la suma ponderada por materia
+             subject_scores AS (
+                 SELECT
+                     id_subject,
+                     period_id,
+                     SUM(avg_knowledge_score * percentage / 100) AS weighted_sum,
+                     SUM(percentage) AS total_percentage
+                 FROM
+                     knowledge_averages
+                 GROUP BY
+                     id_subject, period_id
+             )
+
+        -- Paso 4: Normalizar la calificación final (escala 0-5)
+        SELECT
+            id_subject AS subject_id,
+            period_id,
+            CASE
+                WHEN total_percentage > 0 THEN ROUND((weighted_sum * 5 / total_percentage)::numeric, 2)
+                ELSE 0
+                END AS final_score
+        FROM
+            subject_scores
+    ) LOOP
+            -- Actualizar o insertar en subject_grade
+UPDATE subject_grade
+SET total_score = rec.final_score
+WHERE student_id = student_id_val
+  AND subject_id = rec.subject_id
+  AND period_id = rec.period_id;
+
+IF NOT FOUND THEN
+                INSERT INTO subject_grade (subject_id, student_id, period_id, comment, total_score, recovered)
+                    VALUES (rec.subject_id, student_id_val, rec.period_id, 'Calificación generada automática', COALESCE(rec.final_score, 0), 'N');
+END IF;
+END LOOP;
+
+RETURN NEW;
+END;
+$$;
+
+alter function update_subject_grade_after_activity_grade() owner to postgres;
+
+------

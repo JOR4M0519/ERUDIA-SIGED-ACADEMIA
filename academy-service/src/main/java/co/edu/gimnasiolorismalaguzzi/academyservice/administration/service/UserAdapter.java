@@ -1,12 +1,13 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserRegistrationDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.*;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Role;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceRolePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserRolePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
@@ -42,12 +43,17 @@ public class UserAdapter implements PersistenceUserPort {
     private final PersistenceUserDetailPort persistenceUserDetailPort;
     private final PersistenceGroupStudentPort persistenceGroupStudentPort;
 
+    private final PersistenceRolePort persistenceRolePort;
+    private final PersistenceUserRolePort persistenceUserRolePort;
 
 
-    public UserAdapter(UserCrudRepo userCrudRepo, FamilyAdapter familyAdapter, PersistenceUserDetailPort persistenceUserDetailPort, PersistenceGroupStudentPort persistenceGroupStudentPort) {
+
+    public UserAdapter(UserCrudRepo userCrudRepo, FamilyAdapter familyAdapter, PersistenceUserDetailPort persistenceUserDetailPort, PersistenceGroupStudentPort persistenceGroupStudentPort, PersistenceRolePort persistenceRolePort, PersistenceUserRolePort persistenceUserRolePort) {
         this.userCrudRepo = userCrudRepo;
         this.persistenceUserDetailPort = persistenceUserDetailPort;
         this.persistenceGroupStudentPort = persistenceGroupStudentPort;
+        this.persistenceRolePort = persistenceRolePort;
+        this.persistenceUserRolePort = persistenceUserRolePort;
     }
 
     @Override
@@ -209,6 +215,44 @@ public class UserAdapter implements PersistenceUserPort {
                 delete(savedUser.getUsername());
                 throw new AppException("Error creating group student relation", HttpStatus.INTERNAL_SERVER_ERROR);
             }
+
+            // 4. Crear la relación de RoleStudent
+            log.debug("Creating student role relation");
+
+            // Buscar el rol de "estudiante" en la base de datos
+            List<RoleDomain> roles = persistenceRolePort.findAll();
+            RoleDomain studentRole = null;
+            for (RoleDomain role : roles) {
+                if ("estudiante".equalsIgnoreCase(role.getRoleName())) {
+                    studentRole = role;
+                    break;
+                }
+            }
+
+            if (studentRole == null) {
+                log.error("Student role not found in the database");
+                // Limpiar recursos creados si no se encuentra el rol
+                persistenceGroupStudentPort.delete(savedGroupStudent.getId());
+                userCrudRepo.deleteById(savedUser.getId());
+                delete(savedUser.getUsername());
+                throw new AppException("Student role not found in the database", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // Crear el objeto UserRoleDomain
+            UserRoleDomain userRoleDomain = UserRoleDomain.builder().build();
+            userRoleDomain.setUserId(savedUser.getId());
+            userRoleDomain.setRole(studentRole);
+
+            // Guardar la relación usuario-rol
+            UserRoleDomain savedUserRole = persistenceUserRolePort.save(userRoleDomain);
+            if (savedUserRole == null) {
+                // Si falla, limpiamos todo lo creado anteriormente
+                persistenceGroupStudentPort.delete(savedGroupStudent.getId());
+                userCrudRepo.deleteById(savedUser.getId());
+                delete(savedUser.getUsername());
+                throw new AppException("Error creating student role relation", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
 
             log.info("User registration completed successfully");
             return savedUserDetail;

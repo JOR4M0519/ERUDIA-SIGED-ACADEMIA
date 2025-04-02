@@ -49,6 +49,7 @@ dependencies {
 	implementation 'org.keycloak:keycloak-core:26.0.2'
 	implementation 'org.keycloak:keycloak-authz-client:26.0.2'
 	implementation 'org.jboss.resteasy:resteasy-client:6.2.5.Final'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
 
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'

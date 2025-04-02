@@ -1,9 +1,11 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.entity.User;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class UserDetailDomain implements Serializable {
@@ -15,9 +17,13 @@ public class UserDetailDomain implements Serializable {
     private String secondLastName;
     private String address;
     private String phoneNumber;
+    private LocalDate dateOfBirth;
     private String dni;
     private IdTypeDomain idType;
     private String neighborhood;
     private String city;
     private String positionJob;
+
+
+    private List<User> relatives;  //Campo externo
 }
