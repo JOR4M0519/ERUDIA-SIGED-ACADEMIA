@@ -5,8 +5,10 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectKnowl
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+
 
 @Getter
 @Setter

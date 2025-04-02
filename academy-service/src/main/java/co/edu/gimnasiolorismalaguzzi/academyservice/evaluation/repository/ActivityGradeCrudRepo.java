@@ -13,12 +13,13 @@ public interface ActivityGradeCrudRepo extends JpaRepository<ActivityGrade, Inte
 
     ActivityGrade findByActivity_IdAndStudent_Id(Integer id, Integer id1);
 
+
     @Query("SELECT act_grd FROM ActivityGrade act_grd " +
             "JOIN act_grd.activity act_grp " +
             "JOIN act_grp.activity act " +
             "JOIN act_grp.group grp_studnt " +
             "WHERE act.id = :activityId " +
-            "AND grp_studnt.group.id = :groupId")
+            "AND grp_studnt.id = :groupId")
     List<ActivityGrade> findByActivityAndGroupId(@Param("activityId") Integer activityId, @Param("groupId") Integer groupId);
 
     ActivityGrade findByStudent_IdAndActivity_Activity_Id(Integer id, Integer id1); 

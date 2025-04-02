@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.GroupStudent;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -26,7 +27,7 @@ public class ActivityGroup {
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "group_id", nullable = false)
-    private GroupStudent group;
+    private Groups group;
 
     @NotNull
     @Column(name = "start_date", nullable = false)

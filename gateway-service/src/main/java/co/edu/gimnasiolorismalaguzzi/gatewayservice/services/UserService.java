@@ -25,4 +25,9 @@ public class UserService {
         return Mono.fromCallable(() -> academyClient.createStudentUser(registrationDomain))
                 .subscribeOn(Schedulers.boundedElastic());
     }
+
+    public Mono<UserDetailDomain> createGeneralUser(UserRegistrationDomain registrationDomain) {
+        return Mono.fromCallable(() -> academyClient.createGeneralUser(registrationDomain))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
 }

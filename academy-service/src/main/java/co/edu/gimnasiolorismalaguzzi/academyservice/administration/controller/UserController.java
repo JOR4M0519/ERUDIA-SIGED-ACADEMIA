@@ -43,10 +43,13 @@ public class UserController {
     }
 
     @PostMapping()
-    public ResponseEntity<UserDetailDomain> createUser(@RequestBody UserDetailDomain userDetailDomain) {
-        UserDetailDomain createdUser = persistenceUserDetailPort.save(userDetailDomain);
-        return ResponseEntity.ok(createdUser);
+    public ResponseEntity<UserDetailDomain> createUser(@RequestBody UserRegistrationDomain registrationDomain) {
+        UserDetailDomain result = persistenceUserPort.registerAdministrativeUsers(registrationDomain);
+        return ResponseEntity.ok(result);
     }
+
+
+
 
     @GetMapping("/family/{id}")
     public ResponseEntity<List<FamilyDomain>> findRelatives(@PathVariable Integer id){
@@ -82,10 +85,31 @@ public class UserController {
         return ResponseEntity.ok("User updated successfully");
     }
 
-    @DeleteMapping("/{uuid}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Integer id ) {
         persistenceUserDetailPort.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<?> patchGeneralUser(@PathVariable Integer id,
+                                              @RequestBody(required = false) UserRegistrationDomain registrationDomain) {
+        // Validate input parameters
+        if (id == null) {
+            throw new AppException("User ID is required", HttpStatus.BAD_REQUEST);
+        }
+
+        if (registrationDomain == null) {
+            throw new AppException("Request body cannot be null", HttpStatus.BAD_REQUEST);
+        }
+
+        // Check if both userDomain and userDetailDomain are null - this would be a no-op request
+        if (registrationDomain.getUserDomain() == null && registrationDomain.getUserDetailDomain() == null) {
+            throw new AppException("Request must include either user or user detail data", HttpStatus.BAD_REQUEST);
+        }
+
+        persistenceUserPort.patchGeneralUser(id, registrationDomain);
+        return ResponseEntity.ok("User updated successfully");
     }
 
     @PostMapping("/students/register")
@@ -93,6 +117,8 @@ public class UserController {
         UserDetailDomain result = persistenceUserPort.registerByGroupinStudentUser(registrationDomain);
         return ResponseEntity.ok(result);
     }
+
+
     @PatchMapping("/{id}/promotion-status")
     public ResponseEntity<?> updatePromotionStatus(
             @PathVariable Integer id,

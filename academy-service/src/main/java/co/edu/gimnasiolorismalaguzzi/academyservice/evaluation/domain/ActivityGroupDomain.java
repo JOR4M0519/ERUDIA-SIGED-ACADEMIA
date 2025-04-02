@@ -14,7 +14,7 @@ import java.time.LocalDate;
 public class ActivityGroupDomain {
     private Integer id;
     private ActivityDomain activity;
-    private GroupStudentsDomain group;
+    private GroupsDomain group;
     private LocalDate startDate;
     private LocalDate endDate;
 }

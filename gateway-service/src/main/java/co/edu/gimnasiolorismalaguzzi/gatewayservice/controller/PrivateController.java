@@ -45,6 +45,22 @@ public class PrivateController {
                 });
     }
 
+    @PostMapping("/users/register")
+    public Mono<ResponseEntity<UserDetailDomain>> registerUser(@RequestBody UserRegistrationDomain registrationDomain) {
+        return keycloakService.registerUser(registrationDomain)
+                .map(ResponseEntity::ok)
+                .onErrorResume(e -> {
+                    if (e instanceof AppException) {
+                        return Mono.just(ResponseEntity
+                                .status(((AppException) e).getCode())
+                                .body(null));
+                    }
+                    return Mono.just(ResponseEntity
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                            .body(null));
+                });
+    }
+
 
     @GetMapping("/users/{username}/roles")
     public ResponseEntity<?> getRolesUserByUuid(@PathVariable String username) {

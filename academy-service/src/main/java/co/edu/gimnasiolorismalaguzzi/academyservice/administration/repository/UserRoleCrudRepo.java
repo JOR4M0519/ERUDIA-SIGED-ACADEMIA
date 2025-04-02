@@ -8,11 +8,13 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 public interface UserRoleCrudRepo extends JpaRepository<UserRole,Integer> {
 
-    @Query("SELECT DISTINCT ur.user FROM UserRole ur WHERE ur.role.roleName IN ('administrativos', 'profesores', 'admin')")
+    @Query("SELECT DISTINCT ur.user FROM UserRole ur WHERE ur.role.roleName IN ('administrador', 'profesor', 'admin')")
     List<User> findAllAdministrativeUsers();
 
-    @Query("SELECT DISTINCT ur.user FROM UserRole ur WHERE ur.role.roleName = 'estudiantes'")
+    @Query("SELECT DISTINCT ur.user FROM UserRole ur WHERE ur.role.roleName = 'estudiante'")
     List<User> findAllStudents();
 
     List<UserRole> findByUserId(Integer userId);
+
+    long deleteByUser_Id(Integer id);
 }

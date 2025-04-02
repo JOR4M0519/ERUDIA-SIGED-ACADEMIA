@@ -23,4 +23,10 @@ public interface PersistenceUserPort  {
 
     @Transactional
     UserDetailDomain registerByGroupinStudentUser(UserRegistrationDomain registrationDomain);
+
+    @Transactional
+    UserDetailDomain registerAdministrativeUsers(UserRegistrationDomain registrationDomain);
+
+    @Transactional
+    void patchGeneralUser(Integer id, UserRegistrationDomain registrationDomain);
 }

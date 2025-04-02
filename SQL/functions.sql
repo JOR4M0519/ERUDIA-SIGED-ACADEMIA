@@ -231,33 +231,6 @@ $$;
 
 alter function get_repeating_students_report_by_group() owner to postgres;
 
-create function get_subject_schedules(p_group_id integer, p_period_id integer, p_subject_id integer, p_professor_id integer) returns SETOF subject_schedule
-    language plpgsql
-as
-$$
-BEGIN
-RETURN QUERY
-SELECT
-    ss.*
-FROM
-    subject_schedule ss
-        JOIN
-    subject_groups sg ON ss.subject_group_id = sg.id
-        JOIN
-    groups g ON sg.group_students = g.id
-WHERE
-    g.id = p_group_id
-  AND sg.academic_period_id = p_period_id
-  AND sg.subject_professor_id = (
-    SELECT sp.id
-    FROM subject_professors sp
-    WHERE sp.subject_id = p_subject_id
-      AND sp.professor_id = p_professor_id
-);
-END;
-$$;
-
-alter function get_subject_schedules(integer, integer, integer, integer) owner to postgres;
 
 create function obtener_familias()
     returns TABLE(codigo text, familia text, miembros bigint, estudiantes_activos bigint, ids_estudiantes integer[])
@@ -591,3 +564,39 @@ $$;
 alter function update_subject_grade_after_activity_grade() owner to postgres;
 
 ------
+
+----------------------
+--subject_schedule----
+----------------------
+
+-- Primero, creamos la función que ejecutará el trigger
+CREATE OR REPLACE FUNCTION create_default_subject_schedule()
+RETURNS TRIGGER AS $$
+BEGIN
+    -- Insertamos un registro en subject_schedule con valores predeterminados
+INSERT INTO subject_schedule (
+    subject_group_id,
+    day_of_week,
+    start_time,
+    end_time,
+    status
+) VALUES (
+             NEW.id,                -- El ID del subject_group recién insertado
+             'Lunes',               -- Día predeterminado
+             '08:00:00'::TIME,      -- Hora de inicio predeterminada
+             '09:00:00'::TIME,      -- Hora de fin predeterminada
+             'A'                    -- Estado activo por defecto (A = Activo)
+         );
+
+RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Luego, creamos el trigger que llama a esta función
+CREATE TRIGGER after_insert_subject_group
+    AFTER INSERT ON subject_groups
+    FOR EACH ROW
+    EXECUTE FUNCTION create_default_subject_schedule();
+
+
+----------------------

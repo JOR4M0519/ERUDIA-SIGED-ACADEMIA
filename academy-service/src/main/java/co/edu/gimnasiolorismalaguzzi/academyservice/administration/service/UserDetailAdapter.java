@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserRegistrationDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserDetail;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserRole;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserDetailMapper;
@@ -62,8 +63,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     public UserDetailDomain findById(Integer id) {
         try {
             // Modificar para usar una consulta que cargue los roles
-            UserDetail userDetail = userDetailCrudRepo.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("UserDetail not found with id: " + id));
+            UserDetail userDetail = userDetailCrudRepo.findByUser_Id(id);
 
             // Si el usuario existe, cargar explícitamente sus roles
             if (userDetail.getUser() != null) {
@@ -172,5 +172,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Username(username));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
+
+
 
 }

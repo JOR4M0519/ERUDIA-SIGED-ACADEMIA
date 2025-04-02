@@ -130,7 +130,8 @@ CREATE TABLE groups (
 CREATE TABLE group_students (
                                 id int not null primary key generated always as identity,
                                 student_id int not null references users(id),
-                                group_id int not null references groups(id)
+                                group_id int not null references groups(id),
+                                status VARCHAR (1) DEFAULT 'A'
 );
 
 
@@ -174,17 +175,22 @@ CREATE TABLE subject_dimension (
 CREATE TABLE subject_schedule (
                                   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                                   subject_group_id INT NOT NULL REFERENCES subject_groups(id),
-                                  day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
-                                  start_time TIME NOT NULL,         -- E.g., '09:00'
-                                  end_time TIME NOT NULL,           -- E.g., '11:00'
-                                  status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
+                                  day_of_week VARCHAR(10) , -- E.g., 'Monday', 'Tuesday', etc.
+                                  start_time TIME ,         -- E.g., '09:00'
+                                  end_time TIME ,           -- E.g., '11:00'
+                                  status VARCHAR(1)            -- To indicate if the schedule is active or not
 );
+                                -- subject_group_id INT NOT NULL REFERENCES subject_groups(id),
+                                -- day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
+                                -- start_time TIME NOT NULL,         -- E.g., '09:00'
+                                -- end_time TIME NOT NULL,           -- E.g., '11:00'
+                                -- status VARCHAR(1) NOT NULL
 
 -- Table: attendance
 CREATE TABLE attendance (
                             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                             student_id INT NOT NULL REFERENCES users(id),        -- The student who attends
-                            schedule_id INT NOT NULL REFERENCES subject_schedule(id), -- Specific schedule
+                            schedule_id INT REFERENCES subject_schedule(id), -- Specific schedule
                             attendance_date DATE NOT NULL,                       -- Date of attendance
                             status VARCHAR(2) NOT NULL,                          -- Attendance status ('Present', 'Absent', 'Late', etc.)
                             recorded_at TIMESTAMPTZ DEFAULT now()                -- Date and time of record

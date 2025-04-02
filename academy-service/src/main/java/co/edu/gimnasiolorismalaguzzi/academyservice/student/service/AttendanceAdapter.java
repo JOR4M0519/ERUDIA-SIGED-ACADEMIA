@@ -153,8 +153,7 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
     }
 
     @Transactional
-    @Override
-    public List<AttendanceDomain> saveAll(List<AttendanceDomain> attendances,
+    public List<AttendanceDomain> saveAllNullAttendance(List<AttendanceDomain> attendances,
                                                                    Integer groupId,
                                                                    Integer subjectId,
                                                                    Integer professorId,
@@ -163,6 +162,7 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
         var attendanceEntities = attendances.stream()
                 .map(attendanceMapper::toEntity)
                 .toList();
+        subjectScheduleCrudRepo.getSubjectSchedules(groupId,periodId,subjectId,professorId);
 
         var savedAttendances = attendanceCrudRepo.saveAll(attendanceEntities);
         log.info("Se guardaron {} asistencias sin validación de horario", savedAttendances.size());
@@ -170,6 +170,43 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
         return attendanceMapper.toDomains(savedAttendances);
     }
 
+
+    @Transactional
+    @Override
+    public List<AttendanceDomain> saveAll(List<AttendanceDomain> attendances,
+                                          Integer groupId,
+                                          Integer subjectId,
+                                          Integer professorId,
+                                          Integer periodId) {
+        // Obtener el horario para estos parámetros
+        var schedules = subjectScheduleCrudRepo.getSubjectSchedules(groupId, periodId, subjectId, professorId);
+
+        // Si existe un horario, asignarlo a las asistencias que no tengan uno
+        if (!schedules.isEmpty()) {
+            var schedule = schedules.getFirst();  // Tomamos el primer (y presumiblemente único) horario
+            log.info("Se encontró horario ID: {} para asignar a las asistencias", schedule.getId());
+
+            // Asignar el horario a las asistencias que no tienen uno
+            for (var attendance : attendances) {
+                if (attendance.getSchedule() == null) {
+                    attendance.setSchedule(subjectScheduleMapper.toDomain(schedule));
+                }
+            }
+        } else {
+            log.warn("No se encontró horario para grupo:{}, asignatura:{}, profesor:{}, periodo:{}",
+                    groupId, subjectId, professorId, periodId);
+        }
+
+        // Convertir a entidades y guardar
+        var attendanceEntities = attendances.stream()
+                .map(attendanceMapper::toEntity)
+                .toList();
+
+        var savedAttendances = attendanceCrudRepo.saveAll(attendanceEntities);
+        log.info("Se guardaron {} asistencias", savedAttendances.size());
+
+        return attendanceMapper.toDomains(savedAttendances);
+    }
 
     @Transactional
     @Override

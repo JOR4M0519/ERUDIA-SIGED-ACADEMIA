@@ -12,7 +12,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persi
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
@@ -69,6 +69,29 @@ public class UserRoleAdapter implements PersistenceUserRolePort {
             throw new EntityNotFoundException("UserRole with id: " + integer + " not found!");
         }
     }
+
+    @Override
+    public HttpStatus deleteByUserId(Integer userId) {
+        if (userId == null) {
+            log.error("Cannot delete user roles: userId is null");
+            return HttpStatus.BAD_REQUEST;
+        }
+
+        try {
+            log.debug("Deleting all roles for user with ID: {}", userId);
+            userRoleCrudRepo.deleteByUser_Id(userId);
+            log.info("Successfully deleted all roles for user with ID: {}", userId);
+            return HttpStatus.OK;
+        } catch (DataIntegrityViolationException e) {
+            log.error("Cannot delete roles for user ID {} due to data integrity violation: {}", userId, e.getMessage());
+            return HttpStatus.CONFLICT;
+        } catch (Exception e) {
+            log.error("Error deleting roles for user ID {}: {}", userId, e.getMessage());
+            return HttpStatus.INTERNAL_SERVER_ERROR;
+        }
+    }
+
+
 
     @Override
     public HttpStatus delete(Integer integer) {

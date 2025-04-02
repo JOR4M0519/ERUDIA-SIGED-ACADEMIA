@@ -71,7 +71,7 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
 
     @Override
     public List<GroupStudentsDomain> getGroupListByStatus(String status) {
-        return this.groupStudentsMapper.toDomains(groupStudentsCrudRepo.findByGroup_Status(status));
+        return this.groupStudentsMapper.toDomains(groupStudentsCrudRepo.findByStatus(status));
     }
 
     @Override

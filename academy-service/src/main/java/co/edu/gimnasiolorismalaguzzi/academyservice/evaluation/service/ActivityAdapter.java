@@ -12,6 +12,8 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityDo
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.Activity;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.ActivityCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.AchievementGroup;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +94,11 @@ public class ActivityAdapter implements PersistenceActivityPort {
             // 2. Crear y guardar el ActivityGroup
             ActivityGroup activityGroup = new ActivityGroup();
             activityGroup.setActivity(savedActivity);
+            GroupsDomain group = GroupsDomain.builder().id(activityFront.getGroup().getId()).build();
+
             activityGroup.setGroup(activityGroupMapper.toEntity(
                 ActivityGroupDomain.builder()
-                    .group(activityFront.getGroup())
+                    .group(group)
                     .build()
             ).getGroup());
             activityGroup.setStartDate(activityFront.getStartDate());
@@ -162,6 +166,24 @@ public class ActivityAdapter implements PersistenceActivityPort {
     }
 
     @Override
+    public ActivityDomain updateActivityKnowledgeId(Integer activityId, Integer knowledgeId) {
+        try{
+            Optional<Activity> existingActivity = activityCrudRepo.findById(activityId);
+
+            if (existingActivity.isPresent()){
+                AchievementGroup achievementGroup = new AchievementGroup();
+                achievementGroup.setId(knowledgeId);
+                existingActivity.get().setAchievementGroup(achievementGroup);
+            }
+
+            return activityMapper.toDomain(activityCrudRepo.save(existingActivity.get()));
+
+        }catch (EntityNotFoundException e){
+            throw new EntityNotFoundException("UserDetail with ID " + activityId + " not found");
+        }
+    }
+
+    @Override
     public ActivityDomain update(Integer integer, ActivityDomain domain) {
         try{
             Optional<Activity> existingActivity = activityCrudRepo.findById(integer);
@@ -203,6 +225,7 @@ public class ActivityAdapter implements PersistenceActivityPort {
     public List<ActivityDomain> getAllActivitiesByAchievementGroupId(Integer id) {
         return this.activityMapper.toDomains(activityCrudRepo.findByAchievementGroup_Id(id));
     }
+
 
 
 

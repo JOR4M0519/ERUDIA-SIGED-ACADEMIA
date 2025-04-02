@@ -27,4 +27,8 @@ public class GroupStudent {
     @JoinColumn(name = "group_id", nullable = false)
     private Groups group;
 
+
+    @Column(name = "status", nullable = true)
+    private String status;
+
 }

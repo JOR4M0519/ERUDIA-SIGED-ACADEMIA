@@ -1,7 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.*;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Role;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceRolePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserPort;
@@ -26,6 +25,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 @PersistenceAdapter
@@ -207,6 +208,7 @@ public class UserAdapter implements PersistenceUserPort {
             GroupsDomain groupsDomain = GroupsDomain.builder().build();
             groupsDomain.setId(registrationDomain.getGroupId());
             groupStudentsDomain.setGroup(groupsDomain);
+            groupStudentsDomain.setStatus("A");
 
             GroupStudentsDomain savedGroupStudent = persistenceGroupStudentPort.save(groupStudentsDomain);
             if (savedGroupStudent == null) {
@@ -272,4 +274,229 @@ public class UserAdapter implements PersistenceUserPort {
         }
     }
 
+    @Transactional
+    @Override
+    public UserDetailDomain registerAdministrativeUsers(UserRegistrationDomain registrationDomain) {
+        // Validaciones previas
+        if (registrationDomain.getUserDomain() == null) {
+            throw new AppException("User domain is required", HttpStatus.BAD_REQUEST);
+        }
+        if (registrationDomain.getUserDetailDomain() == null) {
+            throw new AppException("User detail domain is required", HttpStatus.BAD_REQUEST);
+        }
+        if (registrationDomain.getUserDomain().getRoles() == null || registrationDomain.getUserDomain().getRoles().isEmpty()) {
+            throw new AppException("At least one role is required", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            log.info("Starting administrative user registration process");
+
+            // 1. Crear el usuario
+            log.debug("Creating user");
+            User user = userMapper.toEntity(registrationDomain.getUserDomain());
+            User savedUser = userCrudRepo.save(user);
+            if (savedUser == null) {
+                throw new AppException("Error creating user", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            UserDomain savedUserDomain = userMapper.toDomain(savedUser);
+
+            // 2. Asignar el usuario creado al userDetail y guardarlo
+            log.debug("Creating user detail");
+            registrationDomain.getUserDetailDomain().setUser(savedUserDomain);
+            UserDetailDomain savedUserDetail = persistenceUserDetailPort.save(registrationDomain.getUserDetailDomain());
+            if (savedUserDetail == null) {
+                // Si falla, eliminamos el usuario creado
+                userCrudRepo.deleteById(savedUser.getId());
+                delete(savedUser.getUsername());
+                throw new AppException("Error creating user detail", HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+
+            // 3. Crear las relaciones de roles para el usuario
+            log.debug("Creating role relations for administrative user");
+
+            if (registrationDomain.getUserDomain().getRoles().isEmpty()) {
+                log.error("No roles provided for administrative user");
+                // Limpiar recursos creados si no hay roles
+                userCrudRepo.deleteById(savedUser.getId());
+                delete(savedUser.getUsername());
+                throw new AppException("Roles were not loaded", HttpStatus.BAD_REQUEST);
+            }
+
+            // Iterar sobre cada rol y crear la relación usuario-rol
+            for (UserRoleDomain roleDomain : registrationDomain.getUserDomain().getRoles()) {
+                UserRoleDomain userRoleDomain = UserRoleDomain.builder()
+                        .userId(savedUser.getId())
+                        .role(roleDomain.getRole())
+                        .build();
+
+                UserRoleDomain savedUserRole = persistenceUserRolePort.save(userRoleDomain);
+                if (savedUserRole == null) {
+                    // Si falla, limpiamos todo lo creado anteriormente
+                    userCrudRepo.deleteById(savedUser.getId());
+                    delete(savedUser.getUsername());
+                    throw new AppException("Error creating role relation", HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+
+            log.info("Administrative user registration completed successfully");
+            return savedUserDetail;
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Duplicate entry found during registration", e);
+            if (registrationDomain.getUserDomain().getUsername() != null) {
+                delete(registrationDomain.getUserDomain().getUsername());
+            }
+            throw new AppException("Duplicate entry found: " + e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            log.error("Error in registration process", e);
+            if (registrationDomain.getUserDomain().getUsername() != null) {
+                delete(registrationDomain.getUserDomain().getUsername());
+            }
+            throw new AppException("Error in registration process: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @Transactional
+    @Override
+    public void patchGeneralUser(Integer userId, UserRegistrationDomain registrationDomain) {
+        // Validaciones previas
+        if (userId == null) {
+            throw new AppException("User ID is required", HttpStatus.BAD_REQUEST);
+        }
+        if (registrationDomain == null) {
+            throw new AppException("Registration data is required", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            log.info("Starting user patch process for userId: {}", userId);
+
+            // 1. Buscar el usuario existente
+            User existingUser = userCrudRepo.findById(userId)
+                    .orElseThrow(() -> new AppException("User not found with ID: " + userId, HttpStatus.NOT_FOUND));
+
+            // Convertir a dominio para operaciones posteriores
+            UserDomain existingUserDomain = userMapper.toDomain(existingUser);
+
+            // 2. Actualizar los campos del usuario si están presentes en el objeto de entrada
+            if (registrationDomain.getUserDomain() != null) {
+                UserDomain userDomain = registrationDomain.getUserDomain();
+
+                // Actualizar solo los campos que no son nulos
+                if (userDomain.getEmail() != null) existingUser.setEmail(userDomain.getEmail());
+                if (userDomain.getUsername() != null) existingUser.setUsername(userDomain.getUsername());
+                if (userDomain.getPassword() != null) existingUser.setPassword(userDomain.getPassword());
+                if (userDomain.getFirstName() != null) existingUser.setFirstName(userDomain.getFirstName());
+                if (userDomain.getLastName() != null) existingUser.setLastName(userDomain.getLastName());
+                if (userDomain.getStatus() != null) existingUser.setStatus(userDomain.getStatus());
+                if (userDomain.getPromotionStatus() != null) existingUser.setPromotionStatus(userDomain.getPromotionStatus());
+
+                // Guardar los cambios en el usuario
+                userCrudRepo.save(existingUser);
+                log.debug("User data updated for userId: {}", userId);
+            }
+
+            // 3. Actualizar el detalle del usuario si está presente
+            if (registrationDomain.getUserDetailDomain() != null) {
+                UserDetailDomain userDetailToUpdate = registrationDomain.getUserDetailDomain();
+
+                // Buscar el detalle del usuario existente
+                UserDetailDomain existingUserDetail = persistenceUserDetailPort.findById(userId);
+
+                if (existingUserDetail != null) {
+                    // Actualizar solo los campos que no son nulos
+                    if (userDetailToUpdate.getIdType() != null) existingUserDetail.setIdType(userDetailToUpdate.getIdType());
+                    if (userDetailToUpdate.getDni() != null) existingUserDetail.setDni(userDetailToUpdate.getDni());
+                    if (userDetailToUpdate.getPhoneNumber() != null) existingUserDetail.setPhoneNumber(userDetailToUpdate.getPhoneNumber());
+                    if (userDetailToUpdate.getAddress() != null) existingUserDetail.setAddress(userDetailToUpdate.getAddress());
+                    if (userDetailToUpdate.getDateOfBirth() != null) existingUserDetail.setDateOfBirth(userDetailToUpdate.getDateOfBirth());
+
+                    // Conservar la referencia al usuario
+                    existingUserDetail.setUser(existingUserDomain);
+
+                    // Guardar los cambios en el detalle del usuario
+                    persistenceUserDetailPort.update(existingUserDetail.getId(), existingUserDetail);
+                    log.debug("User detail updated for userDetailId: {}", existingUserDetail.getId());
+                } else {
+                    // Si no existe un detalle, crearlo (esto no debería ocurrir normalmente)
+                    log.warn("User detail not found for userId: {}. Creating new one.", userId);
+                    userDetailToUpdate.setUser(existingUserDomain);
+                    persistenceUserDetailPort.save(userDetailToUpdate);
+                    log.debug("New user detail created for userId: {}", userId);
+                }
+            }
+
+            // 4. Actualizar roles si se proporcionan (solo para usuarios administrativos)
+            if (registrationDomain.getUserDomain() != null &&
+                    registrationDomain.getUserDomain().getRoles() != null &&
+                    !registrationDomain.getUserDomain().getRoles().isEmpty()) {
+
+                // En lugar de eliminar roles actuales, obtener la lista actual
+                List<UserRoleDomain> allRoles = persistenceUserRolePort.findAll();
+
+                // Filtrar los roles del usuario actual
+                List<UserRoleDomain> currentUserRoles = allRoles.stream()
+                        .filter(role -> role.getUserId() != null && role.getUserId().equals(userId))
+                        .collect(Collectors.toList());
+
+                log.debug("Current roles for userId {}: {}", userId,
+                        currentUserRoles.stream()
+                                .map(role -> role.getRole() != null && role.getRole().getRoleName() != null ?
+                                        role.getRole().getRoleName() : "null")
+                                .collect(Collectors.joining(", ")));
+
+                // Crear un conjunto de IDs de roles actuales para búsqueda eficiente
+                Set<Integer> currentRoleIds = currentUserRoles.stream()
+                        .filter(role -> role.getRole() != null && role.getRole().getId() != null)
+                        .map(role -> role.getRole().getId())
+                        .collect(Collectors.toSet());
+
+                // Procesar los nuevos roles (solo agregar los que no existan)
+                for (UserRoleDomain roleDomain : registrationDomain.getUserDomain().getRoles()) {
+                    // Validar que el rol no sea nulo antes de intentar guardar
+                    if (roleDomain == null) {
+                        log.warn("Null role domain found in roles collection for userId: {}", userId);
+                        continue;
+                    }
+
+                    if (roleDomain.getRole() == null || roleDomain.getRole().getId() == null) {
+                        log.warn("Role domain with null role or role ID found for userId: {}, skipping...", userId);
+                        continue;
+                    }
+
+                    // Verificar si el rol ya está asignado al usuario
+                    if (currentRoleIds.contains(roleDomain.getRole().getId())) {
+                        log.debug("Role {} already assigned to userId: {}, skipping...",
+                                roleDomain.getRole().getRoleName(), userId);
+                        continue;
+                    }
+
+                    log.debug("Adding new role: {} for userId: {}", roleDomain.getRole().getRoleName(), userId);
+
+                    UserRoleDomain userRoleDomain = UserRoleDomain.builder()
+                            .userId(userId)
+                            .role(roleDomain.getRole())
+                            .build();
+
+                    persistenceUserRolePort.save(userRoleDomain);
+                    log.debug("Role saved successfully: {}", roleDomain.getRole().getRoleName());
+                }
+                log.debug("Roles updated for userId: {}", userId);
+            }
+
+            // Nota: No se modifica la asociación de grupo para estudiantes
+            // Esto cumple con el requerimiento de no modificar el grupo para estudiantes
+
+            log.info("User patch completed successfully for userId: {}", userId);
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Data integrity violation during user patch", e);
+            throw new AppException("Duplicate entry or constraint violation: " + e.getMessage(), HttpStatus.CONFLICT);
+        } catch (AppException e) {
+            log.error("Application exception during user patch", e);
+            throw e; // Re-throw AppExceptions as they already have the appropriate status
+        } catch (Exception e) {
+            log.error("Error in user patch process", e);
+            throw new AppException("Error in patch process: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -2,13 +2,16 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectScheduleDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectGroupMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectProfessorMapper;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectScheduleMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGroupCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectProfessorCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGroupPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectSchedulePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
@@ -17,6 +20,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.App
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupStudentPort;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -32,7 +36,6 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     private final SubjectGroupMapper subjectGroupMapper;
 
     private final PersistenceGroupStudentPort groupStudentPort;
-
 
     @Autowired
     private SubjectGroupCrudRepo subjectGroupCrudRepo;
@@ -115,13 +118,29 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return subjectGradeDomain.map(subjectGroupMapper::toDomain).orElse(null);
     }
 
+    @Transactional
     @Override
     public SubjectGroupDomain save(SubjectGroupDomain domain) {
-        SubjectGroup subjectGroup = subjectGroupMapper.toEntity(domain);
-        SubjectGroup savedSubjectGroup = subjectGroupCrudRepo.save(subjectGroup);
-        return this.subjectGroupMapper.toDomain(savedSubjectGroup);
-    }
+        try {
+            // Save the Subject Group
+            SubjectGroup subjectGroup = subjectGroupMapper.toEntity(domain);
+            SubjectGroup savedSubjectGroup = subjectGroupCrudRepo.save(subjectGroup);
 
+            /*// Create a minimal SubjectSchedule with just the SubjectGroup foreign key
+            SubjectScheduleDomain subjectScheduleDomain = SubjectScheduleDomain.builder()
+                    .subjectGroup(subjectGroupMapper.toDomain(savedSubjectGroup))
+                    .build();
+
+            // Save the schedule record
+            subjectSchedulePort.save(subjectScheduleDomain);*/
+
+            return this.subjectGroupMapper.toDomain(savedSubjectGroup);
+        } catch (Exception e) {
+            log.error("Error saving SubjectGroup and SubjectSchedule: {}", e.getMessage(), e);
+            // The @Transactional annotation will automatically rollback if an exception occurs
+            throw new AppException("Error creating subject group and schedule record: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
     @Override
     public SubjectGroupDomain update(Integer integer, SubjectGroupDomain domain) {
         try{

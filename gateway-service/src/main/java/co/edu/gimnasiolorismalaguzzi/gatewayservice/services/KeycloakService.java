@@ -22,6 +22,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -349,21 +350,21 @@ public class KeycloakService {
         UsersResource usersResource = keycloakProvider.getUserResource();
         UserResource userResource = usersResource.get(userId);
 
-        // 1️⃣ Obtener roles efectivos del usuario (directos + heredados)
+        // 1️ Obtener roles efectivos del usuario (directos + heredados)
         List<RoleRepresentation> effectiveRoles = userResource.roles().realmLevel().listEffective();
         List<String> roles = new ArrayList<>(effectiveRoles.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
 
-        // 2️⃣ Obtener los grupos del usuario
+        // 2️ Obtener los grupos del usuario
         List<GroupRepresentation> userGroups = userResource.groups();
 
-        // 3️⃣ Obtener roles efectivos de los grupos
+        // 3️ Obtener roles efectivos de los grupos
         for (GroupRepresentation group : userGroups) {
             List<RoleRepresentation> groupEffectiveRoles = keycloakProvider.getRealmResource()
                     .groups()
                     .group(group.getId())
                     .roles()
                     .realmLevel()
-                    .listEffective(); // 🔥 Cambiamos de listAll() a listEffective()
+                    .listEffective(); //  Cambiamos de listAll() a listEffective()
 
             roles.addAll(groupEffectiveRoles.stream().map(RoleRepresentation::getName).collect(Collectors.toList()));
         }
@@ -400,4 +401,49 @@ public class KeycloakService {
         return users.get(0); // Retorna el primer usuario encontrado
     }
 
+    public Mono<UserDetailDomain> registerUser(UserRegistrationDomain registrationDomain) {
+        keycloakProvider = new KeycloakProvider();
+
+        // Verificar y establecer un valor por defecto para dateOfBirth si es nulo
+        if (registrationDomain.getUserDetailDomain() != null &&
+                registrationDomain.getUserDetailDomain().getDateOfBirth() == null) {
+            // Usar una fecha por defecto (por ejemplo, la fecha actual)
+            registrationDomain.getUserDetailDomain().setDateOfBirth(LocalDate.now());
+            log.info("Se estableció una fecha de nacimiento por defecto ya que era nula");
+        }
+
+        return Mono.fromCallable(() -> {
+                    // Create user in Keycloak (this is blocking but we run it in a separate thread)
+                    String keycloakUserId = createUserInKeycloak(registrationDomain);
+                    registrationDomain.getUserDomain().setUuid(keycloakUserId);
+                    return keycloakUserId;
+                })
+                .subscribeOn(Schedulers.boundedElastic()) // Run blocking code on a separate thread pool
+                .flatMap(keycloakUserId -> {
+                    // Register in Academy Service as administrative user
+                    log.info("Usuario administrativo creado en Keycloak con ID: {}. Registrando en Academy Service...", keycloakUserId);
+                    return userService.createGeneralUser(registrationDomain)
+                            .timeout(java.time.Duration.ofSeconds(30))
+                            .doOnSuccess(result -> log.info("Usuario administrativo registrado exitosamente en ambos sistemas"))
+                            .onErrorResume(e -> {
+                                // If Academy Service registration fails, rollback Keycloak user
+                                log.error("Error al registrar usuario administrativo en Academy Service: {}", e.getMessage(), e);
+                                return Mono.fromCallable(() -> {
+                                            try {
+                                                log.warn("Realizando rollback: eliminando usuario {} de Keycloak", keycloakUserId);
+                                                deleteUsersKeycloak(keycloakUserId);
+                                                log.info("Rollback completado exitosamente");
+                                            } catch (Exception rollbackEx) {
+                                                log.error("Error al realizar rollback en Keycloak: {}", rollbackEx.getMessage(), rollbackEx);
+                                                throw new AppException("Error en el registro y fallo en el rollback",
+                                                        HttpStatus.INTERNAL_SERVER_ERROR);
+                                            }
+                                            return e;  // Return the exception to handle it in the next flatMap
+                                        }).subscribeOn(Schedulers.boundedElastic())
+                                        .flatMap(ex -> Mono.error(ex instanceof AppException ? (AppException)ex :
+                                                new AppException("Error al registrar el usuario administrativo: " + ex.getMessage(),
+                                                        HttpStatus.INTERNAL_SERVER_ERROR)));
+                            });
+                });
+    }
 }

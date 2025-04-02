@@ -21,4 +21,7 @@ public interface AcademyClient {
 
     @PostMapping("/api/academy/users/detail/students/register")
     UserDetailDomain createStudentUser(@RequestBody UserRegistrationDomain registrationDomain);
+
+    @PostMapping("/api/academy/users/detail")
+    UserDetailDomain createGeneralUser(@RequestBody UserRegistrationDomain registrationDomain);
 }

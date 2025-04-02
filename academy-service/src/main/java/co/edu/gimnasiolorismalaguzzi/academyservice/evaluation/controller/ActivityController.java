@@ -56,6 +56,13 @@ public class ActivityController {
         return ResponseEntity.ok(updatedActivity);
     }
 
+    @PutMapping("/{activityId}/knowledges/{knowledgeId}")
+    public ResponseEntity<ActivityDomain> updateActivityKnowledgeId(@PathVariable Integer activityId,
+                                                                    @PathVariable Integer knowledgeId) {
+        ActivityDomain updatedActivity = persistenceActivityPort.updateActivityKnowledgeId(activityId, knowledgeId);
+        return ResponseEntity.ok(updatedActivity);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteActivity(@PathVariable Integer id) {
         persistenceActivityPort.delete(id);

@@ -20,4 +20,5 @@ public interface GroupStudentsCrudRepo extends JpaRepository<GroupStudent, Integ
     // Añadir este método a GroupStudentsCrudRepo.java
     List<GroupStudent> findByGroupId(Integer groupId);
 
+    List<GroupStudent> findByStatus(String status);
 }
