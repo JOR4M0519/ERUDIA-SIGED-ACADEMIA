@@ -31,7 +31,7 @@ CREATE TABLE user_detail (
                              id_type_id INT NOT NULL REFERENCES id_type(id),
                              neighborhood VARCHAR(20) NOT NULL,
                              city VARCHAR(20) NOT NULL,
-                             promotionStatus VARCHAR(2) DEFAULT "A",
+                             promotionStatus VARCHAR(2) DEFAULT 'A',
                              position_job VARCHAR(40)
 );
 
@@ -99,7 +99,7 @@ CREATE TABLE grade_settings(
                                minimum_grade int,
                                pass_grade int,
                                maximum_grade int,
-                               name VARCHAR(20),
+                               name VARCHAR(40),
                                description VARCHAR(400)
 
 );
@@ -110,8 +110,8 @@ CREATE TABLE academic_period (
                                  setting_id int not null references grade_settings(id),
                                  start_date DATE NOT NULL,
                                  end_date DATE NOT NULL,
-                                 name VARCHAR(8) NOT NULL,
-                                 percentage INT ,
+                                 name VARCHAR(30) NOT NULL,
+                                 percentage int,
                                  status varchar(1) NOT NULL
 );
 

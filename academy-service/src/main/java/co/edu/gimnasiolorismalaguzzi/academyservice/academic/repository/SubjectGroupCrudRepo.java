@@ -68,5 +68,9 @@ WHERE s.id = :subjectId
     List<SubjectGroup> findByAcademicPeriod_IdAndGroups_StatusAndGroups_Level_Id(Integer id, String status, Integer id1);
 
     List<SubjectGroup> findByGroups_IdAndAcademicPeriod_Id(Integer id, Integer id1);
+
+    List<SubjectGroup> findByAcademicPeriod_IdAndSubjectProfessor_Id(Integer id, Integer id1);
+
+    List<SubjectGroup> findByAcademicPeriod_IdAndSubjectProfessor_Subject_Id(Integer id, Integer id1);
 }
 

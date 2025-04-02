@@ -30,10 +30,10 @@ public class Attendance {
     @JoinColumn(name = "student_id", nullable = false)
     private User student;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "schedule_id", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "schedule_id", nullable = true)
     private SubjectSchedule schedule;
+
 
     @NotNull
     @Column(name = "attendance_date", nullable = false)

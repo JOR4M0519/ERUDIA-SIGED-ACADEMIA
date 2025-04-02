@@ -82,8 +82,7 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
     }
 
     @Transactional
-    @Override
-    public List<AttendanceDomain> saveAll(List<AttendanceDomain> attendances,
+    public List<AttendanceDomain> saveAllValidateSchedule(List<AttendanceDomain> attendances,
                                           Integer groupId,
                                           Integer subjectId,
                                           Integer professorId,
@@ -150,6 +149,24 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
                 .toList();
 
         var savedAttendances = attendanceCrudRepo.saveAll(attendanceEntities);
+        return attendanceMapper.toDomains(savedAttendances);
+    }
+
+    @Transactional
+    @Override
+    public List<AttendanceDomain> saveAll(List<AttendanceDomain> attendances,
+                                                                   Integer groupId,
+                                                                   Integer subjectId,
+                                                                   Integer professorId,
+                                                                   Integer periodId) {
+        // Convertir directamente a entidades y guardar sin validación de horarios
+        var attendanceEntities = attendances.stream()
+                .map(attendanceMapper::toEntity)
+                .toList();
+
+        var savedAttendances = attendanceCrudRepo.saveAll(attendanceEntities);
+        log.info("Se guardaron {} asistencias sin validación de horario", savedAttendances.size());
+
         return attendanceMapper.toDomains(savedAttendances);
     }
 

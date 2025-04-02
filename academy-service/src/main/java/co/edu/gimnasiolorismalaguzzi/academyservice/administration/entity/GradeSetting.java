@@ -20,9 +20,9 @@ public class GradeSetting {
     @Column(name = "level_id", nullable = false)
     private Integer levelId;
 
-    @Size(max = 20)
+    @Size(max = 40)
     @NotNull
-    @Column(name = "name", nullable = false, length = 20)
+    @Column(name = "name", nullable = false, length = 40)
     private String name;
 
     @Size(max = 400)
