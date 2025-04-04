@@ -59,6 +59,7 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
             if (existingKnowledge.isPresent()) {
                 existingKnowledge.get().setName(entity.getName());
                 existingKnowledge.get().setStatus(entity.getStatus());
+                existingKnowledge.get().setPercentage(entity.getPercentage());
             }
             return knowledgeMapper.toDomain(knowledgeCrudRepo.save(existingKnowledge.get()));
         } catch (EntityNotFoundException e) {

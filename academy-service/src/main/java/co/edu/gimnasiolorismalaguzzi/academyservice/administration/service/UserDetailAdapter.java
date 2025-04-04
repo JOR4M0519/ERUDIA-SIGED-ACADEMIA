@@ -1,6 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserRegistrationDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserDetail;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserRole;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserDetailMapper;
@@ -15,7 +15,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.App
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -31,6 +30,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
 
     private final UserDetailCrudRepo userDetailCrudRepo;
     private final UserRoleCrudRepo userRoleCrudRepo;
+
 
     @Autowired
     private UserMapper userMapper;
@@ -58,9 +58,44 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
 */
+
+    /**
+     * Verifica si un usuario tiene rol de estudiante
+     * @param userId ID del usuario a verificar
+     * @return true si tiene rol de estudiante, false en caso contrario
+     */
+    @Override
+    public boolean hasStudentRole(Integer userId) {
+        try {
+            // Obtenemos el usuario por su ID
+            UserDomain userDomain = findByUser_Id(userId).getUser();
+
+            if (userDomain == null ||
+                    userDomain.getRoles() == null) {
+                return false;
+            }
+
+            // Verificamos si alguno de los roles es "estudiante"
+            return userDomain.getRoles().stream()
+                    .anyMatch(role -> role != null &&
+                            role.getRole() != null &&
+                            "estudiante".equalsIgnoreCase(role.getRole().getRoleName()));
+        } catch (Exception e) {
+            log.error("Error al verificar rol de estudiante para usuario {}: {}", userId, e.getMessage());
+            return false; // O lanzar una excepción dependiendo de tu manejo de errores
+        }
+    }
+
+
+    @Override
+    public UserDetailDomain findById(Integer uuid) {
+        Optional<UserDetail> userDetailOptional = userDetailCrudRepo.findById(uuid);
+        return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
+    }
+
     @Override
     @Transactional
-    public UserDetailDomain findById(Integer id) {
+    public UserDetailDomain findByUser_Id(Integer id) {
         try {
             // Modificar para usar una consulta que cargue los roles
             UserDetail userDetail = userDetailCrudRepo.findByUser_Id(id);
@@ -172,6 +207,7 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Username(username));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
+
 
 
 

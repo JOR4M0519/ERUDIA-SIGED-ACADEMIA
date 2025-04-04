@@ -1,8 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.services;
 
-import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
-import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDomain;
-import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserRegistrationDomain;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.*;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.util.KeycloakProvider;
 import jakarta.ws.rs.core.Response;
@@ -295,6 +293,30 @@ public class KeycloakService {
                         .toList();
             }
 
+            // Añadir usuario a grupos basados en sus roles
+            if (userDomain.getRoles() != null && !userDomain.getRoles().isEmpty()) {
+                GroupsResource groupsResource = realmResource.groups();
+                List<GroupRepresentation> allGroups = groupsResource.groups();
+
+                for (UserRoleDomain roleObj : userDomain.getRoles()) {
+                    String roleName = roleObj.getRole().getRoleName();
+
+                    // Buscar grupo por nombre
+                    Optional<GroupRepresentation> groupOpt = allGroups.stream()
+                            .filter(group -> group.getName().equalsIgnoreCase(roleName))
+                            .findFirst();
+
+                    if (groupOpt.isPresent()) {
+                        GroupRepresentation group = groupOpt.get();
+                        // Añadir usuario al grupo
+                        realmResource.users().get(userId).joinGroup(group.getId());
+                        log.info("Usuario {} añadido al grupo {}", userId, group.getName());
+                    } else {
+                        log.warn("No se encontró un grupo con nombre '{}' para el usuario {}", roleName, userId);
+                    }
+                }
+            }
+
             realmResource.users().get(userId).roles().realmLevel().add(rolesRepresentation);
 
             registrationDomain.getUserDomain().setUuid(userId);
@@ -445,5 +467,56 @@ public class KeycloakService {
                                                         HttpStatus.INTERNAL_SERVER_ERROR)));
                             });
                 });
+    }
+    public HttpStatus updatePassword(String username, Login login) {
+        try {
+            keycloakProvider = new KeycloakProvider();
+
+            // Buscar el usuario por su nombre de usuario
+            UserRepresentation user = getUsersByUsername(username);
+            if (user == null) {
+                log.error("Usuario no encontrado: {}", username);
+                return HttpStatus.NOT_FOUND;
+            }
+
+            // Validar contraseña actual antes de permitir el cambio
+            if (login.getLastPassword() != null && !login.getLastPassword().isEmpty()) {
+                try {
+                    // Intentamos autenticar con las credenciales actuales
+                    keycloakProvider.getToken(username, login.getLastPassword());
+                    log.debug("Credenciales actuales verificadas correctamente para usuario: {}", username);
+                } catch (AppException e) {
+                    // Si la autenticación falla, la contraseña anterior no es correcta
+                    log.error("Contraseña anterior incorrecta para usuario: {}", username);
+                    throw new AppException("La contraseña anterior no es correcta", HttpStatus.UNAUTHORIZED);
+                }
+            } else {
+                log.warn("No se proporcionó la contraseña anterior para el usuario: {}", username);
+                throw new AppException("Se requiere la contraseña anterior para actualizar la contraseña", HttpStatus.BAD_REQUEST);
+            }
+
+            // Obtener el ID del usuario
+            String userId = user.getId();
+            log.debug("Actualizando contraseña para usuario con ID: {}", userId);
+
+            // Crear representación de credenciales para la nueva contraseña
+            CredentialRepresentation credentialRepresentation = new CredentialRepresentation();
+            credentialRepresentation.setTemporary(false);
+            credentialRepresentation.setType(CredentialRepresentation.PASSWORD);
+            credentialRepresentation.setValue(login.getPassword());
+
+            // Obtener el recurso de usuario y actualizar la contraseña
+            UserResource userResource = keycloakProvider.getUserResource().get(userId);
+            userResource.resetPassword(credentialRepresentation);
+
+            log.info("Contraseña actualizada exitosamente para el usuario: {}", username);
+            return HttpStatus.OK;
+        } catch (AppException e) {
+            log.error("Error al actualizar la contraseña - AppException: {}", e.getMessage(), e);
+            throw e; // Re-lanzar AppException con su código de estado
+        } catch (Exception e) {
+            log.error("Error al actualizar la contraseña: {}", e.getMessage(), e);
+            throw new AppException("Error al actualizar la contraseña: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

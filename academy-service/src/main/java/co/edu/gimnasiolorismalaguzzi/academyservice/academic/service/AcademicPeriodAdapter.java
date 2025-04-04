@@ -64,6 +64,7 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
                 existingPeriod.get().setEndDate(entity.getEndDate());
                 existingPeriod.get().setName(entity.getName());
                 existingPeriod.get().setStatus(entity.getStatus());
+                existingPeriod.get().setPercentage(entity.getPercentage());
             }
             return academicPeriodMapper.toDomain(academicPeriodCrudRepo.save(existingPeriod.get()));
         } catch (EntityNotFoundException e){

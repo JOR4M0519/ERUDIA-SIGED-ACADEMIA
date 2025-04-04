@@ -33,8 +33,7 @@ public class User {
     private String email;
 
     @Size(max = 256)
-    @NotNull
-    @Column(name = "password", nullable = false, length = 256)
+    @Column(name = "password", nullable = true, length = 256)
     private String password;
 
     @Size(max = 1)

@@ -409,12 +409,20 @@ public class UserAdapter implements PersistenceUserPort {
                     if (userDetailToUpdate.getPhoneNumber() != null) existingUserDetail.setPhoneNumber(userDetailToUpdate.getPhoneNumber());
                     if (userDetailToUpdate.getAddress() != null) existingUserDetail.setAddress(userDetailToUpdate.getAddress());
                     if (userDetailToUpdate.getDateOfBirth() != null) existingUserDetail.setDateOfBirth(userDetailToUpdate.getDateOfBirth());
+                    // Agregar los campos faltantes
+                    if (userDetailToUpdate.getFirstName() != null) existingUserDetail.setFirstName(userDetailToUpdate.getFirstName());
+                    if (userDetailToUpdate.getMiddleName() != null) existingUserDetail.setMiddleName(userDetailToUpdate.getMiddleName());
+                    if (userDetailToUpdate.getLastName() != null) existingUserDetail.setLastName(userDetailToUpdate.getLastName());
+                    if (userDetailToUpdate.getSecondLastName() != null) existingUserDetail.setSecondLastName(userDetailToUpdate.getSecondLastName());
+                    if (userDetailToUpdate.getNeighborhood() != null) existingUserDetail.setNeighborhood(userDetailToUpdate.getNeighborhood());
+                    if (userDetailToUpdate.getCity() != null) existingUserDetail.setCity(userDetailToUpdate.getCity());
+                    if (userDetailToUpdate.getPositionJob() != null) existingUserDetail.setPositionJob(userDetailToUpdate.getPositionJob());
 
                     // Conservar la referencia al usuario
                     existingUserDetail.setUser(existingUserDomain);
 
                     // Guardar los cambios en el detalle del usuario
-                    persistenceUserDetailPort.update(existingUserDetail.getId(), existingUserDetail);
+                    persistenceUserDetailPort.update(existingUserDetail.getUser().getId(), existingUserDetail);
                     log.debug("User detail updated for userDetailId: {}", existingUserDetail.getId());
                 } else {
                     // Si no existe un detalle, crearlo (esto no debería ocurrir normalmente)
@@ -427,13 +435,12 @@ public class UserAdapter implements PersistenceUserPort {
 
             // 4. Actualizar roles si se proporcionan (solo para usuarios administrativos)
             if (registrationDomain.getUserDomain() != null &&
-                    registrationDomain.getUserDomain().getRoles() != null &&
-                    !registrationDomain.getUserDomain().getRoles().isEmpty()) {
+                    registrationDomain.getUserDomain().getRoles() != null) {
 
-                // En lugar de eliminar roles actuales, obtener la lista actual
+                // Obtener la lista actual de roles del usuario
                 List<UserRoleDomain> allRoles = persistenceUserRolePort.findAll();
 
-                // Filtrar los roles del usuario actual
+                // Filtrar los roles actuales del usuario
                 List<UserRoleDomain> currentUserRoles = allRoles.stream()
                         .filter(role -> role.getUserId() != null && role.getUserId().equals(userId))
                         .collect(Collectors.toList());
@@ -444,43 +451,59 @@ public class UserAdapter implements PersistenceUserPort {
                                         role.getRole().getRoleName() : "null")
                                 .collect(Collectors.joining(", ")));
 
-                // Crear un conjunto de IDs de roles actuales para búsqueda eficiente
-                Set<Integer> currentRoleIds = currentUserRoles.stream()
-                        .filter(role -> role.getRole() != null && role.getRole().getId() != null)
-                        .map(role -> role.getRole().getId())
-                        .collect(Collectors.toSet());
+                // Si la lista de roles está vacía, se eliminan todos los roles existentes
+                if (registrationDomain.getUserDomain().getRoles().isEmpty()) {
+                    log.debug("Removing all roles for userId: {}", userId);
+                    for (UserRoleDomain userRoleDomain : currentUserRoles) {
+                        persistenceUserRolePort.delete(userRoleDomain.getId());
+                    }
+                    log.debug("All roles removed for userId: {}", userId);
+                } else {
+                    // Conjunto de IDs de roles que debe tener el usuario (los nuevos)
+                    Set<Integer> targetRoleIds = registrationDomain.getUserDomain().getRoles().stream()
+                            .filter(role -> role != null && role.getRole() != null && role.getRole().getId() != null)
+                            .map(role -> role.getRole().getId())
+                            .collect(Collectors.toSet());
 
-                // Procesar los nuevos roles (solo agregar los que no existan)
-                for (UserRoleDomain roleDomain : registrationDomain.getUserDomain().getRoles()) {
-                    // Validar que el rol no sea nulo antes de intentar guardar
-                    if (roleDomain == null) {
-                        log.warn("Null role domain found in roles collection for userId: {}", userId);
-                        continue;
+                    // Conjunto de IDs de roles actuales
+                    Set<Integer> currentRoleIds = currentUserRoles.stream()
+                            .filter(role -> role.getRole() != null && role.getRole().getId() != null)
+                            .map(role -> role.getRole().getId())
+                            .collect(Collectors.toSet());
+
+                    // Eliminar roles que ya no están en la lista de destino
+                    for (UserRoleDomain currentRole : currentUserRoles) {
+                        if (currentRole.getRole() != null && currentRole.getRole().getId() != null &&
+                                !targetRoleIds.contains(currentRole.getRole().getId())) {
+                            log.debug("Removing role: {} (ID: {}) for userId: {}",
+                                    currentRole.getRole().getRoleName(), currentRole.getRole().getId(), userId);
+                            persistenceUserRolePort.delete(currentRole.getId());
+                        }
                     }
 
-                    if (roleDomain.getRole() == null || roleDomain.getRole().getId() == null) {
-                        log.warn("Role domain with null role or role ID found for userId: {}, skipping...", userId);
-                        continue;
+                    // Agregar nuevos roles que no existen actualmente
+                    for (UserRoleDomain roleDomain : registrationDomain.getUserDomain().getRoles()) {
+                        // Validar que el rol no sea nulo antes de intentar guardar
+                        if (roleDomain == null || roleDomain.getRole() == null || roleDomain.getRole().getId() == null) {
+                            log.warn("Invalid role domain found in roles collection for userId: {}, skipping...", userId);
+                            continue;
+                        }
+
+                        // Verificar si el rol ya está asignado al usuario
+                        if (!currentRoleIds.contains(roleDomain.getRole().getId())) {
+                            log.debug("Adding new role: {} for userId: {}", roleDomain.getRole().getRoleName(), userId);
+
+                            UserRoleDomain userRoleDomain = UserRoleDomain.builder()
+                                    .userId(userId)
+                                    .role(roleDomain.getRole())
+                                    .build();
+
+                            persistenceUserRolePort.save(userRoleDomain);
+                            log.debug("Role saved successfully: {}", roleDomain.getRole().getRoleName());
+                        }
                     }
-
-                    // Verificar si el rol ya está asignado al usuario
-                    if (currentRoleIds.contains(roleDomain.getRole().getId())) {
-                        log.debug("Role {} already assigned to userId: {}, skipping...",
-                                roleDomain.getRole().getRoleName(), userId);
-                        continue;
-                    }
-
-                    log.debug("Adding new role: {} for userId: {}", roleDomain.getRole().getRoleName(), userId);
-
-                    UserRoleDomain userRoleDomain = UserRoleDomain.builder()
-                            .userId(userId)
-                            .role(roleDomain.getRole())
-                            .build();
-
-                    persistenceUserRolePort.save(userRoleDomain);
-                    log.debug("Role saved successfully: {}", roleDomain.getRole().getRoleName());
+                    log.debug("Roles updated for userId: {}", userId);
                 }
-                log.debug("Roles updated for userId: {}", userId);
             }
 
             // Nota: No se modifica la asociación de grupo para estudiantes
