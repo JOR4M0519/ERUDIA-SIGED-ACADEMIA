@@ -7,6 +7,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowl
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectKnowledge;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectKnowledgeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectKnowledgeCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceAchievementGroups;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +24,9 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
 
     @Autowired
     private SubjectKnowledgeMapper mapper;
+
+    @Autowired
+    private PersistenceAchievementGroups achievementGroupsPort;
 
     public SubjectKnowledgeAdapter(SubjectKnowledgeCrudRepo subjectKnowledgeCrudRepo, SubjectKnowledgeMapper subjectKnowledgeMapper){
         this.crudRepo = subjectKnowledgeCrudRepo;
@@ -63,15 +67,38 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
 
     @Override
     public HttpStatus delete(Integer integer) {
-        try {
-            if(this.crudRepo.existsById(integer)){
-                crudRepo.delete(this.crudRepo.getReferenceById(integer));
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("Relation within Subject and Knowledge ID doesnt exist", HttpStatus.NOT_FOUND);
+
+        if(this.crudRepo.existsById(integer)){
+            // Verificar si el saber está siendo utilizado en logros
+            boolean usedInAchievements = !achievementGroupsPort.getAllBySubjectKnowledgeId(integer).isEmpty();
+
+            // Si está siendo utilizado, lanzar excepción
+            if (usedInAchievements) {
+                throw new AppException(
+                        "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
+                        HttpStatus.CONFLICT);
             }
-        } catch (Exception e){
-            throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+
+            crudRepo.delete(this.crudRepo.getReferenceById(integer));
+            return HttpStatus.OK;
+        } else {
+            throw new AppException("Relation within Subject and Knowledge ID doesnt exist", HttpStatus.NOT_FOUND);
         }
+
+    }
+
+    @Override
+    public List<SubjectKnowledgeDomain> getAllKnowledgesBySubjectIdByPeriodId(Integer subjectId,Integer periodId) {
+        return this.mapper.toDomains(this.crudRepo.findKnowledgesBySubjectId(subjectId,periodId));
+    }
+
+    @Override
+    public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeByKnowledgeId(Integer knowledgeId) {
+        return this.mapper.toDomains(crudRepo.findByIdKnowledge_Id(knowledgeId));
+    }
+
+    @Override
+    public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectId(Integer subjectId) {
+        return this.mapper.toDomains(crudRepo.findByIdSubject_Id(subjectId));
     }
 }

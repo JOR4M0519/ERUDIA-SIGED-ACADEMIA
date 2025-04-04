@@ -1,5 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectGroupPortAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
@@ -11,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,45 +21,47 @@ import java.util.Optional;
 @Slf4j
 public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
-    private ActivityGroupCrudRepo crudRepo;
+    private ActivityGroupCrudRepo activityGroupCrudRepo;
+    private final SubjectGroupPortAdapter persistenceSubjectGroupPort;
 
     @Autowired
-    private ActivityGroupMapper mapper;
+    private ActivityGroupMapper activityGroupMapper;
 
-    public ActivityGroupAdapter(ActivityGroupCrudRepo activityGroupCrudRepo, ActivityGroupMapper activityGroupMapper){
-        this.crudRepo = activityGroupCrudRepo;
-        this.mapper = activityGroupMapper;
+    public ActivityGroupAdapter(ActivityGroupCrudRepo activityGroupCrudRepo, SubjectGroupPortAdapter persistenceSubjectGroupPort, ActivityGroupMapper activityGroupMapper){
+        this.activityGroupCrudRepo = activityGroupCrudRepo;
+        this.persistenceSubjectGroupPort = persistenceSubjectGroupPort;
+        this.activityGroupMapper = activityGroupMapper;
     }
 
     @Override
     public List<ActivityGroupDomain> findAll() {
-        return mapper.toDomains(crudRepo.findAll());
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findAll());
     }
 
     @Override
     public ActivityGroupDomain findById(Integer integer) {
-        Optional<ActivityGroup> activityGroup = this.crudRepo.findById(integer);
-        return activityGroup.map(mapper::toDomain).orElse(null);
+        Optional<ActivityGroup> activityGroup = this.activityGroupCrudRepo.findById(integer);
+        return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
     }
 
     @Override
     public ActivityGroupDomain save(ActivityGroupDomain entity) {
-        ActivityGroup activityGroup = mapper.toEntity(entity);
-        ActivityGroup savedActivityGroup = this.crudRepo.save(activityGroup);
-        return mapper.toDomain(savedActivityGroup);
+        ActivityGroup activityGroup = activityGroupMapper.toEntity(entity);
+        ActivityGroup savedActivityGroup = this.activityGroupCrudRepo.save(activityGroup);
+        return activityGroupMapper.toDomain(savedActivityGroup);
     }
 
     @Override
     public ActivityGroupDomain update(Integer integer, ActivityGroupDomain domain) {
         try{
-            Optional<ActivityGroup> existingActivityGroup = crudRepo.findById(integer);
+            Optional<ActivityGroup> existingActivityGroup = activityGroupCrudRepo.findById(integer);
             if(existingActivityGroup.isPresent()){
-                existingActivityGroup.get().setActivity(mapper.toEntity(domain).getActivity());
-                existingActivityGroup.get().setGroup(mapper.toEntity(domain).getGroup());
-                existingActivityGroup.get().setStartDate(mapper.toEntity(domain).getStartDate());
-                existingActivityGroup.get().setEndDate(mapper.toEntity(domain).getEndDate());
+                existingActivityGroup.get().setActivity(activityGroupMapper.toEntity(domain).getActivity());
+                existingActivityGroup.get().setGroup(activityGroupMapper.toEntity(domain).getGroup());
+                existingActivityGroup.get().setStartDate(activityGroupMapper.toEntity(domain).getStartDate());
+                existingActivityGroup.get().setEndDate(activityGroupMapper.toEntity(domain).getEndDate());
             }
-            return mapper.toDomain(crudRepo.save(existingActivityGroup.get()));
+            return activityGroupMapper.toDomain(activityGroupCrudRepo.save(existingActivityGroup.get()));
         } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Relation Activity Group with ID " + integer + " Not found!");
         }
@@ -66,4 +71,38 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
     public HttpStatus delete(Integer integer) {
         return null;
     }
+
+    @Override
+    public List<ActivityGroupDomain> findActivitiesByGroupId(Integer id, String status) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByGroup_IdAndActivity_StatusNotLike(id, status));
+    }
+
+    @Override
+    public List<ActivityGroupDomain> getAllActivity_ByPeriodUser(Integer periodId, Integer userId, String i) {
+
+        List<ActivityGroupDomain> activityGroupDomainListFinal = new ArrayList<>();
+
+        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+
+        for (SubjectGroupDomain domain :subjectGroupDomainList){
+            activityGroupDomainListFinal.addAll(getAllActivity_ByPeriodSubjectGroup(domain.getSubjectProfessor().getSubject().getId(),periodId,domain.getGroups().getId(),"I"));
+        }
+
+        return activityGroupDomainListFinal;
+       // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
+    }
+
+
+    @Override
+    public List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_IdAndActivity_StatusNotLike(periodId,subjectId,groupId,statusNotLike));
+    }
+
+
+    @Override
+    public ActivityGroupDomain getRangeDateActivityByActivityId(Integer activityId) {
+        Optional<ActivityGroup> activityGroup = Optional.ofNullable(activityGroupCrudRepo.findFirstByActivity_Id(activityId));
+        return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
+    }
+
 }

@@ -1,12 +1,15 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
 
-@RequiredArgsConstructor
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Data
 public class UserDomain implements Serializable {
     private Integer id;
@@ -16,8 +19,9 @@ public class UserDomain implements Serializable {
     private String firstName;
     private String lastName;
     private String password;
-    private Set<String> roles;
+    private Set<UserRoleDomain> roles;
     private String status;
+    private String promotionStatus;
 
     public UserDomain(Integer id) {
         this.id = id;

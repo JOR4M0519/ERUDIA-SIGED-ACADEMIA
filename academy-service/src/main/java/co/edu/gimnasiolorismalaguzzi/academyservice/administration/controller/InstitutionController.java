@@ -31,6 +31,12 @@ public class InstitutionController {
         return ResponseEntity.ok(Institution);
     }
 
+    @GetMapping("/nit/{nit}")
+    public ResponseEntity<InstitutionDomain> getInstitutionByNit(@PathVariable String nit) {
+        InstitutionDomain Institution = persistenceInstitutionPort.findByNit(nit);
+        return ResponseEntity.ok(Institution);
+    }
+
     @PostMapping()
     public ResponseEntity<InstitutionDomain> createInstitution(@RequestBody InstitutionDomain InstitutionDomain) {
         InstitutionDomain createdInstitution = persistenceInstitutionPort.save(InstitutionDomain);

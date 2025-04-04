@@ -1,4 +1,4 @@
--- Table: id_type
+--1 Table: id_type
 CREATE TABLE id_type (
                          id int primary key generated always as identity,
                          name VARCHAR(20) NOT NULL
@@ -10,6 +10,8 @@ CREATE TABLE users (
                        username VARCHAR(30) NOT NULL UNIQUE,
                        email VARCHAR(256) NOT NULL UNIQUE,
                        password VARCHAR(256) NOT NULL,
+                       first_name VARCHAR(40),
+                       last_name VARCHAR(40),
                        uuid VARCHAR(256),
                        status varchar(1) NOT NULL
 );
@@ -29,6 +31,7 @@ CREATE TABLE user_detail (
                              id_type_id INT NOT NULL REFERENCES id_type(id),
                              neighborhood VARCHAR(20) NOT NULL,
                              city VARCHAR(20) NOT NULL,
+                             promotionStatus VARCHAR(2) DEFAULT 'A',
                              position_job VARCHAR(40)
 );
 
@@ -95,7 +98,10 @@ CREATE TABLE grade_settings(
                                level_id int not null references educational_level (id),
                                minimum_grade int,
                                pass_grade int,
-                               maximum_grade int
+                               maximum_grade int,
+                               name VARCHAR(40),
+                               description VARCHAR(400)
+
 );
 
 -- Table: academic_period
@@ -104,7 +110,8 @@ CREATE TABLE academic_period (
                                  setting_id int not null references grade_settings(id),
                                  start_date DATE NOT NULL,
                                  end_date DATE NOT NULL,
-                                 name VARCHAR(8) NOT NULL,
+                                 name VARCHAR(30) NOT NULL,
+                                 percentage int,
                                  status varchar(1) NOT NULL
 );
 
@@ -123,7 +130,8 @@ CREATE TABLE groups (
 CREATE TABLE group_students (
                                 id int not null primary key generated always as identity,
                                 student_id int not null references users(id),
-                                group_id int not null references groups(id)
+                                group_id int not null references groups(id),
+                                status VARCHAR (1) DEFAULT 'A'
 );
 
 
@@ -142,10 +150,18 @@ CREATE TABLE subject (
                          status VARCHAR(1) NOT NULL DEFAULT 'A'
 );
 
+-- Table: subject_professors
+CREATE TABLE subject_professors (
+                                    id int primary key generated always as identity,
+                                    subject_id INT NOT NULL REFERENCES subject(id),
+                                    professor_id INT NOT NULL REFERENCES users(id)
+);
+
 CREATE TABLE subject_groups (
                                 id int not null primary key generated always as identity,
-                                subject_id int not null references subject(id),
-                                group_students int not  null references groups(id)
+                                subject_professor_id int not null references subject_professors(id),
+                                group_students int not  null references groups(id),
+                                academic_period_id int not  null references academic_period(id)
 );
 
 -- All subjects in this table are from preschool, because they have dimensions.
@@ -158,28 +174,26 @@ CREATE TABLE subject_dimension (
 -- Needs a trigger
 CREATE TABLE subject_schedule (
                                   id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-                                  subject_id INT NOT NULL REFERENCES subject(id),
-                                  day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
-                                  start_time TIME NOT NULL,         -- E.g., '09:00'
-                                  end_time TIME NOT NULL,           -- E.g., '11:00'
-                                  status VARCHAR(1) NOT NULL           -- To indicate if the schedule is active or not
+                                  subject_group_id INT NOT NULL REFERENCES subject_groups(id),
+                                  day_of_week VARCHAR(10) , -- E.g., 'Monday', 'Tuesday', etc.
+                                  start_time TIME ,         -- E.g., '09:00'
+                                  end_time TIME ,           -- E.g., '11:00'
+                                  status VARCHAR(1)            -- To indicate if the schedule is active or not
 );
+                                -- subject_group_id INT NOT NULL REFERENCES subject_groups(id),
+                                -- day_of_week VARCHAR(10) NOT NULL, -- E.g., 'Monday', 'Tuesday', etc.
+                                -- start_time TIME NOT NULL,         -- E.g., '09:00'
+                                -- end_time TIME NOT NULL,           -- E.g., '11:00'
+                                -- status VARCHAR(1) NOT NULL
 
 -- Table: attendance
 CREATE TABLE attendance (
                             id INT PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
                             student_id INT NOT NULL REFERENCES users(id),        -- The student who attends
-                            schedule_id INT NOT NULL REFERENCES subject_schedule(id), -- Specific schedule
+                            schedule_id INT REFERENCES subject_schedule(id), -- Specific schedule
                             attendance_date DATE NOT NULL,                       -- Date of attendance
                             status VARCHAR(2) NOT NULL,                          -- Attendance status ('Present', 'Absent', 'Late', etc.)
                             recorded_at TIMESTAMPTZ DEFAULT now()                -- Date and time of record
-);
-
--- Table: subject_professors
-CREATE TABLE subject_professors (
-                                    id int primary key generated always as identity,
-                                    subject_id INT NOT NULL REFERENCES subject(id),
-                                    professor_id INT NOT NULL REFERENCES users(id)
 );
 
 -- Table: knowledge
@@ -190,9 +204,17 @@ CREATE TABLE knowledge (
                            status varchar(1) DEFAULT 'A'
 );
 
+-- Table: subject_knowledge
+CREATE TABLE subject_knowledge (
+                                   id int not null primary key generated always as identity,
+                                   id_subject int not null references subject(id),
+                                   id_knowledge int not null references knowledge(id)
+);
+
+
 CREATE TABLE achievement_groups(
                                    id int not null primary key generated always as identity,
-                                   knowledge_id int not null references knowledge(id),
+                                   subject_knowledge_id int not null references subject_knowledge(id),
                                    achievement text not null ,
                                    group_id int not null references groups(id),
                                    period_id int not null references academic_period(id)
@@ -204,9 +226,7 @@ CREATE TABLE activity (
                           id int primary key generated always as identity,
                           activity_name VARCHAR(50) NOT NULL,
                           description TEXT NOT NULL,
-                          subject INT NOT NULL REFERENCES subject(id),
-                          period_id INT NOT NULL REFERENCES academic_period(id),
-                          knowledge int not null references knowledge(id),
+                          achievement_groups_id int not null references achievement_groups(id),
                           status varchar(1) NOT NULL
 );
 
@@ -219,19 +239,12 @@ CREATE TABLE activity_group(
                                end_date DATE
 );
 
--- Table: subject_knowledge
-CREATE TABLE subject_knowledge (
-                                   id int not null primary key generated always as identity,
-                                   id_subject int not null references subject(id),
-                                   id_knowledge int not null references knowledge(id)
-);
-
 -- Table: grades
 CREATE TABLE activity_grade (
                                 id int primary key generated always as identity,
                                 student_id INT NOT NULL REFERENCES users(id),
                                 activity_id INT NOT NULL REFERENCES activity_group(id),
-                                score NUMERIC(5, 2) NOT NULL,
+                                score NUMERIC(5, 2),
                                 comment TEXT
 );
 
@@ -240,6 +253,7 @@ CREATE TABLE subject_grade (
                                subject_id INT NOT NULL REFERENCES subject(id),
                                student_id INT NOT NULL REFERENCES users(id),
                                period_id INT NOT NULL REFERENCES academic_period(id),
+                               comment varchar,
                                total_score NUMERIC (5,2) NOT NULL,
                                recovered VARCHAR(1)
 );
@@ -277,11 +291,19 @@ CREATE TABLE backup_history (
                                 created_by INT NOT NULL REFERENCES users(id)
 );
 
+CREATE TABLE tracking_type(
+                              id int primary key generated always as identity,
+                              type varchar(1)
+);
+
 -- Table: student_tracking
 CREATE TABLE student_tracking (
                                   id int primary key generated always as identity,
                                   student INT NOT NULL REFERENCES users(id),
                                   professor INT NOT NULL REFERENCES users(id),
+                                  period_id INT NOT NULL REFERENCES academic_period(id),
+                                  tracking_type INT NOT NULL REFERENCES tracking_type(id),
+                                  date DATE NOT NULL DEFAULT now(),
                                   situation TEXT NOT NULL, -- Behavior description
                                   compromise TEXT NOT NULL, -- Commitment
                                   follow_up TEXT NOT NULL, -- Follow-up

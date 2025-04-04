@@ -14,6 +14,7 @@ public interface KnowledgeMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "name", target = "name"),
+            @Mapping(source = "percentage", target = "percentage"),
             @Mapping(source = "status", target = "status")
     })
     KnowledgeDomain toDomain(Knowledge knowledge);

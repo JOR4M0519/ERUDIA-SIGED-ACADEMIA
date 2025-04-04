@@ -15,7 +15,8 @@ public interface GroupStudentsMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "student", target = "student"),
-            @Mapping(source = "group", target = "group")
+            @Mapping(source = "group", target = "group"),
+            @Mapping(source = "status", target = "status")
     })
     GroupStudentsDomain toDomain(GroupStudent groupStudent);
     @InheritInverseConfiguration

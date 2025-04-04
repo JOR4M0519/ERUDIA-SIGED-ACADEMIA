@@ -7,7 +7,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {UserRoleMapper.class})
 public interface UserMapper {
 
     @Mappings({
@@ -18,10 +18,12 @@ public interface UserMapper {
             @Mapping(source = "firstName", target = "firstName"),
             @Mapping(source = "lastName", target = "lastName"),
             @Mapping(source = "uuid", target = "uuid"),
+            @Mapping(source = "userRoles",target = "roles"),
             //@Mapping(source = "createdAt", target = "createdAt"),
             // @Mapping(source = "lastLogin", target = "lastLogin"),
             //@Mapping(source = "attemptedFailedLogin", target = "attemptedFailedLogin"),
-            @Mapping(source = "status", target = "status")
+            @Mapping(source = "status", target = "status"),
+            @Mapping(source = "promotionStatus", target = "promotionStatus")
     })
     UserDomain toDomain(User user);
 

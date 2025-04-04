@@ -10,7 +10,7 @@ import java.util.List;
 
 @WebAdapter
 @RestController
-@RequestMapping("api/academy/relationship-types")
+@RequestMapping("/api/academy/relationship-types")
 public class RelationshipController {
 
     private final PersistenceRelationshipPort persistenceRelationshipPort;

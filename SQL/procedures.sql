@@ -16,7 +16,7 @@ BEGIN
     end if;
 
     --- Si el estudiante si paso.
-    update subject_grade sg set recovered = 'R', total_score = newScore where sg.subject_id = idSubject and student_id = idStudent and sg.period_id = idPeriod returning id into subjectGradeId;
+    update subject_grade sg set recovered = 'Y', total_score = newScore where sg.subject_id = idSubject and student_id = idStudent and sg.period_id = idPeriod returning id into subjectGradeId;
     insert into recovery_period (subject_grade, previous_score) values (subjectGradeId, previousScore);
 end;
 $$;

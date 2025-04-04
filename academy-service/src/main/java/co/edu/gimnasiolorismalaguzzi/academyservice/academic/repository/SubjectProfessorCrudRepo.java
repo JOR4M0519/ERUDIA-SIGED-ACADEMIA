@@ -13,6 +13,7 @@ public interface SubjectProfessorCrudRepo extends JpaRepository<SubjectProfessor
     @Query(value = "SELECT * FROM subject_professors WHERE subject_id = :subjectId", nativeQuery = true)
     List<SubjectProfessor> findBySubjectId(@Param("subjectId") Integer subjectId);
 
+
     @Override
     Optional<SubjectProfessor> findById(Integer id);
 }

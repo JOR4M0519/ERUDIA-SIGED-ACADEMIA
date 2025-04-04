@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.CreateActivityFront;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityDomain;
@@ -26,25 +27,44 @@ public class ActivityController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityDomain> getEducationalLevelById(@PathVariable Integer id) {
+    public ResponseEntity<?> getActivityById(@PathVariable Integer id) {
         ActivityDomain activityDomain = persistenceActivityPort.findById(id);
         return ResponseEntity.ok(activityDomain);
     }
 
+    /**
+     * Obtiene los knowledges, junto a los achievements por actividad
+     * @param id
+     * @return
+     */
+
+    @GetMapping("/knowledges/{id}")
+    public ResponseEntity<List<?>> getAllActivitiesWithKnowledgesAchievements(@PathVariable Integer id) {
+        List<ActivityDomain> activityDomains = persistenceActivityPort.getAllActivitiesWithKnowledgesAchievements(id);
+        return ResponseEntity.ok(activityDomains);
+    }
+
     @PostMapping()
-    public ResponseEntity<ActivityDomain> createEducationalLevel(@RequestBody ActivityDomain ActivityDomain) {
-        ActivityDomain createdActivity = persistenceActivityPort.save(ActivityDomain);
+    public ResponseEntity<ActivityDomain> createActivity(@RequestBody CreateActivityFront ActivityDomainFront) {
+        ActivityDomain createdActivity = persistenceActivityPort.createActivityAndGroup(ActivityDomainFront);
         return ResponseEntity.ok(createdActivity);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ActivityDomain> updateEducationalLevel(@PathVariable Integer id, @RequestBody ActivityDomain ActivityDomain) {
-        ActivityDomain updatedActivity = persistenceActivityPort.update(id, ActivityDomain);
+    public ResponseEntity<ActivityDomain> updateActivity(@PathVariable Integer id, @RequestBody CreateActivityFront ActivityDomainFront) {
+        ActivityDomain updatedActivity = persistenceActivityPort.updateActivityAndGroup(id, ActivityDomainFront);
+        return ResponseEntity.ok(updatedActivity);
+    }
+
+    @PutMapping("/{activityId}/knowledges/{knowledgeId}")
+    public ResponseEntity<ActivityDomain> updateActivityKnowledgeId(@PathVariable Integer activityId,
+                                                                    @PathVariable Integer knowledgeId) {
+        ActivityDomain updatedActivity = persistenceActivityPort.updateActivityKnowledgeId(activityId, knowledgeId);
         return ResponseEntity.ok(updatedActivity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEducationalLevel(@PathVariable Integer id) {
+    public ResponseEntity<Void> deleteActivity(@PathVariable Integer id) {
         persistenceActivityPort.delete(id);
         return ResponseEntity.noContent().build();
     }

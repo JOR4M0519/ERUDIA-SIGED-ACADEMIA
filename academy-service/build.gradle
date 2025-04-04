@@ -1,11 +1,13 @@
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.3.3'
+	id 'jacoco'
 
 }
 
 group = 'co.edu.gimnasiolorismalaguzzi'
 version = '0.0.1-SNAPSHOT'
+
 
 java {
 	toolchain {
@@ -46,4 +48,64 @@ dependencies {
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 	/*compileOnly 'org.projectlombok:lombok:1.18.28'  // Versión más reciente de Lombok
 	annotationProcessor 'org.projectlombok:lombok:1.18.28'*/
+}
+
+
+test {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport // Genera el reporte después de los tests
+}
+
+jacoco {
+    toolVersion = "0.8.10"
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)  // Para SonarQube
+		csv.required.set(false)
+		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, includes: [
+					// Incluir solo los servicios que te interesan
+					'co/edu/gimnasiolorismalaguzzi/academyservice/academic/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/administration/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/evaluation/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/knowledge/service/**',
+					'co/edu/gimnasiolorismalaguzzi/academyservice/student/service/**'
+			], excludes: [
+					// Excluir explícitamente los mappers y otras clases que no quieres incluir
+					'**/*Mapper*',
+					'**/*Controller*',
+					'**/*Entity*',
+					'**/*Repository*',
+					'**/*Domain*',
+					'**/*Exception*',
+					'**/*Config*'
+			])
+		}))
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			element = 'CLASS'
+			includes = [
+					'co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.*',
+					'co.edu.gimnasiolorismalaguzzi.academyservice.student.service.*'
+			]
+			limit {
+				counter = 'LINE'
+				minimum = 0.80 // Puedes ajustar este valor según tus necesidades
+			}
+		}
+	}
 }

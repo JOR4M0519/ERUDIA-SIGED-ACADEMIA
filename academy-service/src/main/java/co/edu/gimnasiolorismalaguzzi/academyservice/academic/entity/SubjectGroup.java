@@ -18,12 +18,17 @@ public class SubjectGroup {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "subject_id", nullable = false)
-    private Subject subject;
+    @JoinColumn(name = "subject_professor_id", nullable = false)
+    private SubjectProfessor subjectProfessor;
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "group_students", nullable = false)
     private Groups groups;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "academic_period_id", nullable = false)
+    private AcademicPeriod academicPeriod;
 
 }

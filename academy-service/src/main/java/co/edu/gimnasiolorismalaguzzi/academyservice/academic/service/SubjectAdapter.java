@@ -3,6 +3,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
@@ -10,7 +11,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomai
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectCrudRepo;
-//import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserCrudRepo;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SubjectAdapter implements PersistenceSubjectPort {
 
-    private final SubjectCrudRepo subjectCrudRepo; // Repositorio JPA
+    private final SubjectCrudRepo subjectCrudRepo;
     private final SubjectProfessorAdapter subjectProfessorAdapter;
 
     @Autowired
@@ -43,7 +43,7 @@ public class SubjectAdapter implements PersistenceSubjectPort {
         for(SubjectDomain subjectDomain : subjectDomainList) {
             List<SubjectProfessorDomain> professorDomains = subjectProfessorAdapter.findBySubjectId(subjectDomain.getId());
 
-            List<User> professors = professorDomains.stream()
+            List<UserDomain> professors = professorDomains.stream()
                     .map(SubjectProfessorDomain::getProfessor)
                     .toList();
             subjectDomain.setProfessor(professors);
@@ -59,7 +59,6 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
     @Override
     public SubjectDomain save(SubjectDomain subjectDomain) {
-
         subjectDomain.setSubjectName(subjectDomain.getSubjectName());
         subjectDomain.setStatus("A");
 
@@ -68,10 +67,13 @@ public class SubjectAdapter implements PersistenceSubjectPort {
         SubjectDomain savedSubjectDomain = subjectMapper.toDomain(savedSubject);
 
         if (subjectDomain.getProfessor() != null && !subjectDomain.getProfessor().isEmpty()) {
-            for (User professor : subjectDomain.getProfessor()) {
-                SubjectProfessorDomain professorDomain = new SubjectProfessorDomain();
-                professorDomain.setSubject(savedSubject);
-                professorDomain.setProfessor(professor);
+            for (UserDomain professor : subjectDomain.getProfessor()) {
+                // Usar directamente el UserDomain sin convertir
+                SubjectProfessorDomain professorDomain = SubjectProfessorDomain.builder()
+                        .professor(professor)
+                        .subject(savedSubject)
+                        .build();
+
                 subjectProfessorAdapter.save(professorDomain);
             }
         } else {
@@ -96,7 +98,7 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
             if (subjectDomain.getProfessor() != null) {
                 Set<Integer> newProfessorIds = subjectDomain.getProfessor().stream()
-                        .map(User::getId)
+                        .map(UserDomain::getId)
                         .collect(Collectors.toSet());
 
                 List<SubjectProfessorDomain> existingRelations = subjectProfessorAdapter.findBySubjectId(id);
@@ -107,9 +109,15 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
                 newProfessorIds.forEach(professorId -> {
                     if (existingRelations.stream().noneMatch(r -> r.getProfessor().getId().equals(professorId))) {
-                        SubjectProfessorDomain newRelation = new SubjectProfessorDomain();
-                        newRelation.setSubject(existingSubject);
-                        newRelation.setProfessor(User.builder().id(professorId).build());
+                        // Crear un UserDomain en lugar de User
+                        UserDomain professorDomain = UserDomain.builder()
+                                .id(professorId)
+                                .build();
+
+                        SubjectProfessorDomain newRelation = SubjectProfessorDomain.builder()
+                                .subject(existingSubject)
+                                .professor(professorDomain)
+                                .build();
                         subjectProfessorAdapter.save(newRelation);
                     }
                 });
@@ -124,7 +132,13 @@ public class SubjectAdapter implements PersistenceSubjectPort {
                         SubjectProfessor sp = new SubjectProfessor();
                         sp.setId(spDomain.getId());
                         sp.setSubject(updatedSubject);
-                        sp.setProfessor(spDomain.getProfessor());
+
+                        // Convertir UserDomain a User
+                        User professorEntity = User.builder()
+                                .id(spDomain.getProfessor().getId())
+                                .build();
+                        sp.setProfessor(professorEntity);
+
                         return sp;
                     })
                     .collect(Collectors.toSet());
@@ -140,17 +154,14 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
     @Override
     public HttpStatus delete(Integer integer) {
-
-        //Check if there are  some register in other table
-        //table
         try{
             if (this.subjectCrudRepo.existsById(integer)) {
-                subjectCrudRepo.updateStatusById("I",integer);
+                subjectCrudRepo.updateStatusById("I", integer);
                 return HttpStatus.OK;
             } else {
                 throw new AppException("Subject doesnt exist", HttpStatus.NOT_FOUND);
             }
-        }catch(Exception e){
+        } catch(Exception e){
             throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }

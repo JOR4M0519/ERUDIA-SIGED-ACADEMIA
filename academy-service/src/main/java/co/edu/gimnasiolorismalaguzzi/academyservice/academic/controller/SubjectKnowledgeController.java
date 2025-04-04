@@ -3,6 +3,8 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectKnowledgePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowledgeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,20 @@ public class SubjectKnowledgeController {
         return ResponseEntity.ok(SubjectKnowledgeDomains);
     }
 
+    @GetMapping("/periods/{periodId}/subjects/{subjectId}")
+    public ResponseEntity<?> getAllKnowledgeBySubjectIdByPeriodId(@PathVariable Integer periodId,@PathVariable Integer subjectId){
+        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains = subjectKnowledgePort.getAllKnowledgesBySubjectIdByPeriodId(subjectId,periodId);
+        return ResponseEntity.ok(SubjectKnowledgeDomains);
+    }
+
+    @GetMapping("/subjects/{subjectId}")
+    public ResponseEntity<?> getAllKnowledgeBySubjectId(@PathVariable Integer subjectId){
+        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains =
+                subjectKnowledgePort.getAllSubjectKnowledgeBySubjectId(subjectId);
+        return ResponseEntity.ok(SubjectKnowledgeDomains);
+    }
+
+
     @GetMapping("/{id}")
     public ResponseEntity<SubjectKnowledgeDomain> getKnowledgeById(@PathVariable Integer id) {
         SubjectKnowledgeDomain Knowledge = subjectKnowledgePort.findById(id);
@@ -44,8 +60,21 @@ public class SubjectKnowledgeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteKnowledge(@PathVariable Integer id) {
-        subjectKnowledgePort.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteKnowledge(@PathVariable Integer id) {
+        try {
+            subjectKnowledgePort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
     }
+
 }

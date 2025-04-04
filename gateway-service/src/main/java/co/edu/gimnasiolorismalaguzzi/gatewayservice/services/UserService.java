@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.gatewayservice.services;
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.client.AcademyClient;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserRegistrationDomain;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -17,6 +18,16 @@ public class UserService {
 
     public Mono<UserDetailDomain> getDetailUser(String username) {
         return Mono.fromCallable(() -> academyClient.getDetailUser(username))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<UserDetailDomain> createStudentUser(UserRegistrationDomain registrationDomain) {
+        return Mono.fromCallable(() -> academyClient.createStudentUser(registrationDomain))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<UserDetailDomain> createGeneralUser(UserRegistrationDomain registrationDomain) {
+        return Mono.fromCallable(() -> academyClient.createGeneralUser(registrationDomain))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 }

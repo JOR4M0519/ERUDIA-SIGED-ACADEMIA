@@ -14,9 +14,9 @@ public class UserDomain implements Serializable {
     private String firstName;
     private String lastName;
     private String password;
-    private Set<String> roles;
+    private Set<UserRoleDomain> roles;
     private String status;
-
+    private String promotionStatus;
 
 /*
     private Integer id;

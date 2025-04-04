@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.AcademicPeriod;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.Subject;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.AchievementGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Knowledge;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +11,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 @Data
 @Entity
@@ -34,25 +38,16 @@ public class Activity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "subject", nullable = false)
-    private Subject subject;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "period_id", nullable = false)
-    private AcademicPeriod period;
-
-    @NotNull
-    @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "knowledge", nullable = false)
-    private Knowledge knowledge;
+    @JoinColumn(name = "achievement_groups_id", nullable = false)
+    private AchievementGroup achievementGroup;
 
     @Size(max = 1)
     @NotNull
     @Column(name = "status", nullable = false, length = 1)
     private String status;
 
-//    @OneToMany(mappedBy = "activity")
-//    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+    @OneToMany(mappedBy = "activity", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private Set<ActivityGroup> activityGroups = new LinkedHashSet<>();
+
 
 }

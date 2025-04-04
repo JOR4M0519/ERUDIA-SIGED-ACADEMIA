@@ -1,18 +1,26 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserRegistrationDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserDetail;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.UserRole;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserDetailMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.IdTypeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserDetailCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.UserRoleCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +30,8 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
 
 
     private final UserDetailCrudRepo userDetailCrudRepo;
+    private final UserRoleCrudRepo userRoleCrudRepo;
 
-    @Autowired
-    private UserAdapter userAdapter;
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -33,8 +40,11 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     @Autowired
     private IdTypeMapper typeMapper;
 
-    public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo) {
+
+
+    public UserDetailAdapter(UserDetailCrudRepo userDetailCrudRepo, UserRoleCrudRepo userRoleCrudRepo) {
         this.userDetailCrudRepo = userDetailCrudRepo;
+        this.userRoleCrudRepo = userRoleCrudRepo;
     }
 
     @Override
@@ -42,24 +52,72 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
         return this.userDetailMapper.toDomains(this.userDetailCrudRepo.findAll());
     }
 
-    @Override
+    /*@Override
     public UserDetailDomain findById(Integer uuid) {
         Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Id(uuid));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
-
+*/
     @Override
-    public UserDetailDomain save(UserDetailDomain entity) {
-        return null;
+    @Transactional
+    public UserDetailDomain findById(Integer id) {
+        try {
+            // Modificar para usar una consulta que cargue los roles
+            UserDetail userDetail = userDetailCrudRepo.findByUser_Id(id);
+
+            // Si el usuario existe, cargar explícitamente sus roles
+            if (userDetail.getUser() != null) {
+                // Obtener los roles directamente desde el repositorio
+                List<UserRole> userRoles = userRoleCrudRepo.findByUserId(userDetail.getUser().getId());
+                userDetail.getUser().setUserRoles(new LinkedHashSet<>(userRoles));
+            }
+
+            return userDetailMapper.toDomain(userDetail);
+        } catch (EntityNotFoundException e) {
+            log.error("Error getting UserDetail by id: {}", id, e);
+            throw new AppException(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            log.error("Error getting UserDetail by id: {}", id, e);
+            throw new AppException("Error getting UserDetail by id: " + id, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
+
     @Override
-    public UserDetailDomain saveDetailUser(String uuid, UserDetailDomain userDetailDomain) {
-        userDetailDomain.setUser(userAdapter.searchUserByUuid(uuid));
-        UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
-        UserDetail savedUserDetail = this.userDetailCrudRepo.save(userDetail);
-        return userDetailMapper.toDomain(savedUserDetail);
+    @Transactional
+    public UserDetailDomain save(UserDetailDomain userDetailDomain) {
+        try {
+            log.debug("Saving user detail: {}", userDetailDomain);
+
+            // Validaciones
+            if (userDetailDomain == null) {
+                throw new AppException("UserDetailDomain cannot be null", HttpStatus.BAD_REQUEST);
+            }
+            if (userDetailDomain.getUser() == null) {
+                throw new AppException("User reference cannot be null", HttpStatus.BAD_REQUEST);
+            }
+
+            // Convertir a entidad
+            UserDetail userDetail = userDetailMapper.toEntity(userDetailDomain);
+
+            // Guardar
+            UserDetail savedUserDetail = userDetailCrudRepo.save(userDetail);
+
+            // Convertir resultado a domain y retornar
+            UserDetailDomain savedDomain = userDetailMapper.toDomain(savedUserDetail);
+            log.debug("Successfully saved user detail with ID: {}", savedDomain.getId());
+
+            return savedDomain;
+
+        } catch (DataIntegrityViolationException e) {
+            log.error("Error saving user detail - duplicate entry", e);
+            throw new AppException("Duplicate entry found in user detail", HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            log.error("Error saving user detail", e);
+            throw new AppException("Error saving user detail: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
+
 
 
     @Override
@@ -105,9 +163,16 @@ public class UserDetailAdapter implements PersistenceUserDetailPort {
     }
 
     @Override
+    public UserDetailDomain saveDetailUser(String uuid, UserDetailDomain user) {
+        return null;
+    }
+
+    @Override
     public UserDetailDomain findByUsername(String username) {
         Optional<UserDetail> userDetailOptional = Optional.ofNullable(userDetailCrudRepo.findByUser_Username(username));
         return userDetailOptional.map(userDetailMapper::toDomain).orElse(null);
     }
+
+
 
 }

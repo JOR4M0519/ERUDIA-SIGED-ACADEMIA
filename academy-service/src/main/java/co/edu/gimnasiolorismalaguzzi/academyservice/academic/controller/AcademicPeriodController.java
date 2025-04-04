@@ -24,6 +24,42 @@ public class AcademicPeriodController {
         return ResponseEntity.ok(AcademicPeriodDomains);
     }
 
+    /**
+     * Obtiene los periods académicos por un estaus (Activo, Inactivo y Finalizado)
+     * @param status
+     * @return Lista de periodos académiocos
+     */
+    @GetMapping("/{status}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getAllPeriodsByStatus(@PathVariable String status){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getAllPeriodsByStatus(status);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    /**
+     * Obtiene todos los periodos académicos activos por año
+     * @param year
+     * @return Lista de periodos académicos
+     */
+    @GetMapping("/active/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getActivePeriodsByYear(@PathVariable String year){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getActivePeriodsByYear(year);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    @GetMapping("/years/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getPeriodsByYear(@PathVariable String year){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getPeriodsByYear(year);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
+    @GetMapping("/settings/{settingId}/active/{year}")
+    public ResponseEntity<List<AcademicPeriodDomain>> getPeriodsByYearAndSetting(
+            @PathVariable String year,
+            @PathVariable Integer settingId){
+        List<AcademicPeriodDomain> AcademicPeriodDomains = academicPeriodServicePort.getPeriodsBySettingsAndYear(settingId,year);
+        return ResponseEntity.ok(AcademicPeriodDomains);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<AcademicPeriodDomain> getAcademicPeriodById(@PathVariable Integer id) {
         AcademicPeriodDomain AcademicPeriod = academicPeriodServicePort.findById(id);

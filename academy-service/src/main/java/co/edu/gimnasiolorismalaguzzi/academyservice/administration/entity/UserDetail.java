@@ -62,6 +62,7 @@ public class UserDetail {
     @Column(name = "dni", nullable = false, length = 20)
     private String dni;
 
+
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_type_id", nullable = false)

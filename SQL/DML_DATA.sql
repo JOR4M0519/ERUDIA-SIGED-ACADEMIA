@@ -7,21 +7,21 @@ INSERT INTO id_type (name) VALUES
                                ('Registro Civil');
 
 -- 2. La tabla users ya contenía registros, no se modifica.
-INSERT INTO users (username, email, password, uuid, status) VALUES
-                                                                ('juanita.perez', 'jdramos10000@gmail.com', 'hashed_password', '47928edd-60b4-4b61-97c8-285e15d0c867', 'A'),
-                                                                ('nicolas.rodriguez', 'jdramos100@gmail.com', 'hashed_password', '8a00719b-f1ec-4332-b187-5826278addc6', 'A'),
-                                                                ('pepito.perez', 'jdramos1000@gmail.com', 'hashed_password', '13644306-4de2-440c-89bd-8cec1ee2ab41', 'A'),
-                                                                ('rectoria', 'soporteyopal@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'cf3fb2ce-5ed0-4f10-beda-2d40999e0138', 'A'),
-                                                                ('admin', 'admin@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'admin-uuid-001', 'A');
+INSERT INTO users (username, email, password, uuid, status,first_name, last_name) VALUES
+                                                                                      ('juanita.perez', 'jdramos10000@gmail.com', 'hashed_password', '47928edd-60b4-4b61-97c8-285e15d0c867', 'A','Juanita', 'Andrea'),
+                                                                                      ('nicolas.rodriguez', 'jdramos100@gmail.com', 'hashed_password', '8a00719b-f1ec-4332-b187-5826278addc6', 'A','Nicolás', 'Fernando'),
+                                                                                      ('pepito.perez', 'jdramos1000@gmail.com', 'hashed_password', '13644306-4de2-440c-89bd-8cec1ee2ab41', 'A','Pepito', 'José'),
+                                                                                      ('rectoria', 'soporteyopal@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'cf3fb2ce-5ed0-4f10-beda-2d40999e0138', 'A','Rectoría', NULL),
+                                                                                      ('admin', 'admin@gimnasiolorismalaguzzi.edu.co', 'hashed_password', 'admin-uuid-001', 'A','Admin', NULL);
 
 -- 3. Tabla: user_detail
 INSERT INTO user_detail (user_id, first_name, middle_name, last_name, second_last_name, address, phone_number, date_of_birth, dni, id_type_id, neighborhood, city, position_job)
 VALUES
-    (1, 'Juanita', 'Andrea', 'Pérez', 'Rodríguez', 'Calle 123', '3124567890', '1990-05-14', '123456789', 1, 'Centro', 'Bogotá', 'Docente'),
-    (2, 'Nicolás', 'Fernando', 'Rodríguez', 'Lopez', 'Carrera 45', '3201234567', '1985-07-20', '987654321', 2, 'Chapinero', 'Bogotá', 'Administrador'),
-    (3, 'Pepito', 'José', 'Pérez', 'Gómez', 'Avenida 56', '3109876543', '1992-11-05', '456123789', 3, 'Teusaquillo', 'Bogotá', 'Coordinador'),
-    (4, 'Rectoría', NULL, 'Gimnasio', 'Loris Malaguzzi', 'Sede Principal', '6012345678', '2000-01-01', '999999999', 4, 'Centro', 'Yopal', 'Rector'),
-    (5, 'Admin', NULL, 'Gimnasio', 'Admin', 'Sede Administrativa', '6018765432', '1999-12-25', '888888888', 5, 'Suba', 'Bogotá', 'Administrador');
+    (1, 'Juanita', 'Andrea', 'Pérez', 'Rodríguez', 'Calle 123', '3124567890', '1990-05-14', '123456789', 1, 'Centro', 'Bogotá', 'estudiante'),
+    (2, 'Nicolás', 'Fernando', 'Rodríguez', 'Lopez', 'Carrera 45', '3201234567', '1985-07-20', '987654321', 2, 'Chapinero', 'Bogotá', 'teacher'),
+    (3, 'Pepito', 'José', 'Pérez', 'Gómez', 'Avenida 56', '3109876543', '1992-11-05', '456123789', 3, 'Teusaquillo', 'Bogotá', 'estudiante'),
+    (4, 'Rectoría', NULL, 'Gimnasio', 'Loris Malaguzzi', 'Sede Principal', '6012345678', '2000-01-01', '999999999', 4, 'Centro', 'Yopal', 'administrador'),
+    (5, 'Admin', NULL, 'Gimnasio', 'Admin', 'Sede Administrativa', '6018765432', '1999-12-25', '888888888', 5, 'Suba', 'Bogotá', 'administrador');
 
 -- 4. Tabla: role
 INSERT INTO role (role_name, status) VALUES
@@ -84,7 +84,7 @@ INSERT INTO educational_level (level_name, status) VALUES
                                                        ('Preescolar', 'A'),
                                                        ('Primaria', 'A'),
                                                        ('Secundaria', 'A'),
-                                                       ('Media', 'A'),
+                                                       ('Primaria', 'A'),
                                                        ('Universitaria', 'A');
 
 -- 12. Tabla: grade_settings
@@ -97,27 +97,27 @@ INSERT INTO grade_settings (level_id, minimum_grade, pass_grade, maximum_grade) 
 
 -- 13. Tabla: academic_period
 INSERT INTO academic_period (setting_id, start_date, end_date, name, status) VALUES
-                                                                                 (1, '2024-01-01', '2024-06-30', 'Q1', 'A'),
-                                                                                 (2, '2024-07-01', '2024-12-31', 'Q2', 'A'),
-                                                                                 (3, '2023-01-01', '2023-06-30', 'Q1', 'I'),
-                                                                                 (4, '2023-07-01', '2023-12-31', 'Q2', 'I'),
-                                                                                 (5, '2022-01-01', '2022-12-31', 'Annual', 'I');
+                                                                                 (1, '2025-01-01', '2025-06-30', 'P2025-1', 'A'),
+                                                                                 (2, '2025-07-01', '2025-12-31', 'P2025-2', 'I'),
+                                                                                 (3, '2026-01-01', '2026-06-30', 'P2026-1', 'I'),
+                                                                                 (4, '2026-07-01', '2026-12-31', 'P2026-2', 'I'),
+                                                                                 (5, '2027-01-01', '2027-12-31', 'P2021-1', 'I');
 
 -- 14. Tabla: groups
 INSERT INTO groups (level_id, group_code, group_name, mentor_id, status) VALUES
-                                                                             (1, 'G1A', 'Preescolar A', 1, 'A'),
-                                                                             (2, 'G2B', 'Primaria B', 2, 'A'),
-                                                                             (3, 'G3C', 'Secundaria C', 3, 'A'),
-                                                                             (4, 'G4D', 'Media D', 4, 'A'),
-                                                                             (5, 'G5E', 'Universitaria E', 5, 'A');
+                                                                             (1, 'G1A', 'Primero A', 1, 'A'),
+                                                                             (2, 'G2B', 'Segundo B', 2, 'A'),
+                                                                             (3, 'G3C', 'Tercero C', 3, 'A'),
+                                                                             (4, 'G4D', 'Cuarto D', 3, 'A'),
+                                                                             (5, 'G5E', 'Quinto E', 5, 'A');
 
 -- 15. Tabla: group_students
 INSERT INTO group_students (student_id, group_id) VALUES
                                                       (3, 1),
                                                       (1, 2),
-                                                      (2, 3),
+                                                      (2, 2),
                                                       (4, 4),
-                                                      (5, 5);
+                                                      (5, 4);
 
 -- 16. Tabla: dimensions
 INSERT INTO dimensions (name, description) VALUES
@@ -135,13 +135,24 @@ INSERT INTO subject (subject_name, status) VALUES
                                                ('Historia', 'A'),
                                                ('Inglés', 'A');
 
+-- 22. Tabla: subject_professors
+INSERT INTO subject_professors (subject_id, professor_id) VALUES
+                                                              (1, 1),
+                                                              (2, 2),
+                                                              (3, 3),
+                                                              (4, 2),
+                                                              (5, 5);
+
 -- 18. Tabla: subject_groups
-INSERT INTO subject_groups (subject_id, group_students) VALUES
-                                                            (1, 1),
-                                                            (2, 2),
-                                                            (3, 3),
-                                                            (4, 4),
-                                                            (5, 5);
+INSERT INTO subject_groups (subject_professor_id, group_students,academic_period_id) VALUES
+                                                            (1, 1,1),
+                                                            (2, 2,1),
+                                                            (3, 3,1),
+                                                            (1, 4,1),
+                                                            (2, 4,1),
+                                                            (3, 4,1),
+                                                            (4, 4,1),
+                                                            (5, 5,1);
 
 -- 19. Tabla: subject_dimension
 INSERT INTO subject_dimension (dimension_id, subject_id) VALUES
@@ -152,12 +163,12 @@ INSERT INTO subject_dimension (dimension_id, subject_id) VALUES
                                                              (5, 5);
 
 -- 20. Tabla: subject_schedule
-INSERT INTO subject_schedule (subject_id, day_of_week, start_time, end_time, status) VALUES
+INSERT INTO subject_schedule (subject_group_id, day_of_week, start_time, end_time, status) VALUES
                                                                                          (1, 'Monday', '08:00', '10:00', 'A'),
-                                                                                         (2, 'Tuesday', '10:00', '12:00', 'A'),
-                                                                                         (3, 'Wednesday', '14:00', '16:00', 'A'),
-                                                                                         (4, 'Thursday', '08:00', '10:00', 'A'),
-                                                                                         (5, 'Friday', '12:00', '14:00', 'A');
+                                                                                         (1, 'Tuesday', '10:00', '12:00', 'A'),
+                                                                                         (1, 'Wednesday', '14:00', '16:00', 'A'),
+                                                                                         (1, 'Thursday', '08:00', '10:00', 'A'),
+                                                                                         (1, 'Friday', '12:00', '14:00', 'A');
 
 -- 21. Tabla: attendance
 INSERT INTO attendance (student_id, schedule_id, attendance_date, status) VALUES
@@ -167,53 +178,53 @@ INSERT INTO attendance (student_id, schedule_id, attendance_date, status) VALUES
                                                                               (4, 4, '2024-02-01', 'P'),
                                                                               (5, 5, '2024-02-01', 'A');
 
--- 22. Tabla: subject_professors
-INSERT INTO subject_professors (subject_id, professor_id) VALUES
-                                                              (1, 1),
-                                                              (2, 2),
-                                                              (3, 3),
-                                                              (4, 4),
-                                                              (5, 5);
+
 
 -- 23. Tabla: knowledge
 INSERT INTO knowledge (name, percentage, status) VALUES
                                                      ('Ser', 20, 'A'),
                                                      ('Hacer', 30, 'A'),
-                                                     ('Nose', 40, 'A'),
-                                                     ('test', 50, 'A'),
-                                                     ('a', 60, 'A');
-
--- 24. Tabla: achievement_groups
-INSERT INTO achievement_groups (knowledge_id, achievement, group_id, period_id) VALUES
-                                                                                    (1, 'Logro en teoría', 1, 1),
-                                                                                    (2, 'Logro en práctica', 2, 2),
-                                                                                    (3, 'Logro en evaluación', 3, 3),
-                                                                                    (4, 'Logro en proyecto', 4, 4),
-                                                                                    (5, 'Logro en investigación', 5, 5);
-
--- 25. Tabla: activity
-INSERT INTO activity (activity_name, description, subject, period_id, knowledge, status) VALUES
-                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 1, 1, 1, 'A'),
-                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 2, 2, 2, 'A'),
-                                                                                             ('Laboratorio Ciencias', 'Experimento químico', 3, 3, 3, 'A'),
-                                                                                             ('Debate Lenguaje', 'Debate sobre literatura', 4, 4, 4, 'A'),
-                                                                                             ('Listening Inglés', 'Comprensión auditiva', 5, 5, 5, 'A');
-
--- 26. Tabla: activity_group
-INSERT INTO activity_group (activity_id, group_id, start_date, end_date) VALUES
-                                                                             (1, 1, '2024-02-05', '2024-02-06'),
-                                                                             (2, 2, '2024-02-07', '2024-02-08'),
-                                                                             (3, 3, '2024-02-09', '2024-02-10'),
-                                                                             (4, 4, '2024-02-11', '2024-02-12'),
-                                                                             (5, 5, '2024-02-13', '2024-02-14');
-
+                                                     ('Saber', 20, 'A'),
+                                                     ('test', 10, 'A'),
+                                                     ('a', 10, 'A');
 -- 27. Tabla: subject_knowledge
 INSERT INTO subject_knowledge (id_subject, id_knowledge) VALUES
                                                              (1, 1),
                                                              (2, 2),
-                                                             (3, 3),
+                                                             (2, 3),
+                                                             (3, 4),
+                                                             (3, 2),
+                                                             (4, 3),
                                                              (4, 4),
                                                              (5, 5);
+
+
+-- 24. Tabla: achievement_groups
+INSERT INTO achievement_groups (subject_knowledge_id, achievement, group_id, period_id) VALUES
+                                                                                    (1, 'Logro en teoría', 1, 1),
+                                                                                    (2, 'Logro en práctica', 2, 2),
+                                                                                    (3, 'Logro en evaluación', 4, 1),
+                                                                                    (4, 'Logro en proyecto', 4, 1),
+                                                                                    (5, 'Logro en investigación', 4, 1),
+                                                                                    (6, 'Logro en evaluación', 4, 1),
+                                                                                    (7, 'Logro en proyecto', 4, 1),
+                                                                                    (8, 'Logro en investigación',4 , 1);
+
+-- 25. Tabla: activity
+INSERT INTO activity (activity_name, description, achievement_groups_id, status) VALUES
+                                                                                             ('Quiz Matemáticas', 'Prueba de álgebra', 3, 'A'),
+                                                                                             ('Ensayo Historia', 'Ensayo sobre la independencia', 4, 'A'),
+                                                                                             ('Laboratorio Ciencias', 'Experimento químico',  5, 'A'),
+                                                                                             ('Debate Lenguaje', 'Debate sobre literatura',  6, 'A'),
+                                                                                             ('Listening Inglés', 'Comprensión auditiva',  7, 'A');
+
+-- 26. Tabla: activity_group
+INSERT INTO activity_group (activity_id, group_id, start_date, end_date) VALUES
+                                                                             (1, 4, '2025-02-05', '2024-02-06'),
+                                                                             (2, 4, '2025-02-07', '2024-02-08'),
+                                                                             (3, 4, '2025-02-09', '2024-02-10'),
+                                                                             (4, 4, '2025-02-11', '2024-02-12'),
+                                                                             (5, 4, '2025-02-13', '2024-02-14');
 
 -- 28. Tabla: activity_grade
 INSERT INTO activity_grade (student_id, activity_id, score, comment) VALUES
@@ -228,7 +239,10 @@ INSERT INTO subject_grade (subject_id, student_id, period_id, total_score, recov
                                                                                           (1, 1, 1, 4.2, 'N'),
                                                                                           (2, 2, 2, 3.6, 'N'),
                                                                                           (3, 3, 3, 4.0, 'N'),
-                                                                                          (4, 4, 4, 3.2, 'S'),
+                                                                                          (1, 4, 1, 1.0, 'S'),
+                                                                                          (2, 4, 1, 2.2, 'S'),
+                                                                                          (3, 4, 1, 3.2, 'S'),
+                                                                                          (4, 4, 1, 4.2, 'S'),
                                                                                           (5, 5, 5, 4.8, 'N');
 
 -- 30. Tabla: recovery_period
@@ -254,11 +268,18 @@ INSERT INTO backup_history (backup_name, description, file_path, created_by) VAL
                                                                                  ('Backup 03', 'Copia de seguridad marzo', '/backups/backup03.sql', 3),
                                                                                  ('Backup 04', 'Copia de seguridad abril', '/backups/backup04.sql', 4),
                                                                                  ('Backup 05', 'Copia de seguridad mayo', '/backups/backup05.sql', 5);
+-- 33. Tabla: tracking_type
+INSERT INTO tracking_type (type) VALUES
+                                         ('1'),
+                                         ('2'),
+                                         ('3'),
+                                         ('4');
+
 
 -- 33. Tabla: student_tracking
-INSERT INTO student_tracking (student, professor, situation, compromise, follow_up, status) VALUES
-                                                                                                (1, 2, 'Falta a clases', 'Asistir puntualmente', 'Revisión semanal', 'A'),
-                                                                                                (2, 3, 'Bajo rendimiento', 'Estudio diario', 'Informe mensual', 'A'),
-                                                                                                (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario', 'A'),
-                                                                                                (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral', 'A'),
-                                                                                                (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico', 'A');
+INSERT INTO student_tracking (student, professor, situation, compromise, follow_up,period_id,tracking_type, status) VALUES
+                                                                                                (1, 2, 'Falta a clases', 'Asistir puntualmente', 'Revisión semanal',1,1, 'A'),
+                                                                                                (2, 3, 'Bajo rendimiento', 'Estudio diario', 'Informe mensual',1,5, 'A'),
+                                                                                                (3, 4, 'Comportamiento inadecuado', 'Respeto en clase', 'Seguimiento disciplinario',1,4, 'A'),
+                                                                                                (4, 5, 'Dificultades en inglés', 'Tutorías adicionales', 'Evaluación trimestral',1,3, 'A'),
+                                                                                                (5, 1, 'Problemas de concentración', 'Técnicas de estudio', 'Seguimiento psicopedagógico',1,2, 'A');

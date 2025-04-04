@@ -1,8 +1,10 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.EducationalLevelDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceEducationalLevelPort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -48,8 +50,21 @@ public class EducationalLevelController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEducationalLevel(@PathVariable Integer id) {
-        EducationalLevelServicePort.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteEducationalLevel(@PathVariable Integer id) {
+        try {
+            HttpStatus status = EducationalLevelServicePort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.IM_USED) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
     }
+
 }

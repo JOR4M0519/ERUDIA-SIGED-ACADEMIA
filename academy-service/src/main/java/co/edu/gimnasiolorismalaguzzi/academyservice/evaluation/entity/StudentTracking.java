@@ -1,15 +1,18 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.AcademicPeriod;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+import java.time.LocalDate;
+
+@Getter
+@Setter
 @Entity
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "student_tracking")
 public class StudentTracking {
     @Id
@@ -28,6 +31,16 @@ public class StudentTracking {
     private User professor;
 
     @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "period_id", nullable = false)
+    private AcademicPeriod period;
+
+    @NotNull
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "tracking_type", nullable = false)
+    private TrackingType trackingType;
+
+    @NotNull
     @Column(name = "situation", nullable = false, length = Integer.MAX_VALUE)
     private String situation;
 
@@ -40,7 +53,12 @@ public class StudentTracking {
     private String followUp;
 
     @NotNull
-    @Column(name = "status", nullable = false)
+    @Column(name = "date", nullable = false)
+    private LocalDate date;
+
+    @Size(max = 1)
+    @NotNull
+    @Column(name = "status", nullable = false, length = 1)
     private String status;
 
 }

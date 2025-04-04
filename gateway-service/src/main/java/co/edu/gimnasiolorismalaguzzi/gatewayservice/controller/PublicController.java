@@ -2,20 +2,16 @@ package co.edu.gimnasiolorismalaguzzi.gatewayservice.controller;
 
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.Login;
-import co.edu.gimnasiolorismalaguzzi.gatewayservice.domain.UserDetailDomain;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.KeycloakService;
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.services.UserService;
-import org.keycloak.representations.idm.GroupRepresentation;
-import org.springframework.http.ResponseCookie;
-import org.springframework.web.server.ServerWebExchange;
+import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
@@ -36,10 +32,10 @@ public class PublicController {
         return ResponseEntity.ok(token);
     }*/
 
-    @PostMapping("/login")
+/*    @PostMapping("/login")
     public Mono<ResponseEntity<Map<String, Object>>> login(@RequestBody Login request) {
-        return keycloakService.getToken(request.getUsername(), request.getPassword())  // 🔥 Llamada reactiva para el token
-                .flatMap(token -> userService.getDetailUser(request.getUsername())  // 🔥 Llamada reactiva para los detalles del usuario
+        return keycloakService.getToken(request.getUsername(), request.getPassword())  //  Llamada reactiva para el token
+                .flatMap(token -> userService.getDetailUser(request.getUsername())  //  Llamada reactiva para los detalles del usuario
                         .map(userDetail -> {
                             Map<String, Object> response = new HashMap<>();
                             response.put("token", token);
@@ -47,8 +43,40 @@ public class PublicController {
                             return ResponseEntity.ok(response);
                         })
                 );
+    }*/
+
+    @PostMapping("/login")
+    public Mono<ResponseEntity<Map<String, Object>>> login(@RequestBody Login request) {
+        return keycloakService.getTokens(request.getUsername(), request.getPassword())  // Llamada reactiva para los tokens
+                .flatMap(tokens -> userService.getDetailUser(request.getUsername())  // Llamada reactiva para los detalles del usuario
+                        .map(userDetail -> {
+                            Map<String, Object> response = new HashMap<>();
+                            response.put("accessToken", tokens.get("accessToken"));
+                            response.put("refreshToken", tokens.get("refreshToken"));
+                            response.put("user", userDetail);
+                            return ResponseEntity.ok(response);
+                        })
+                );
     }
 
+    @PostMapping("/refresh-token")
+    public Mono<ResponseEntity<?>> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshToken = request.get("refreshToken");
+        if (refreshToken == null || refreshToken.isEmpty()) {
+            return Mono.just(ResponseEntity.badRequest().build());
+        }
+
+        return Mono.fromCallable(() -> {
+            try {
+                String newToken = keycloakService.refreshToken(refreshToken);
+                Map<String, String> response = new HashMap<>();
+                response.put("accessToken", newToken);
+                return ResponseEntity.ok(response);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            }
+        }).subscribeOn(Schedulers.boundedElastic()); // Ejecuta en un hilo seguro para bloqueos
+    }
 
 
 /*    @GetMapping("/groups/{username}")

@@ -25,8 +25,21 @@ public class ActivityGradeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ActivityGradeDomain> getActivityGroupById(@PathVariable Integer id){
+    public ResponseEntity<ActivityGradeDomain> getActivityGradeById(@PathVariable Integer id){
         ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.findById(id);
+        return ResponseEntity.ok(ActivityGradeDomain);
+    }
+
+    @GetMapping("/activities/{activityId}/groups/{groupId}")
+    public ResponseEntity<?> getGradeByActivityId(@PathVariable Integer activityId,@PathVariable Integer groupId){
+        List<ActivityGradeDomain> ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityIdGroupId(activityId,groupId);
+        return ResponseEntity.ok(ActivityGradeDomain);
+    }
+
+
+    @GetMapping("/activities/{activityId}/students/{studentId}")
+    public ResponseEntity<?> getGradeByActivityIdByStudentId(@PathVariable Integer activityId,@PathVariable Integer studentId){
+        ActivityGradeDomain ActivityGradeDomain = persistanceActivityGradePort.getGradeByActivityGroupIdByStudentId(activityId,studentId);
         return ResponseEntity.ok(ActivityGradeDomain);
     }
 

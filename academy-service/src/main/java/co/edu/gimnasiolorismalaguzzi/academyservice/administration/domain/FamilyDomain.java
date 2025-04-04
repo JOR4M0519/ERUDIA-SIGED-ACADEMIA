@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 @Data
 public class FamilyDomain {
     private Integer id;
-    private UserDomain student;
+    private UserDomain relativeUser;
     private UserDomain user;
     private RelationshipDomain relationship;
 

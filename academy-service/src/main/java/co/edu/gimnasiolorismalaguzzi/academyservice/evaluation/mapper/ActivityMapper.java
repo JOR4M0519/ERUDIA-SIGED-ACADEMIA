@@ -12,17 +12,19 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ActivityMapper {
 
+
+
     @Mappings({
             @Mapping(source = "id", target = "id"),
             @Mapping(source = "activityName", target = "activityName"),
             @Mapping(source = "description", target = "description"),
-            @Mapping(source = "subject", target = "subject"),
-            @Mapping(source = "period", target = "period"),
-            @Mapping(source = "knowledge", target = "knowledge"),
+            @Mapping(source = "achievementGroup", target = "achievementGroup"),
             @Mapping(source = "status", target = "status"),
     })
 
     ActivityDomain toDomain(Activity activity);
+
+
 
     @InheritInverseConfiguration
     Activity toEntity (ActivityDomain activityDomain);

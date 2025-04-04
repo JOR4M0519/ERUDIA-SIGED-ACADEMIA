@@ -21,8 +21,8 @@ public class SubjectSchedule {
 
     @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
-    @JoinColumn(name = "subject_id", nullable = false)
-    private Subject subject;
+    @JoinColumn(name = "subject_group_id", nullable = false)
+    private SubjectGroup subjectGroup;
 
     @Size(max = 10)
     @NotNull

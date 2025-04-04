@@ -24,6 +24,7 @@ public class UserDetailDomain implements Serializable {
     private String neighborhood;
     private String city;
     private String positionJob;
+
     private List<User> relatives;  //Campo externo
 }
 

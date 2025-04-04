@@ -3,5 +3,13 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persisten
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 
+import java.util.List;
+
 public interface PersistenceAchievementGroups extends PersistencePort<AchievementGroupDomain, Integer> {
+    List<AchievementGroupDomain> getKnowledgeAchievementBySubjectId(Integer subjectId,Integer groupId,Integer periodId);
+
+    List<AchievementGroupDomain> getKnowledgeAchievementListByPeriodAndGroupId(Integer periodId,Integer groupId);
+
+    List<AchievementGroupDomain> getAllBySubjectKnowledgeId(Integer subjectKnowledgeId);
+
 }

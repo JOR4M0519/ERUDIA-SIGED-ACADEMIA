@@ -5,6 +5,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.LinkedHashSet;
+import java.util.Objects;
+import java.util.Set;
+
 @Data
 @Entity
 @Builder
@@ -49,6 +53,26 @@ public class User {
     @Size(max = 256)
     @Column(name = "uuid", length = 256)
     private String uuid;
+    @Size(max = 2)
+    @NotNull
+    @Column(name = "promotion_status", length = 2)
+    private String promotionStatus;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    private Set<UserRole> userRoles = new LinkedHashSet<>();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return Objects.equals(id, user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
     /*@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

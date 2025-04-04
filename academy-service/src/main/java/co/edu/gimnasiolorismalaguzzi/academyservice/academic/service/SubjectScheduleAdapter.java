@@ -53,7 +53,7 @@ public class SubjectScheduleAdapter implements PersistenceSubjectSchedulePort {
         try{
             Optional<SubjectSchedule> existingSchedule = subjectScheduleCrudRepo.findById(integer);
             if(existingSchedule.isPresent()){
-                existingSchedule.get().setSubject(subjectScheduleDomain.getSubject());
+                existingSchedule.get().setSubjectGroup(subjectScheduleMapper.toEntity(subjectScheduleDomain).getSubjectGroup());
                 existingSchedule.get().setDayOfWeek(subjectScheduleDomain.getDayOfWeek());
                 existingSchedule.get().setStartTime(subjectScheduleDomain.getStartTime());
                 existingSchedule.get().setEndTime(subjectScheduleDomain.getEndTime());
@@ -77,5 +77,10 @@ public class SubjectScheduleAdapter implements PersistenceSubjectSchedulePort {
         } catch (Exception e){
             throw new AppException("Internal Error! ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    @Override
+    public List<SubjectScheduleDomain> getScheduleByGroupStudentId(Integer id) {
+        return this.subjectScheduleMapper.toDomains(subjectScheduleCrudRepo.findBySubjectGroup_Groups_Id(id));
     }
 }
