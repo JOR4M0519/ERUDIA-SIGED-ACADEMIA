@@ -9,7 +9,7 @@ CREATE TABLE users (
                        id int primary key generated always as identity,
                        username VARCHAR(30) NOT NULL UNIQUE,
                        email VARCHAR(256) NOT NULL UNIQUE,
-                       password VARCHAR(256) NOT NULL,
+                       password VARCHAR(256) ,
                        first_name VARCHAR(40),
                        last_name VARCHAR(40),
                        uuid VARCHAR(256),
@@ -234,7 +234,7 @@ CREATE TABLE activity (
 CREATE TABLE activity_group(
                                id int primary key generated always as identity,
                                activity_id INT NOT NULL REFERENCES activity(id),
-                               group_id INT NOT NULL REFERENCES group_students(id),
+                               group_id INT NOT NULL REFERENCES groups(id),
                                start_date DATE NOT NULL,
                                end_date DATE
 );

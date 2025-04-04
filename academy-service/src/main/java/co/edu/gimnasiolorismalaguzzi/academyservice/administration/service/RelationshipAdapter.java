@@ -4,8 +4,11 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.Relati
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relationship;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.RelationshipMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.repository.RelationshipCrudRepo;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceFamilyPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceRelationshipPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.DimensionDomain;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +27,13 @@ public class RelationshipAdapter implements PersistenceRelationshipPort {
     @Autowired
     private final RelationshipMapper relationshipMapper;
 
-    public RelationshipAdapter(RelationshipCrudRepo relationshipCrudRepo, RelationshipMapper relationshipMapper) {
+    @Autowired
+    private final PersistenceFamilyPort persistenceFamilyPort;
+
+    public RelationshipAdapter(RelationshipCrudRepo relationshipCrudRepo, RelationshipMapper relationshipMapper, PersistenceFamilyPort persistenceFamilyPort) {
         this.relationshipCrudRepo = relationshipCrudRepo;
         this.relationshipMapper = relationshipMapper;
+        this.persistenceFamilyPort = persistenceFamilyPort;
     }
 
     @Override
@@ -60,6 +67,25 @@ public class RelationshipAdapter implements PersistenceRelationshipPort {
 
     @Override
     public HttpStatus delete(Integer integer) {
-        return null;
+
+        RelationshipDomain relationship = findById(integer);
+
+        // Verificar si existe la dimension
+        if (relationship.equals(null)) {
+            throw new AppException("La dimension no existe", HttpStatus.NOT_FOUND);
+        }
+
+        // Verificar si el saber está siendo utilizado
+        boolean usedInFamilyRelations = !persistenceFamilyPort.findAllByRelationType(integer).isEmpty();
+
+        // Si está siendo utilizado, lanzar excepción
+        if (usedInFamilyRelations) {
+            throw new AppException(
+                    "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
+                    HttpStatus.CONFLICT);
+        }
+
+        relationshipCrudRepo.deleteById(integer);
+        return HttpStatus.OK;
     }
 }

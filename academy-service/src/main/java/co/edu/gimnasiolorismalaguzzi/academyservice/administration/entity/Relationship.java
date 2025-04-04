@@ -11,7 +11,7 @@ import lombok.Setter;
 @Table(name = "relationship")
 public class Relationship {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private Integer id;
 

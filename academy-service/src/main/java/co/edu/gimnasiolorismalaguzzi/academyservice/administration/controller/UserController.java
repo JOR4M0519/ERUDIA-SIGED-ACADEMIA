@@ -49,7 +49,11 @@ public class UserController {
     }
 
 
-
+    @GetMapping("/family")
+    public ResponseEntity<List<UserFamilyRelationDomain>> getAllUsersWithFamily() {
+        List<UserFamilyRelationDomain> users = persistenceFamilyPort.findAllWithRelatives();
+        return ResponseEntity.ok(users);
+    }
 
     @GetMapping("/family/{id}")
     public ResponseEntity<List<FamilyDomain>> findRelatives(@PathVariable Integer id){
@@ -91,7 +95,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{id}/all")
     public ResponseEntity<?> patchGeneralUser(@PathVariable Integer id,
                                               @RequestBody(required = false) UserRegistrationDomain registrationDomain) {
         // Validate input parameters

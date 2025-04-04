@@ -14,6 +14,7 @@ public class Login implements Serializable {
     private String firstName;
     private String lastName;
     private String password;
+    private String lastPassword;
     private Set<String> roles;
     private String status;
 
