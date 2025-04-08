@@ -144,8 +144,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
             Integer studentId = familyDomain.getUser().getId();
             Integer relativeId = familyDomain.getRelativeUser().getId();
 
-            boolean isStudentValid =  userDetailPort.hasStudentRole(relativeId); // El familiar no debería tener rol de estudiante
-            boolean isRelativeValid =  userDetailPort.hasStudentRole(studentId);
+            boolean isStudentValid =  userDetailPort.hasStudentRole(studentId); // El familiar no debería tener rol de estudiante
+            boolean isRelativeValid =  userDetailPort.hasStudentRole(relativeId);
 
             if (!isStudentValid) {
                 throw new AppException("El usuario con ID " + studentId + " no tiene rol de estudiante", HttpStatus.BAD_REQUEST);

@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
@@ -13,7 +14,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.util.ArrayList;
@@ -29,9 +29,13 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
 
     private GroupStudentsMapper groupStudentsMapper;
 
-    public GroupStudentsAdapter(GroupStudentsCrudRepo groupStudentsCrudRepo, GroupStudentsMapper groupStudentsMapper) {
+
+    private final PersistenceUserDetailPort persistenceUserDetailPort;
+
+    public GroupStudentsAdapter(GroupStudentsCrudRepo groupStudentsCrudRepo, GroupStudentsMapper groupStudentsMapper, PersistenceUserDetailPort persistenceUserDetailPort) {
         this.groupStudentsCrudRepo = groupStudentsCrudRepo;
         this.groupStudentsMapper = groupStudentsMapper;
+        this.persistenceUserDetailPort = persistenceUserDetailPort;
     }
 
     // Añadir este método a GroupStudentsAdapter.java
@@ -53,6 +57,12 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
         Optional<GroupStudent> groupStudent = groupStudentsCrudRepo.findById(integer);
         return groupStudent.map(groupStudentsMapper::toDomain).orElse(null);
     }
+
+    @Override
+    public List<GroupStudentsDomain> findByStudentId(Integer studentId) {
+        return this.groupStudentsMapper.toDomains(groupStudentsCrudRepo.findByStudent_Id(studentId));
+    }
+
 
     @Override
     public List<GroupStudentsDomain> getGroupsStudentById(int id,String status) {
@@ -88,6 +98,7 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
             if(existingGroupStudent.isPresent()){
                 existingGroupStudent.get().setGroup(groupStudentsMapper.toEntity(domain).getGroup());
                 existingGroupStudent.get().setStudent(groupStudentsMapper.toEntity(domain).getStudent());
+                existingGroupStudent.get().setStatus(groupStudentsMapper.toEntity(domain).getStatus());
             }
             return groupStudentsMapper.toDomain(groupStudentsCrudRepo.save(existingGroupStudent.get()));
         } catch (EntityNotFoundException e){
@@ -109,10 +120,20 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
                 boolean existingAssignment = groupStudentsCrudRepo
                         .existsByStudent_IdAndGroup_Id(studentId, promotionDTO.getTargetGroupId());
 
+                boolean isActiveToPromotion = persistenceUserDetailPort
+                        .findByUser_Id(studentId).getUser().getPromotionStatus().equals("A");
+
                 if (existingAssignment) {
-                    log.warn("Student {} already assigned to target group {}",
+                    log.warn("Student "+studentId +" already assigned to target group "+promotionDTO.getTargetGroupId(),
                             studentId, promotionDTO.getTargetGroupId());
-                    continue;
+                    throw new AppException("El estudiante "+studentId +" ya se encuentra registrado en el grupo "+promotionDTO.getTargetGroupId()
+                            ,HttpStatus.CONFLICT);
+                }
+                if (!isActiveToPromotion) {
+                    log.warn("Student "+studentId +" already assigned to target group "+promotionDTO.getTargetGroupId(),
+                            studentId, promotionDTO.getTargetGroupId());
+                    throw new AppException("El estudiante "+studentId +" no se encuentra activo para promover"
+                            ,HttpStatus.UPGRADE_REQUIRED);
                 }
 
                 // 2. Crear nueva asignación de grupo
@@ -127,8 +148,18 @@ public class GroupStudentsAdapter implements PersistenceGroupStudentPort {
                         .id(promotionDTO.getTargetGroupId())
                         .build();
                 newAssignment.setGroup(targetGroup);
+                newAssignment.setStatus("A");
 
                 // 3. Guardar la nueva asignación
+                 List<GroupStudentsDomain> groupStudents =  findByStudentId(studentId);
+
+                 for (GroupStudentsDomain group: groupStudents){
+                     group.setStatus("I");
+                     update(group.getId(),group);
+
+                 }
+
+                // 4. Guardar la nueva asignación
                 GroupStudentsDomain savedAssignment = save(newAssignment);
 
                 if (savedAssignment != null) {

@@ -69,7 +69,7 @@ public class AttendanceController {
 
     @PutMapping("/batch")
     public ResponseEntity<List<AttendanceDomain>> updateAttendances(@RequestBody List<AttendanceDomain> attendances) {
-        List<AttendanceDomain> updatedAttendances = attendancePort.updateAll(attendances);
+       List<AttendanceDomain> updatedAttendances = attendancePort.updateAll(attendances);
         return ResponseEntity.ok(updatedAttendances);
     }
 
