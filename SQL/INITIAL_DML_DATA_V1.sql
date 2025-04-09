@@ -334,7 +334,7 @@ FROM academic_period ap
 WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- Inicia antes o durante el año
   AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')    -- Termina después o durante el año
   AND ap.status IN ('A', 'F')
-ORDER BY ap.start_date DESC;
+ORDER BY ap.start_date ASC;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -354,7 +354,8 @@ RETURN QUERY
 SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
 FROM academic_period ap
 WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  --  Inicia antes o durante el año
-  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD');  --  Termina después o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')  --  Termina después o durante el año
+ORDER BY ap.start_date ASC;
 END;
 $$ LANGUAGE plpgsql;
 

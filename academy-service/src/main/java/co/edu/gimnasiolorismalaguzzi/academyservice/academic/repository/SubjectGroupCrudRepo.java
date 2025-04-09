@@ -72,5 +72,7 @@ WHERE s.id = :subjectId
     List<SubjectGroup> findByAcademicPeriod_IdAndSubjectProfessor_Id(Integer id, Integer id1);
 
     List<SubjectGroup> findByAcademicPeriod_IdAndSubjectProfessor_Subject_Id(Integer id, Integer id1);
+
+    List<SubjectGroup> findBySubjectProfessor_Id(Integer id);
 }
 

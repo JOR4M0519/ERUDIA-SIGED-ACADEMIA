@@ -152,17 +152,22 @@ public class SubjectAdapter implements PersistenceSubjectPort {
         }
     }
 
+
     @Override
-    public HttpStatus delete(Integer integer) {
-        try{
-            if (this.subjectCrudRepo.existsById(integer)) {
-                subjectCrudRepo.updateStatusById("I", integer);
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("Subject doesnt exist", HttpStatus.NOT_FOUND);
-            }
-        } catch(Exception e){
-            throw new AppException("INTERN ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
+    public HttpStatus delete(Integer id) {
+
+        SubjectDomain subjectDomain = findById(id);
+
+        // Verificar si existe la dimension
+        if (subjectDomain.equals(null)) {
+            throw new AppException("La dimension no existe", HttpStatus.NOT_FOUND);
+        }
+
+        try {
+            subjectCrudRepo.deleteById(id);
+            return HttpStatus.OK;
+        }catch (Exception e){
+            throw new AppException("Se tuvo un error al eliminar la relación", HttpStatus.CONFLICT);
         }
     }
 }

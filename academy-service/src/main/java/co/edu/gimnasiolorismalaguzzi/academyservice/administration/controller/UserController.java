@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<UserDetailDomain> getUserById(@PathVariable Integer id) {
-        UserDetailDomain user = persistenceUserDetailPort.findById(id);
+        UserDetailDomain user = persistenceUserDetailPort.findByUser_Id(id);
         return ResponseEntity.ok(user);
     }
 

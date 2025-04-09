@@ -87,13 +87,14 @@ public class GroupsAdapter implements PersistenceGroupsPort {
     public HttpStatus delete(Integer id) {
         try {
             if(this.groupsCrudRepo.existsById(id)){
-                groupsCrudRepo.updateStatusById("I",id); //I de inactivo
+                groupsCrudRepo.deleteById(id);
                 return HttpStatus.OK;
             } else {
                 throw new AppException("Group ID doesnt exist!", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            throw new AppException("Internal Error", HttpStatus.INTERNAL_SERVER_ERROR);
+            groupsCrudRepo.updateStatusById("I",id); //I de inactivo
+            throw new AppException("Internal Error", HttpStatus.CONFLICT);
         }
     }
 

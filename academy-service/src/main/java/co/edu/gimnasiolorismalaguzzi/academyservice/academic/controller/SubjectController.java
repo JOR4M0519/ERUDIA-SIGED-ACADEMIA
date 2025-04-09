@@ -6,6 +6,8 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectProf
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectProfessorPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -63,6 +65,24 @@ public class SubjectController {
         return ResponseEntity.ok(subjectProfessorDomainList);
     }
 
+    @DeleteMapping("/professors/{id}")
+    public ResponseEntity<?> deleteSubjectsProfessors(@PathVariable Integer id) {
+        try {
+            subjectProfessorPort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<SubjectDomain> updateSubject(@PathVariable Integer id, @RequestBody SubjectDomain SubjectDomain) {
         SubjectDomain updatedSubject = subjectServicePort.update(id, SubjectDomain);
@@ -70,8 +90,20 @@ public class SubjectController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSubject(@PathVariable Integer id) {
-        subjectServicePort.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteSubject(@PathVariable Integer id) {
+        try {
+            subjectServicePort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
     }
 }

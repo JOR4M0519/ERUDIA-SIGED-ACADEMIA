@@ -271,11 +271,11 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
         try {
             // Primero buscamos si el usuario es un estudiante y tiene familiares asociados
-            List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userDetailPort.findById(userId).getUser().getId());
+            List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userId);
             relativesOfStudent.forEach(relation -> uniqueFamilyRelations.put(relation.getId(), relation));
 
             // Luego buscamos si el usuario es un familiar y está asociado a estudiantes
-            List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userDetailPort.findById(userId).getUser().getId());
+            List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userId);
             studentsOfRelative.forEach(relation -> uniqueFamilyRelations.put(relation.getId(), relation));
 
             // Si encontramos que el usuario es un familiar con estudiantes asociados,

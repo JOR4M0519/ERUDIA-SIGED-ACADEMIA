@@ -1,20 +1,10 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectProfessorDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectScheduleDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGroup;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectProfessor;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectGroupMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectProfessorMapper;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectScheduleMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGroupCrudRepo;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectProfessorCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGroupPort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectSchedulePort;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
@@ -51,6 +41,10 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findAll());
     }
 
+    @Override
+    public List<SubjectGroupDomain> findAllBySubjectProfessor(Integer subjectProfessorId) {
+        return this.subjectGroupMapper.toDomains(subjectGroupCrudRepo.findBySubjectProfessor_Id(subjectProfessorId));
+    }
 
     @Override
     public List<SubjectGroupDomain> getAllSubjectGroupsByStudentId(Integer studentId, String year) {

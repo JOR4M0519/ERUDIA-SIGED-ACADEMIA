@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicYearPercentageDTO;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistencePort;
 
 import java.util.List;
@@ -12,4 +13,7 @@ public interface PersistenceAcademicPeriodPort extends PersistencePort<AcademicP
     List<AcademicPeriodDomain> getPeriodsBySettingsAndYear(Integer settingId, String year);
 
     List<AcademicPeriodDomain> getActivePeriodsByYear(String year);
+
+    List<AcademicYearPercentageDTO> getAcademicYearsWithPercentages();
+    Boolean verifyYearPercentages(Integer year);
 }

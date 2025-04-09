@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.RepeatingStudentsGroupReportDomain;
@@ -54,9 +55,21 @@ public class GroupsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGroupStudent(@PathVariable Integer id) {
-        persistenceGroupsPort.delete(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteGroupStudent(@PathVariable Integer id) {
+        try {
+            persistenceGroupsPort.delete(id);
+            return ResponseEntity.noContent().build();
+        } catch (AppException e) {
+            if (e.getCode() == HttpStatus.CONFLICT) {
+                return ResponseEntity.status(HttpStatus.CONFLICT)
+                        .body(e.getMessage());
+            } else if (e.getCode() == HttpStatus.NOT_FOUND) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(e.getMessage());
+            }
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la solicitud");
+        }
     }
 
     @GetMapping("/students/attendance")

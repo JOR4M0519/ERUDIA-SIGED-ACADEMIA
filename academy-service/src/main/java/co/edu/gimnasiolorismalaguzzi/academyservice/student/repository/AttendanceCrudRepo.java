@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,9 @@ public interface AttendanceCrudRepo extends JpaRepository<Attendance, Integer> {
 
     @Override
     Optional<Attendance> findById(Integer id);
+
+    // Método para verificar asistencias duplicadas
+    @Query("SELECT COUNT(a) > 0 FROM Attendance a WHERE a.student.id = ?1 AND a.schedule.id = ?2 AND a.attendanceDate = ?3")
+    boolean existsByStudentIdAndScheduleIdAndAttendanceDate(Integer studentId, Integer scheduleId, LocalDate attendanceDate);
 }
+
