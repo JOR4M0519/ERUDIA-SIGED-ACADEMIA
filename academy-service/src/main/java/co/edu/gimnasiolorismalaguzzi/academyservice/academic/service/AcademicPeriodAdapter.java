@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicYearPercentageDTO;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
@@ -123,16 +124,20 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     }
 
     @Override
-    public HttpStatus delete(Integer integer) {
+    public HttpStatus delete(Integer id) {
+
+        AcademicPeriodDomain academicPeriodDomain = findById(id);
+
+        // Verificar si existe la dimension
+        if (academicPeriodDomain.equals(null)) {
+            throw new AppException("El periodo no existe", HttpStatus.NOT_FOUND);
+        }
+
         try {
-            if(this.academicPeriodCrudRepo.existsById(integer)){
-                academicPeriodCrudRepo.updateStatusById("I", integer);
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("Period ID doesnt exist!", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e){
-            throw new AppException("Intern Error!", HttpStatus.INTERNAL_SERVER_ERROR);
+            academicPeriodCrudRepo.deleteById(id);
+            return HttpStatus.OK;
+        }catch (Exception e){
+            throw new AppException("Se tuvo un error al eliminar la relación", HttpStatus.CONFLICT);
         }
     }
 

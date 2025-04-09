@@ -52,7 +52,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
                     continue;
                 }
 
-                Integer userId = userDetail.getId();
+                //Integer userId = userDetail.getId();
+                Integer userId = userDetail.getUser().getId();
                 boolean isStudent = false;
 
                 // Verificar si el usuario tiene roles
