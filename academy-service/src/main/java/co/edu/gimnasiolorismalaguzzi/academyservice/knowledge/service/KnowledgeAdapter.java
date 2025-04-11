@@ -95,14 +95,16 @@ public class KnowledgeAdapter implements PersistenceKnowledgePort {
 
         // Si está siendo utilizado, lanzar excepción
         if (usedInAchievements) {
+            knowledge.setStatus("I");
+            // Si no está siendo utilizado, actualizar el estado a inactivo
+            updateStatusById(id, knowledge);
             throw new AppException(
-                    "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
+                    "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones, se inactiva...",
                     HttpStatus.CONFLICT);
         }
 
-        knowledge.setStatus("I");
-        // Si no está siendo utilizado, actualizar el estado a inactivo
-        updateStatusById(id, knowledge);
+        knowledgeCrudRepo.deleteById(id);
+
         return HttpStatus.OK;
     }
 

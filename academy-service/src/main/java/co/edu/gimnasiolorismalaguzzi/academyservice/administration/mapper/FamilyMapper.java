@@ -13,8 +13,8 @@ import java.util.List;
 public interface FamilyMapper {
     @Mappings({
             @Mapping(source = "id", target = "id"),
-            @Mapping(source = "student", target = "relativeUser"),
-            @Mapping(source = "user", target = "user"),
+            @Mapping(source = "student", target = "user"),
+            @Mapping(source = "user", target = "relativeUser"),
             @Mapping(source = "relationship", target = "relationship")
     })
     FamilyDomain toDomain (Family family);
