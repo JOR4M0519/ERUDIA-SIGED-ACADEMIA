@@ -1,10 +1,12 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGroupDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectScheduleDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.entity.SubjectGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectGroupMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectGroupCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGroupPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectSchedulePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
@@ -23,6 +25,7 @@ import java.util.Optional;
 @PersistenceAdapter
 public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
 
+    private final PersistenceSubjectSchedulePort subjectSchedulePort;
     private final SubjectGroupMapper subjectGroupMapper;
 
     private final PersistenceGroupStudentPort groupStudentPort;
@@ -31,7 +34,8 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     private SubjectGroupCrudRepo subjectGroupCrudRepo;
 
 
-    public SubjectGroupPortAdapter(SubjectGroupMapper subjectGroupMapper, PersistenceGroupStudentPort groupStudentPort) {
+    public SubjectGroupPortAdapter(PersistenceSubjectSchedulePort subjectSchedulePort, SubjectGroupMapper subjectGroupMapper, PersistenceGroupStudentPort groupStudentPort) {
+        this.subjectSchedulePort = subjectSchedulePort;
         this.subjectGroupMapper = subjectGroupMapper;
         this.groupStudentPort = groupStudentPort;
     }
@@ -87,7 +91,7 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     }
 
     @Override
-    public List<GroupStudentsDomain> getGroupsStudentsByPeriodIdAndSubjectId(Integer periodId, Integer subjectId) {
+    public List<GroupStudentsDomain> getGroupsStudentsByPeriodIdAndSubjectProfessorId(Integer periodId, Integer subjectId) {
         List<SubjectGroupDomain> subjectGroupDomainList = subjectGroupMapper.toDomains(
                 subjectGroupCrudRepo.findByAcademicPeriod_IdAndSubjectProfessor_Subject_Id(periodId,subjectId)
         );
@@ -98,12 +102,24 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
                 subjectGroupDomainList.getFirst().getGroups().getId(), STATUS_NOT_LIKE));
     }
 
+    @Override
+    public List<GroupStudentsDomain> getGroupsStudentsByPeriodIdAndSubjectProfessorIdAndGroupId(
+            Integer periodId, Integer subjectId,Integer groupId) {
+        SubjectGroupDomain subjectGroupDomainList = subjectGroupMapper.toDomain(
+                subjectGroupCrudRepo.findByAcademicPeriod_IdAndSubjectProfessor_IdAndGroups_Id(periodId,subjectId,groupId)
+        );
+
+        String STATUS_NOT_LIKE = "I";
+
+        return new ArrayList<>(groupStudentPort.getGroupsStudentByGroupId(
+                subjectGroupDomainList.getGroups().getId(), STATUS_NOT_LIKE));
+    }
+
 
     @Override
     public List<SubjectGroupDomain> getSubjectsByGroupIdAndPeriodId(Integer groupId, Integer periodId) {
         return this.subjectGroupMapper.toDomains(subjectGroupCrudRepo.findByGroups_IdAndAcademicPeriod_Id(groupId,periodId));
     }
-
 
 
     @Override
@@ -120,13 +136,14 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
             SubjectGroup subjectGroup = subjectGroupMapper.toEntity(domain);
             SubjectGroup savedSubjectGroup = subjectGroupCrudRepo.save(subjectGroup);
 
-            /*// Create a minimal SubjectSchedule with just the SubjectGroup foreign key
+            // Create a minimal SubjectSchedule with just the SubjectGroup foreign key
             SubjectScheduleDomain subjectScheduleDomain = SubjectScheduleDomain.builder()
                     .subjectGroup(subjectGroupMapper.toDomain(savedSubjectGroup))
+                    .status("A")
                     .build();
 
             // Save the schedule record
-            subjectSchedulePort.save(subjectScheduleDomain);*/
+            subjectSchedulePort.save(subjectScheduleDomain);
 
             return this.subjectGroupMapper.toDomain(savedSubjectGroup);
         } catch (Exception e) {

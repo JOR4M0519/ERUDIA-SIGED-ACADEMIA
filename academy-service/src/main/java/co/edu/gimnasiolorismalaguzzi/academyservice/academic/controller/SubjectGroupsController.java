@@ -121,11 +121,24 @@ public class SubjectGroupsController {
     public ResponseEntity<?> getGroupsStudentsByPeriodIdAndSubjectId(
             @PathVariable Integer periodId,
             @PathVariable Integer subjectId){
-        List<GroupStudentsDomain> subjectGroupDomainList= subjectGroupPort.getGroupsStudentsByPeriodIdAndSubjectId(
+        List<GroupStudentsDomain> subjectGroupDomainList= subjectGroupPort.getGroupsStudentsByPeriodIdAndSubjectProfessorId(
                 periodId,subjectId
         );
         return ResponseEntity.ok(subjectGroupDomainList);
     }
+
+    @GetMapping("/periods/{periodId}/subjects/{subjectId}/groups/{groupId}")
+    public ResponseEntity<?> getGroupsStudentsByPeriodIdAndSubjectId(
+            @PathVariable Integer periodId,
+            @PathVariable Integer subjectId,
+            @PathVariable Integer groupId){
+        List<GroupStudentsDomain> subjectGroupDomainList=
+                subjectGroupPort.getGroupsStudentsByPeriodIdAndSubjectProfessorIdAndGroupId(
+                        periodId,subjectId,groupId
+                );
+        return ResponseEntity.ok(subjectGroupDomainList);
+    }
+
 
     @PostMapping
     public ResponseEntity<SubjectGroupDomain> createSubjectGroup(@RequestBody SubjectGroupDomain subjectGroupDomain){
