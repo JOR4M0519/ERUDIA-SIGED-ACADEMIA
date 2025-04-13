@@ -139,6 +139,7 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
             // Create a minimal SubjectSchedule with just the SubjectGroup foreign key
             SubjectScheduleDomain subjectScheduleDomain = SubjectScheduleDomain.builder()
                     .subjectGroup(subjectGroupMapper.toDomain(savedSubjectGroup))
+                    .dayOfWeek("")
                     .status("A")
                     .build();
 
