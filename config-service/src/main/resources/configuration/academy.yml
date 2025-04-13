@@ -3,9 +3,12 @@ spring:
     name: academy
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/test_academy
-    username: postgres
-    password: root
+    url: jdbc:postgresql://34.72.214.106:5432/academy
+    username: apiclient-erudia
+    password: postgres
+    #url: jdbc:postgresql://localhost:5432/test_academy
+    #username: postgres
+    #password: root
   jpa:
     show-sql: false
     hibernate:

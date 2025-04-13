@@ -54,8 +54,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8181/realms/academy-glm-realm
-          jwk-set-uri: http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs
+          issuer-uri: http://35.198.2.89:8181/realms/academy-glm-realm
+          jwk-set-uri: http://35.198.2.89:8181/realms/academy-glm-realm/protocol/openid-connect/certs
+          #issuer-uri: http://localhost:8181/realms/academy-glm-realm
+          #jwk-set-uri: http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs
 
 jwt.auth.converter.resource-id: spring-cloud-client
 jwt.auth.converter.principle-attribute: sub
