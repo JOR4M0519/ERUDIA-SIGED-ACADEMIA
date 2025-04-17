@@ -33,6 +33,13 @@ public class SubjectKnowledgeController {
         return ResponseEntity.ok(SubjectKnowledgeDomains);
     }
 
+    @GetMapping("/subjects/{subjectId}/groups/{groupId}")
+    public ResponseEntity<?> getAllKnowledgeBySubjectId(@PathVariable Integer subjectId,@PathVariable Integer groupId){
+        List<SubjectKnowledgeDomain> SubjectKnowledgeDomains =
+                subjectKnowledgePort.getAllSubjectKnowledgeBySubjectIdAndGroupId(subjectId,groupId);
+        return ResponseEntity.ok(SubjectKnowledgeDomains);
+    }
+
     @GetMapping("/subjects/{subjectId}")
     public ResponseEntity<?> getAllKnowledgeBySubjectId(@PathVariable Integer subjectId){
         List<SubjectKnowledgeDomain> SubjectKnowledgeDomains =

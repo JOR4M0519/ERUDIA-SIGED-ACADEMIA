@@ -1,19 +1,28 @@
-package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain;
+package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity;
 
+
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+
+
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 @Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class GradeReport {
+@Entity
+@Table(name = "v_academic_report")
+public class GradeReportView {
     @Id
     @Column(name = "grade_id")
     private Long gradeId;
@@ -23,6 +32,12 @@ public class GradeReport {
 
     @Column(name = "student_name")
     private String studentName;
+
+    @Column(name = "document_number")
+    private String documentNumber;
+
+    @Column(name = "document_type")
+    private String documentType;
 
     @Column(name = "subject_id")
     private Long subjectId;
@@ -35,6 +50,9 @@ public class GradeReport {
 
     @Column(name = "period_name")
     private String periodName;
+
+    @Column(name = "academic_year")
+    private String academicYear;
 
     @Column(name = "total_score")
     private BigDecimal totalScore;
@@ -71,4 +89,24 @@ public class GradeReport {
 
     @Column(name = "achievement")
     private String achievement;
+
+    @Column(name = "score")
+    private BigDecimal score;
+
+    @Column(name = "definitiva_score")
+    private BigDecimal definitivaScore;
+
+    @Column(name = "period_number")
+    private Integer periodNumber;
+
+    @Column(name = "teacher_name")
+    private String teacherName;
+
+    @Column(name = "inasistencias")
+    private Integer inasistencias;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data", columnDefinition = "jsonb")
+    private  List<Map<String, Object>> periodScores;
 }
+

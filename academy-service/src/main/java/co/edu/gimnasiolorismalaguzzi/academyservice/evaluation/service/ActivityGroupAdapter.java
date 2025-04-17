@@ -95,7 +95,8 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
     @Override
     public List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike) {
-        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_IdAndActivity_StatusNotLike(periodId,subjectId,groupId,statusNotLike));
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.
+                findActivityGroupsByFilters(periodId,subjectId,groupId,statusNotLike));
     }
 
 
