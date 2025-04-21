@@ -96,6 +96,41 @@ public class SecurityConfig {
         return http.build(); // Construye y devuelve la cadena de filtros de seguridad
     }
 
+
+/*
+    @Bean
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        http
+                // Deshabilita la protección contra ataques CSRF
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+
+                // Configuración de autorizaciones para intercambios HTTP
+                .authorizeExchange(exchange -> exchange
+                        .pathMatchers("/api/gtw/public/**").permitAll() // Permitir acceso sin autenticación a rutas de login
+                        //.pathMatchers("/eureka/**").authenticated() // Requiere autenticación para rutas de eureka
+                        .anyExchange().authenticated() // Requiere autenticación para cualquier otra ruta
+                )
+
+                // Configuración de CORS (Cross-Origin Resource Sharing)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                // Agrega un filtro personalizado para manejar claims de JWT
+                .addFilterAt(jwtClaimsFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+
+                // Configuración del servidor OAuth2 como recurso para validar JWT
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(reactiveJwtAuthenticationConverter())) // Convierte JWT a autenticación reactiva
+                );
+
+        // Si necesitas mantener la autenticación básica HTTP, usa el patrón Customizer:
+        // http.httpBasic(Customizer.withDefaults());
+
+        // O si no necesitas autenticación básica HTTP, simplemente omite esta línea
+
+        return http.build(); // Construye y devuelve la cadena de filtros de seguridad
+    }
+*/
+
     /**
      * Configuración de CORS (Cross-Origin Resource Sharing).
      * Permite solicitudes desde un origen específico y define las políticas de seguridad para CORS.

@@ -6,10 +6,13 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMa
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGradeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.ActivityGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGrade;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.entity.ActivityGroup;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.mapper.ActivityGradeMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.repository.ActivityGradeCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistanceActivityGradePort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityGroupPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceActivityPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceAchievementGroups;
@@ -37,6 +40,10 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     private PersistenceActivityPort activityPort;
 
     @Autowired
+    private PersistenceActivityGroupPort activityGroupPort;
+
+
+    @Autowired
     private PersistenceAcademicPeriodPort academicPeriodPort;
 
     @Autowired
@@ -52,8 +59,8 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
     private UserMapper userMapper;
 
 
-    public ActivityGradeAdapter(ActivityGradeCrudRepo activityGradeCrudRepo, ActivityGradeMapper gradeMapper){
-        this.activityGradeMapper = gradeMapper;
+    public ActivityGradeAdapter(ActivityGradeCrudRepo activityGradeCrudRepo, ActivityGradeMapper activityGradeMapper){
+        this.activityGradeMapper = activityGradeMapper;
         this.activityGradeCrudRepo = activityGradeCrudRepo;
     }
 
@@ -81,12 +88,25 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
         try{
             Optional<ActivityGrade> existingActivityGrade = activityGradeCrudRepo.findById(integer);
             ActivityGrade activityGrade = activityGradeMapper.toEntity(entity);
+            if (existingActivityGrade.isPresent()) {
+                ActivityGrade gradeToUpdate = existingActivityGrade.get();
 
-            if(existingActivityGrade.isPresent()){
-                existingActivityGrade.get().setStudent(userMapper.toEntity(entity.getStudent()));
-                existingActivityGrade.get().setActivity(activityGrade.getActivity());
-                existingActivityGrade.get().setScore(entity.getScore());
-                existingActivityGrade.get().setComment(entity.getComment());
+                // Mapear y asignar el estudiante
+                gradeToUpdate.setStudent(userMapper.toEntity(entity.getStudent()));
+
+                // Buscar el ActivityGroup usando los IDs de Activity y Group
+                ActivityGroup activityGroup = activityGroupPort.findByActivity_IdAndGroup_Id(
+                        entity.getActivity().getActivity().getId(),
+                        entity.getActivity().getGroup().getId()
+                ).orElseThrow(() -> new EntityNotFoundException("ActivityGroup not found for activityId "
+                        + entity.getActivity().getActivity().getId()
+                        + " and groupId "
+                        + entity.getActivity().getGroup().getId()));
+
+                // Asignar el ActivityGroup al grade
+                gradeToUpdate.setActivity(activityGroup);
+                gradeToUpdate.setScore(entity.getScore());
+                gradeToUpdate.setComment(entity.getComment());
             }
 
             ActivityGradeDomain updatedGrade = activityGradeMapper.toDomain(activityGradeCrudRepo.save(existingActivityGrade.get()));
@@ -97,9 +117,11 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
             Integer studentId = updatedGrade.getStudent().getId();
 
             //Se toma el id del grupo de estudiantes
-            Integer groupId = groupStudentsPort.getGroupsStudentById(entity.getStudent().getId(),"A")
-                    .get(0).getGroup().getId();
+            Integer groupId = entity.getActivity().getGroup().getId();
 
+            /*        groupStudentsPort.getGroupsStudentById(entity.getStudent().getId(),"A")
+                    .get(0).getGroup().getId();
+*/
             //Se toma el id del academicPeriod
             Integer academicPeriodId = academicPeriodPort.getAllPeriodsByStatus("A")
                     .get(0).getId();
@@ -168,7 +190,7 @@ public class ActivityGradeAdapter implements PersistanceActivityGradePort {
 
 
             return updatedGrade;
-            } catch (EntityNotFoundException e){
+        } catch (EntityNotFoundException e){
             throw new EntityNotFoundException("Relation Activity Grade with ID " + integer + " Not found!");
         }
     }

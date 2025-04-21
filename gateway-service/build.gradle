@@ -17,9 +17,14 @@ repositories {
 	mavenCentral()
 }
 
+// Configuración de Spring Cloud
+ext {
+	set('springCloudVersion', "2023.0.3")
+}
+
 dependencyManagement {
 	imports {
-		mavenBom 'org.springframework.cloud:spring-cloud-dependencies:2023.0.3'
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
 	}
 }
 
@@ -32,10 +37,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-json'
 
 	implementation 'org.projectlombok:lombok'
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' // 🔥 Feign Client
-	implementation 'com.fasterxml.jackson.core:jackson-databind' // 🔥 Jackson para convertir JSON
-	implementation 'io.github.openfeign:feign-core' // 🔥 Core de Feign
-	implementation 'io.github.openfeign:feign-jackson' // 🔥 Jackson para Feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign' // Feign Client
+	implementation 'com.fasterxml.jackson.core:jackson-databind' // Jackson para convertir JSON
+	implementation 'io.github.openfeign:feign-core' //  Core de Feign
+	implementation 'io.github.openfeign:feign-jackson' // Jackson para Feign
 
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'jakarta.servlet:jakarta.servlet-api:5.0.0'

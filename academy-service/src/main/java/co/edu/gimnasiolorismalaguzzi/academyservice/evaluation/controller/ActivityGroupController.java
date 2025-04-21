@@ -40,7 +40,7 @@ public class ActivityGroupController {
     }
 
     /**
-     * Las actividades de una materia, por el periodo de un grupo de estudiantes (Activas y finalizadas) para los profesores
+     * Las actividades de una materia, por el periodo de un grupo de estudiantes P (Activas y finalizadas) para los profesores
      * @param subjectId
      * @param periodId
      * @param

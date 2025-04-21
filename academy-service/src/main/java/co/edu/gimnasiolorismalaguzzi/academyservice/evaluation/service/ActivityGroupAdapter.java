@@ -89,7 +89,7 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
         }
 
         return activityGroupDomainListFinal;
-       // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
+        // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
     }
 
     @Override
@@ -110,6 +110,12 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
     public ActivityGroupDomain getRangeDateActivityByActivityId(Integer activityId) {
         Optional<ActivityGroup> activityGroup = Optional.ofNullable(activityGroupCrudRepo.findFirstByActivity_Id(activityId));
         return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
+    }
+
+    @Override
+    public Optional<ActivityGroup> findByActivity_IdAndGroup_Id(Integer activityId, Integer groupId) {
+        Optional<ActivityGroup> activityGroup = activityGroupCrudRepo.findByActivity_IdAndGroup_Id(activityId, groupId);
+        return activityGroup;
     }
 
 }
