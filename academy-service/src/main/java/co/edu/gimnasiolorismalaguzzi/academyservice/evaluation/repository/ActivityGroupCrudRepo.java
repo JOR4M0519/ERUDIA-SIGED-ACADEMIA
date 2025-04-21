@@ -24,6 +24,7 @@ public interface ActivityGroupCrudRepo extends JpaRepository<ActivityGroup, Inte
             "WHERE ag.period_id = :periodId " +
             "AND sp.id = :subjectProfessorId " +
             "AND ag.group_id = :groupId " +
+            "AND ag.group_id = sg.group_students"+
             "AND act.status != :status " +
             "AND s.id = s2.id", nativeQuery = true)
     List<ActivityGroup> findActivityGroupsByFilters(
