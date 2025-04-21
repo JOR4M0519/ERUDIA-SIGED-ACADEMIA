@@ -41,16 +41,16 @@ public class ActivityGroupController {
 
     /**
      * Las actividades de una materia, por el periodo de un grupo de estudiantes P (Activas y finalizadas) para los profesores
-     * @param subjectId
+     * @param subjectProfessorId
      * @param periodId
      * @param
      * @return Lista de actividades
      */
-    @GetMapping("/periods/{periodId}/subjects/{subjectId}/groups/{groupId}")
-    public ResponseEntity<List<?>> getAllActivity_ByPeriodSubjectGroup(@PathVariable Integer subjectId,
+    @GetMapping("/periods/{periodId}/subjects/{subjectProfessorId}/groups/{groupId}")
+    public ResponseEntity<List<?>> getAllActivity_ByPeriodSubjectGroup(@PathVariable Integer subjectProfessorId,
                                                                              @PathVariable Integer periodId,
                                                                              @PathVariable Integer groupId ){
-        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriodSubjectGroup(subjectId,periodId,groupId,"I");
+        List<ActivityGroupDomain> activityGroupDomains = persistenceActivityGroupPort.getAllActivity_ByPeriodSubjectGroup(subjectProfessorId,periodId,groupId,"I");
         return ResponseEntity.ok(activityGroupDomains);
     }
 

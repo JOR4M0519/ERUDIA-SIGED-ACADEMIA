@@ -22,16 +22,15 @@ public interface ActivityGroupCrudRepo extends JpaRepository<ActivityGroup, Inte
             "JOIN subject_professors sp ON sg.subject_professor_id = sp.id " +
             "JOIN subject s2 ON s2.id = sp.subject_id " +
             "WHERE ag.period_id = :periodId " +
-            "AND sg.id = :subjectGroupId " +
+            "AND sp.id = :subjectProfessorId " +
             "AND ag.group_id = :groupId " +
             "AND act.status != :status " +
             "AND s.id = s2.id", nativeQuery = true)
     List<ActivityGroup> findActivityGroupsByFilters(
             @Param("periodId") Integer periodId,
-            @Param("subjectGroupId") Integer subjectGroupId,
+            @Param("subjectProfessorId") Integer subjectProfessorId,
             @Param("groupId") Integer groupId,
             @Param("status") String status);
-
 
     @Query(value = "SELECT act_g.* FROM activity_group act_g " +
             "JOIN activity act ON act_g.activity_id = act.id " +
