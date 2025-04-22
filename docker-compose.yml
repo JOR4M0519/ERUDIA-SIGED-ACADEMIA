@@ -2,7 +2,9 @@ version: '3.8'
 
 services:
   config-service:
-    image: jpramos19/erudia-config:latest
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
     container_name: config-service
     ports:
       - "8888:8888"
@@ -17,7 +19,9 @@ services:
       - SPRING_PROFILES_ACTIVE=native
 
   eureka-service:
-    image: jpramos19/erudia-eureka:latest
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
     container_name: eureka-service
     ports:
       - "8761:8761"
@@ -45,7 +49,9 @@ services:
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
 
   gateway-service:
-    image: jpramos19/erudia-gateway:latest
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
     container_name: gateway-service
     ports:
       - "8080:8080"
@@ -65,17 +71,19 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@eureka-service:8761/eureka/
-      - KEYCLOAK_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_SERVER_URL=http://keycloak:8181
       - KEYCLOAK_REALM=academy-glm-realm
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/academy-glm-realm
-      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/academy-glm-realm/protocol/openid-connect/certs
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8181/realms/academy-glm-realm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8181/realms/academy-glm-realm/protocol/openid-connect/certs
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_NETFLIX_RIBBON=DEBUG
       - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_LOADBALANCER=DEBUG
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   academy-service-1:
-    image: jpramos19/erudia-academy:latest
+    build:
+      context: ./academy-service
+      dockerfile: Dockerfile
     container_name: academy-service-1
     depends_on:
       config-service:
@@ -103,7 +111,9 @@ services:
       - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
 
   academy-service-2:
-    image: jpramos19/erudia-academy:latest
+    build:
+      context: ./academy-service
+      dockerfile: Dockerfile
     container_name: academy-service-2
     depends_on:
       config-service:
@@ -145,17 +155,6 @@ services:
       - erudia-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
-  frontend:
-    image: jpramos19/erudia-frontend:latest
-    container_name: frontend
-    ports:
-      - "80:80"
-    networks:
-      - erudia-network
-    depends_on:
-      - gateway-service
-    restart: unless-stopped
 
 volumes:
   keycloak_data:

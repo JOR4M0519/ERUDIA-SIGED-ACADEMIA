@@ -11,8 +11,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://host.docker.internal:8181/realms/academy-glm-realm
-          jwk-set-uri: http://host.docker.internal:8181/realms/academy-glm-realm/protocol/openid-connect/certs
+          issuer-uri: http://keycloak:8181/realms/academy-glm-realm
+          jwk-set-uri: http://keycloak:8181/realms/academy-glm-realm/protocol/openid-connect/certs
   cloud:
     gateway:
       discovery:

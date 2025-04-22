@@ -31,7 +31,7 @@ public class KeycloakProvider {
 
     private static final String SERVER_URL = System.getenv("KEYCLOAK_SERVER_URL") != null ?
             System.getenv("KEYCLOAK_SERVER_URL") : "http://localhost:8181";
-            //"http://host.docker.internal:8181";
+    //"http://keycloak:8181";
     //private static final String SERVER_URL = "http://35.198.2.89:8181";
     private static final String REALM_NAME = System.getenv("KEYCLOAK_REALM") != null ?
             System.getenv("KEYCLOAK_REALM") : "academy-glm-realm";

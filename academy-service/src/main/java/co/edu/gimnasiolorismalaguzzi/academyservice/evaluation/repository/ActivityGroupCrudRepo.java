@@ -33,7 +33,7 @@ public interface ActivityGroupCrudRepo extends JpaRepository<ActivityGroup, Inte
             @Param("groupId") Integer groupId,
             @Param("status") String status);
 
-    @Query(value = "SELECT act_g.* FROM activity_group act_g " +
+/*    @Query(value = "SELECT act_g.* FROM activity_group act_g " +
             "JOIN activity act ON act_g.activity_id = act.id " +
             "JOIN achievement_groups ag ON ag.id = act.achievement_groups_id " +
             "JOIN subject_knowledge sk ON ag.subject_knowledge_id = sk.id " +
@@ -45,7 +45,26 @@ public interface ActivityGroupCrudRepo extends JpaRepository<ActivityGroup, Inte
             @Param("periodId") Integer periodId,
             @Param("subjectGroupId") Integer subjectGroupId,
             @Param("groupId") Integer groupId,
-            @Param("status") String status);
+            @Param("status") String status);*/
+
+    @Query(value =
+            "SELECT act_g.* " +
+                    "  FROM activity_group act_g " +
+                    "  JOIN activity          act ON act_g.activity_id = act.id " +
+                    "  JOIN achievement_groups ach ON ach.id = act.achievement_groups_id " +
+                    "  JOIN subject_knowledge   sk ON sk.id = ach.subject_knowledge_id " +
+                    " WHERE ach.period_id    = :periodId       " +  // filtra por periodo
+                    "   AND sk.id_subject    = :subjectId      " +  // el verdadero subject_id
+                    "   AND act_g.group_id   = :groupId        " +  // ahora filtro en activity_group
+                    "   AND act.status       <> :status        ",  // omitimos estado inactivo
+            nativeQuery = true
+    )
+    List<ActivityGroup> findActivityBySubjectAndPeriodAndGroupIdAndStatusNotLike(
+            @Param("periodId")  Integer periodId,
+            @Param("subjectId") Integer subjectId,   // ojo: aquí pasa el subject_id, no subject_group_id
+            @Param("groupId")   Integer groupId,     // el id de la clase/grupo
+            @Param("status")    String status
+    );
 
     //List<ActivityGroup> findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_IdAndActivity_StatusNotLike(Integer id, Integer id1, Integer id2, String status);
 

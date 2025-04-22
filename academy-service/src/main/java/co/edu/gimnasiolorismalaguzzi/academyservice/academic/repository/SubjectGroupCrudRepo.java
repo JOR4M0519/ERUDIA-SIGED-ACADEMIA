@@ -27,16 +27,16 @@ WHERE s.id = :subjectId
     List<User> findBySubjectId(@Param("subjectId") Integer id);
 
     List<SubjectGroup> findByGroups_Id(Integer id);
-/***
-    SELECT sub_group.*
-    FROM subject_groups sub_group
-    JOIN subject_professors sub_prof on sub_prof.id = sub_group.subject_professor_id
-    JOIN academic_period ap ON sub_group.academic_period_id = ap.id
-    WHERE sub_prof.professor_id = 2
-    AND ap.start_date <= TO_DATE('2025-12-31', 'YYYY-MM-DD')
-    AND ap.end_date >= TO_DATE( '2025-01-01', 'YYYY-MM-DD')
-    AND ap.status IN ('A', 'F');
- **/
+    /***
+     SELECT sub_group.*
+     FROM subject_groups sub_group
+     JOIN subject_professors sub_prof on sub_prof.id = sub_group.subject_professor_id
+     JOIN academic_period ap ON sub_group.academic_period_id = ap.id
+     WHERE sub_prof.professor_id = 2
+     AND ap.start_date <= TO_DATE('2025-12-31', 'YYYY-MM-DD')
+     AND ap.end_date >= TO_DATE( '2025-01-01', 'YYYY-MM-DD')
+     AND ap.status IN ('A', 'F');
+     **/
 
     @Query(value = "SELECT sub_group.* FROM subject_groups sub_group " +
             "JOIN subject_professors sub_prof on sub_prof.id = sub_group.subject_professor_id " +
@@ -47,7 +47,7 @@ WHERE s.id = :subjectId
             "  AND ap.status IN ('A', 'F')",
             nativeQuery = true)
     List<SubjectGroup> getAllSubjectByTeacher(@Param("teacherId") Integer teacherId,
-                                                  @Param("year") Integer year);
+                                              @Param("year") Integer year);
 
     List<SubjectGroup> findByGroups_IdAndSubjectProfessor_Professor_IdAndAcademicPeriod_Id(Integer id, Integer id1, Integer id2);
 
@@ -63,7 +63,18 @@ WHERE s.id = :subjectId
             nativeQuery = true)
     List<SubjectGroup> findSubjectGroupsByStudentIdAndAcademicYear(
             @Param("studentId") Integer studentId,
-            @Param("year") String year);;
+            @Param("year") String year);
+
+    @Query(value = "SELECT sg.* FROM subject_groups sg " +
+            "JOIN groups g ON sg.group_students = g.id " +
+            "JOIN group_students gs ON g.id = gs.group_id " +
+            "JOIN academic_period ap ON sg.academic_period_id = ap.id " +
+            "WHERE gs.student_id = :studentId " +
+            "AND ap.id =:periodId ",nativeQuery = true)
+    List<SubjectGroup> findSubjectGroupsByStudentIdAndPeriodId(
+            @Param("studentId") Integer studentId,
+            @Param("periodId") Integer periodId);;
+
 
     List<SubjectGroup> findByAcademicPeriod_IdAndGroups_StatusAndGroups_Level_Id(Integer id, String status, Integer id1);
 

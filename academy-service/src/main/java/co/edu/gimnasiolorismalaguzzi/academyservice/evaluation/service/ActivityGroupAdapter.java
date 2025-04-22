@@ -82,7 +82,10 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
         List<ActivityGroupDomain> activityGroupDomainListFinal = new ArrayList<>();
 
-        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+        //List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+
+        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentIdByPeriod(userId,periodId);
+
 
         for (SubjectGroupDomain domain :subjectGroupDomainList){
             activityGroupDomainListFinal.addAll(getAllActivityBySubjectAndPeriodAndGroupIdAndStatusNotLike(domain.getSubjectProfessor().getSubject().getId(),periodId,domain.getGroups().getId(),"I"));

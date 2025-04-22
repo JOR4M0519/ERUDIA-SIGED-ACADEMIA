@@ -55,6 +55,16 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
         return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findSubjectGroupsByStudentIdAndAcademicYear(studentId,year));
     }
 
+    @Override
+    public List<SubjectGroupDomain> getAllSubjectGroupsByStudentIdPeriodId(Integer studentId, Integer periodId) {
+        return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findSubjectGroupsByStudentIdAndPeriodId(studentId,periodId));
+    }
+
+    @Override
+    public List<SubjectGroupDomain> getAllSubjectGroupsByStudentIdByPeriod(Integer studentId, Integer periodId) {
+        return this.subjectGroupMapper.toDomains(this.subjectGroupCrudRepo.findSubjectGroupsByStudentIdAndPeriodId(studentId,periodId));
+    }
+
     /**
      * Obtiene todas las materias de un profesor con base en el id
      * @param id

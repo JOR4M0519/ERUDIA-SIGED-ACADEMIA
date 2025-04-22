@@ -27,6 +27,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Arrays;
+
 //@EnableWebFluxSecurity
 @Configuration
 @EnableReactiveMethodSecurity
@@ -77,7 +79,9 @@ public class SecurityConfig {
 
                 // Configuración de autorizaciones para intercambios HTTP
                 .authorizeExchange(exchange -> exchange
-                        .pathMatchers("/api/gtw/public/**").permitAll() // Permitir acceso sin autenticación a rutas de login
+                        .pathMatchers("/api/gtw/public/**").permitAll()
+                        .pathMatchers("/gtw/public/**").permitAll()
+                        .pathMatchers("/actuator/health").permitAll()// Permitir acceso sin autenticación a rutas de login
                         //.pathMatchers("/eureka/**").authenticated() // Requiere autenticación para rutas de eureka
                         .anyExchange().authenticated() // Requiere autenticación para cualquier otra ruta
                 )
@@ -137,11 +141,26 @@ public class SecurityConfig {
      *
      * @return Una instancia de CorsConfigurationSource con las reglas de CORS.
      */
-    @Bean
+
+/*    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }*/
+
+        @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("http://localhost:5173");
-        configuration.addAllowedOrigin("http://35.198.2.89:8181");// Permitir solicitudes desde este origen
+        configuration.addAllowedOrigin("http://35.198.2.89:8181");
+        configuration.addAllowedOrigin("http://35.198.2.89:5173");
+        configuration.addAllowedOrigin("http://35.198.2.89"); // Frontend en puerto 80
+        configuration.addAllowedOrigin("http://35.198.2.89:80"); // Explícitamente puerto 80// Permitir solicitudes desde este origen
         configuration.addAllowedHeader("*"); // Permitir todos los encabezados
         configuration.addAllowedMethod("*"); // Permitir todos los métodos HTTP
         configuration.setAllowCredentials(true); // Permitir el uso de credenciales (cookies, encabezados de autenticación)

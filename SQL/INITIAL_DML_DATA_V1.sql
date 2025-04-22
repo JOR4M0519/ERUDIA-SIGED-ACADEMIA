@@ -696,7 +696,7 @@ $$;
 alter function obtener_familias() owner to postgres;
 
 ---- v3
-create or replace function update_subject_grade_after_activity_grade() returns trigger
+/*create or replace function update_subject_grade_after_activity_grade() returns trigger
     language plpgsql
 as
 $$
@@ -781,8 +781,104 @@ END LOOP;
 
 RETURN NEW;
 END;
-$$;
+$$;*/
+CREATE OR REPLACE FUNCTION update_subject_grade_after_activity_grade()
+RETURNS trigger
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+student_id_val INT := NEW.student_id;
+  period_id_val  INT;
+  subject_id_val INT;
+  rec            RECORD;
+BEGIN
+  -- 1) Obtener el periodo y la materia de la actividad que acaba de cambiar
+SELECT
+    achg.period_id,
+    sk.id_subject
+INTO
+    period_id_val,
+    subject_id_val
+FROM activity_group agr
+         JOIN activity a              ON agr.activity_id          = a.id
+         JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+         JOIN subject_knowledge sk    ON achg.subject_knowledge_id = sk.id
+WHERE agr.id = NEW.activity_id;
 
+-- 2) Sólo recalcular para esa materia y ese periodo
+FOR rec IN (
+    WITH activity_scores AS (
+      SELECT
+        ag.score,
+        sk.id_subject,
+        achg.period_id,
+        sk.id_knowledge,
+        k.percentage
+      FROM activity_grade ag
+      JOIN activity_group agr      ON ag.activity_id            = agr.id
+      JOIN activity       a        ON agr.activity_id           = a.id
+      JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+      JOIN subject_knowledge   sk  ON achg.subject_knowledge_id = sk.id
+      JOIN knowledge           k   ON sk.id_knowledge           = k.id
+      WHERE ag.student_id  = student_id_val
+        AND achg.period_id = period_id_val
+        AND sk.id_subject  = subject_id_val      -- <— aquí filtramos la materia
+    ),
+    knowledge_averages AS (
+      SELECT
+        id_subject,
+        period_id,
+        id_knowledge,
+        percentage,
+        AVG(score) AS avg_knowledge_score
+      FROM activity_scores
+      GROUP BY id_subject, period_id, id_knowledge, percentage
+    ),
+    subject_scores AS (
+      SELECT
+        id_subject,
+        period_id,
+        SUM(avg_knowledge_score * percentage)   AS numerator,
+        SUM(percentage)                         AS total_percentage
+      FROM knowledge_averages
+      GROUP BY id_subject, period_id
+    )
+    SELECT
+      id_subject   AS subject_id,
+      period_id,
+      ROUND((numerator::numeric / NULLIF(total_percentage,0)), 2) AS final_score
+    FROM subject_scores
+  ) LOOP
+
+UPDATE subject_grade
+SET total_score = COALESCE(rec.final_score, 0)
+WHERE student_id = student_id_val
+  AND subject_id = rec.subject_id
+  AND period_id  = rec.period_id;
+
+IF NOT FOUND THEN
+      INSERT INTO subject_grade (
+        subject_id,
+        student_id,
+        period_id,
+        comment,
+        total_score,
+        recovered
+      ) VALUES (
+        rec.subject_id,
+        student_id_val,
+        rec.period_id,
+        'Calificación generada automática',
+        COALESCE(rec.final_score, 0),
+        'N'
+      );
+END IF;
+END LOOP;
+
+RETURN NEW;
+END;
+$$;
 
 ------
 --Ver para implementar reglas
