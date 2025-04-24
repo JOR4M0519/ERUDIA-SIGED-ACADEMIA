@@ -106,7 +106,7 @@ public class GradeReportView {
     private Integer inasistencias;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "data", columnDefinition = "jsonb")
+    @Column(name = "period_scores", columnDefinition = "jsonb")
     private  List<Map<String, Object>> periodScores;
 }
 

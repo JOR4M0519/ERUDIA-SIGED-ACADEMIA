@@ -45,7 +45,7 @@ public class GroupStudentsController {
     }
 
     @GetMapping("/users/{id}")
-    public ResponseEntity<?> getGroupsStudentByUsername(@PathVariable Integer id){
+    public ResponseEntity<?> getGroupsStudentByStudentId(@PathVariable Integer id){
         List<GroupStudentsDomain> groupStudentsList = groupStudentPort.getGroupsStudentById(id,"A");
         return ResponseEntity.ok(groupStudentsList);
     }

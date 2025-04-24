@@ -8,10 +8,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +50,7 @@ public class AcademicReportController {
         return ResponseEntity.ok(report);
     }
 
-    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
+/*    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
     public ResponseEntity<Resource> getGroupReportPdf(@PathVariable Long groupId, @PathVariable Long periodId) throws IOException {
         ByteArrayResource resource = reportService.generatePdfReport(groupId, periodId);
 
@@ -61,7 +58,134 @@ public class AcademicReportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_grupo.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
                 .body(resource);
+    }*/
+
+    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
+    public ResponseEntity<Resource> getGroupReportPdf(@PathVariable Long groupId, @PathVariable Long periodId) throws IOException {
+        // Obtener la lista de reportes por estudiante
+        Map<Long, ByteArrayResource> studentReports = reportService.generateMultipleStudentReports(groupId, periodId);
+
+        if (studentReports.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // Crear un archivo ZIP con todos los PDFs
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zipOut = new ZipOutputStream(baos);
+
+        for (Map.Entry<Long, ByteArrayResource> entry : studentReports.entrySet()) {
+            Long studentId = entry.getKey();
+            ByteArrayResource pdfResource = entry.getValue();
+
+            ZipEntry zipEntry = new ZipEntry("boletin_estudiante_" + studentId + "_periodo_" + periodId + ".pdf");
+            zipOut.putNextEntry(zipEntry);
+            zipOut.write(pdfResource.getByteArray());
+            zipOut.closeEntry();
+        }
+
+        zipOut.close();
+
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=boletines_grupo_" + groupId + "_periodo_" + periodId + ".zip")
+                .body(resource);
     }
+
+    @GetMapping("/view/group/{groupId}/student/{studentId}/period/{periodId}")
+    public ResponseEntity<Resource> viewStudentReport(
+            @PathVariable Long studentId,
+            @PathVariable Long groupId,
+            @PathVariable Long periodId) throws IOException {
+
+        ByteArrayResource resource = reportService.generateStudentPdfReport(groupId, studentId, periodId);
+
+        if (resource == null) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=boletin_estudiante_" + studentId + "_periodo_" + periodId + ".pdf")
+                .body(resource);
+    }
+
+    @GetMapping("/view/group/{groupId}/period/{periodId}")
+    public ResponseEntity<Resource> viewGroupReport(
+            @PathVariable Long groupId,
+            @PathVariable Long periodId) throws IOException {
+
+        // Obtener la lista de reportes por estudiante
+        Map<Long, ByteArrayResource> studentReports = reportService.generateMultipleStudentReports(groupId, periodId);
+
+        if (studentReports.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // Crear un archivo ZIP con todos los PDFs
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zipOut = new ZipOutputStream(baos);
+
+        for (Map.Entry<Long, ByteArrayResource> entry : studentReports.entrySet()) {
+            Long studentId = entry.getKey();
+            ByteArrayResource pdfResource = entry.getValue();
+
+            ZipEntry zipEntry = new ZipEntry("boletin_estudiante_" + studentId + "_periodo_" + periodId + ".pdf");
+            zipOut.putNextEntry(zipEntry);
+            zipOut.write(pdfResource.getByteArray());
+            zipOut.closeEntry();
+        }
+
+        zipOut.close();
+
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=boletines_grupo_" + groupId + "_periodo_" + periodId + ".zip")
+                .body(resource);
+    }
+
+
+    @GetMapping("/pdf/group/{groupId}/period/{periodId}/students")
+    public ResponseEntity<Resource> getSelectedStudentsReportPdf(
+            @PathVariable Long groupId,
+            @PathVariable Long periodId,
+            @RequestParam List<Long> studentIds) throws IOException {
+
+        // Obtener reportes solo para los estudiantes seleccionados
+        Map<Long, ByteArrayResource> studentReports = reportService.generateMultipleSelectedStudentReports(groupId, periodId, studentIds);
+
+        if (studentReports.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        // Crear un archivo ZIP con los PDFs seleccionados
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ZipOutputStream zipOut = new ZipOutputStream(baos);
+
+        for (Map.Entry<Long, ByteArrayResource> entry : studentReports.entrySet()) {
+            Long studentId = entry.getKey();
+            ByteArrayResource pdfResource = entry.getValue();
+
+            ZipEntry zipEntry = new ZipEntry("boletin_estudiante_" + studentId + "_periodo_" + periodId + ".pdf");
+            zipOut.putNextEntry(zipEntry);
+            zipOut.write(pdfResource.getByteArray());
+            zipOut.closeEntry();
+        }
+
+        zipOut.close();
+
+        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=boletines_seleccionados_grupo_" + groupId + "_periodo_" + periodId + ".zip")
+                .body(resource);
+    }
+
+
 
     @GetMapping("/pdf/group/{groupId}/student/{studentId}/period/{periodId}")
     public ResponseEntity<Resource> getStudentReportPdf(@PathVariable Long groupId, @PathVariable Long studentId, @PathVariable Long periodId) throws IOException {

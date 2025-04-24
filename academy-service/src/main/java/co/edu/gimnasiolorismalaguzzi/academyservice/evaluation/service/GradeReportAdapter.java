@@ -122,7 +122,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
     // Método para obtener datos directamente con JDBC
     private List<GradeReportView> getReportDataWithJdbc(Long groupId, Long periodId) {
-        String sql = "SELECT DISTINCT * FROM  v_academic_report " +
+        String sql = "SELECT * FROM  v_academic_report " +
                 "WHERE group_id = ? AND period_id = ? " +
                 "ORDER BY student_name, subject_name, knowledge_name";
 
@@ -176,6 +176,61 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
             }
         });
     }
+
+    private List<GradeReportView> getReportDataWithJdbc(Long groupId, Long studentId, Long periodId) {
+        String sql = "SELECT * FROM v_academic_report " +
+                "WHERE group_id = ? AND student_id = ? AND period_id = ? " +
+                "ORDER BY subject_name, knowledge_name";
+
+        return jdbcTemplate.query(sql, new Object[]{groupId, studentId, periodId}, new RowMapper<GradeReportView>() {
+            @Override
+            public GradeReportView mapRow(ResultSet rs, int rowNum) throws SQLException {
+                GradeReportView view = new GradeReportView();
+                view.setGradeId(rs.getLong("grade_id"));
+                view.setStudentId(rs.getLong("student_id"));
+                view.setStudentName(rs.getString("student_name"));
+                view.setDocumentNumber(rs.getString("document_number"));
+                view.setDocumentType(rs.getString("document_type"));
+                view.setSubjectId(rs.getLong("subject_id"));
+                view.setSubjectName(rs.getString("subject_name"));
+                view.setPeriodId(rs.getLong("period_id"));
+                view.setPeriodName(rs.getString("period_name"));
+                view.setAcademicYear(rs.getString("academic_year"));
+                view.setTotalScore(rs.getBigDecimal("total_score"));
+                view.setRecovered(rs.getString("recovered"));
+                view.setComment(rs.getString("comment"));
+                view.setGroupId(rs.getLong("group_id"));
+                view.setGroupName(rs.getString("group_name"));
+                view.setGroupCode(rs.getString("group_code"));
+                view.setSubjectKnowledgeId(rs.getLong("subject_knowledge_id"));
+                view.setKnowledgeId(rs.getLong("knowledge_id"));
+                view.setKnowledgeName(rs.getString("knowledge_name"));
+                view.setKnowledgePercentage(rs.getInt("knowledge_percentage"));
+                view.setAchievementGroupId(rs.getLong("achievement_group_id"));
+                view.setAchievement(rs.getString("achievement"));
+                view.setScore(rs.getBigDecimal("score"));
+                view.setDefinitivaScore(rs.getBigDecimal("definitiva_score"));
+                view.setPeriodNumber(rs.getInt("period_number"));
+                view.setTeacherName(rs.getString("teacher_name"));
+                view.setInasistencias(rs.getInt("inasistencias"));
+
+                // Mapeo del campo JSON period_scores
+                try {
+                    String periodScoresJson = rs.getString("period_scores");
+                    if (periodScoresJson != null) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        view.setPeriodScores(mapper.readValue(periodScoresJson,
+                                new TypeReference<List<Map<String, Object>>>() {}));
+                    }
+                } catch (Exception e) {
+                    log.error("Error parsing period_scores JSON", e);
+                }
+
+                return view;
+            }
+        });
+    }
+
 
     @Override
     public List<StudentReportDTO> generateGroupReport(Long groupId, Long periodId) {
@@ -263,9 +318,12 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
                     newSubject.setRecovered(Boolean.valueOf(data.getRecovered()));
                     newSubject.setComment(data.getComment());
 
-                    // Establecer el profesor si está disponible
-                    if (data.getTeacherName() != null) {
-                        newSubject.setTeacherName(data.getTeacherName());
+                    // Asignar siempre el nombre del profesor (nunca "No asignado")
+                    if (data.getTeacherName() != null && !data.getTeacherName().trim().isEmpty()) {
+                        newSubject.setTeacherName(data.getTeacherName().trim());
+                    } else {
+                        // Si por alguna razón no hubiera profesor, usar una descripción más específica
+                        newSubject.setTeacherName("Institución");
                     }
 
                     // Establecer el área (por defecto es el nombre de la materia)
@@ -277,15 +335,51 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
                     // Agregar información de notas por periodo si está disponible
                     if (data.getPeriodScores() != null) {
                         newSubject.setPeriodScores(data.getPeriodScores());
+                    } else {
+                        // Inicializar una lista vacía para evitar NullPointerException
+                        newSubject.setPeriodScores(new ArrayList<>());
                     }
 
                     studentReport.getSubjects().add(newSubject);
                     return newSubject;
                 });
 
-        // Verificar si el conocimiento ya existe usando ID en lugar de nombre
-        boolean knowledgeExists = subjectReport.getKnowledges().stream()
-                .anyMatch(k -> k.getKnowledgeId().equals(data.getKnowledgeId()));
+        // Actualizar el nombre del profesor si la materia ya existe y no tiene profesor
+        if (data.getTeacherName() != null && !data.getTeacherName().trim().isEmpty() &&
+                (subjectReport.getTeacherName() == null || subjectReport.getTeacherName().equals("Institución"))) {
+            subjectReport.setTeacherName(data.getTeacherName().trim());
+        }
+
+        // Si la materia ya tiene notas por periodo pero es un arreglo vacío, usar la información de data
+        if (subjectReport.getPeriodScores() == null) {
+            subjectReport.setPeriodScores(data.getPeriodScores());
+        } else if (data.getPeriodScores() != null && !data.getPeriodScores().isEmpty()) {
+            // Asegurarse de que todas las notas de periodos anteriores estén incluidas
+            for (Map<String, Object> periodScore : data.getPeriodScores()) {
+                // Verificar si este periodo ya existe en la lista
+                boolean exists = false;
+                for (Map<String, Object> existingScore : subjectReport.getPeriodScores()) {
+                    if (existingScore.get("period_number").equals(periodScore.get("period_number"))) {
+                        exists = true;
+                        break;
+                    }
+                }
+
+                // Si no existe, agregar
+                if (!exists) {
+                    subjectReport.getPeriodScores().add(periodScore);
+                }
+            }
+        }
+
+        // El resto del código para procesar conocimientos permanece igual
+        boolean knowledgeExists = false;
+        for (KnowledgeReportDTO k : subjectReport.getKnowledges()) {
+            if (k.getKnowledgeId().equals(data.getKnowledgeId())) {
+                knowledgeExists = true;
+                break;
+            }
+        }
 
         if (!knowledgeExists) {
             KnowledgeReportDTO knowledgeReport = new KnowledgeReportDTO();
@@ -293,34 +387,11 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
             knowledgeReport.setKnowledgeName(data.getKnowledgeName());
             knowledgeReport.setPercentage(data.getKnowledgePercentage());
             knowledgeReport.setAchievement(data.getAchievement());
+            knowledgeReport.setScore(data.getScore());
 
-            // Usar las notas calculadas por la función
-            if (data.getScore() != null) {
-                knowledgeReport.setScore(data.getScore());
-            } else {
-                // Asignar una nota por defecto basada en el conocimiento
-                if ("SER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("HACER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("CONOCER".equals(data.getKnowledgeName()) || "SABER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("5.0"));
-                } else if ("PENSAR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("INNOVAR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("SENTIR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.0"));
-                } else {
-                    knowledgeReport.setScore(new BigDecimal("4.0"));
-                }
-            }
-
-            // Usar definitiva_score si está disponible
             if (data.getDefinitivaScore() != null) {
                 knowledgeReport.setDefinitivaScore(data.getDefinitivaScore());
             } else {
-                // Calcular nota definitiva basada en el porcentaje
                 BigDecimal percentage = new BigDecimal(data.getKnowledgePercentage()).divide(new BigDecimal("100"));
                 knowledgeReport.setDefinitivaScore(knowledgeReport.getScore().multiply(percentage));
             }
@@ -328,7 +399,6 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
             subjectReport.getKnowledges().add(knowledgeReport);
         }
     }
-
     // Método para calcular el desempeño
     private void calculatePerformance(SubjectReportDTO subject) {
         BigDecimal totalScore = subject.getTotalScore();
@@ -419,7 +489,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
         // Generar un reporte PDF para cada estudiante
         for (Long studentId : studentIds) {
-            ByteArrayResource report = generatePdfReport(studentId, periodId);
+            ByteArrayResource report = generateStudentPdfReport(groupId,studentId, periodId);
             if (report != null) {
                 reports.put(studentId, report);
             }
@@ -427,6 +497,28 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
         return reports;
     }
+
+    public Map<Long, ByteArrayResource> generateMultipleSelectedStudentReports(Long groupId, Long periodId, List<Long> selectedStudentIds) throws IOException {
+        Map<Long, ByteArrayResource> reports = new HashMap<>();
+
+        // Filtrar solo los estudiantes seleccionados que pertenecen al grupo
+        List<Long> groupStudentIds = getStudentIdsFromGroup(groupId);
+        List<Long> validStudentIds = selectedStudentIds.stream()
+                .filter(groupStudentIds::contains)
+                .collect(Collectors.toList());
+
+        // Generar un reporte PDF para cada estudiante seleccionado
+        for (Long studentId : validStudentIds) {
+            ByteArrayResource report = generateStudentPdfReport(groupId, studentId, periodId);
+            if (report != null) {
+                reports.put(studentId, report);
+            }
+        }
+
+        return reports;
+    }
+
+
 
     private List<Long> getStudentIdsFromGroup(Long groupId) {
         // Implementar la lógica para obtener todos los IDs de estudiantes de un grupo
@@ -483,6 +575,12 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
     @Override
     public ByteArrayResource generateStudentPdfReport(Long groupId, Long studentId, Long periodId) throws IOException {
+
+
+        if(groupId == 0){
+            groupId = groupStudentsAdapter.getGroupsStudentById(Math.toIntExact(studentId),"A").getFirst().getGroup().getId().longValue();
+        }
+
         StudentReportDTO reportData = generateStudentReport(groupId, studentId, periodId);
         if (reportData == null) {
             throw new AppException("No se encontró reporte para el estudiante", HttpStatus.NOT_FOUND);
@@ -496,37 +594,123 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
     // Método para generar el reporte individual por estudiante
     @Override
     public StudentReportDTO generateStudentReport(Long groupId, Long studentId, Long periodId) {
-        List<GradeReportView> reportData = reportRepository
-                .findByGroupIdAndStudentIdAndPeriodIdOrderBySubjectNameAsc(groupId, studentId, periodId);
+        List<GradeReportView> reportData = getReportDataWithJdbc(groupId, studentId, periodId);
 
-        if (reportData.isEmpty()) {
-            return null;
+        if (reportData == null || reportData.isEmpty()) {
+            throw new AppException("No se encontró reporte para el estudiante", HttpStatus.NOT_FOUND);
         }
 
-        // Intentar obtener información detallada del estudiante
-        Object[] studentDetails = null;
-        Map<Long, String> teachersBySubject = new HashMap<>();
+        // Crear una estructura para los datos del estudiante a partir del primer registro
+        GradeReportView firstData = reportData.get(0);
+        StudentReportDTO studentReport = new StudentReportDTO();
+        studentReport.setStudentId(firstData.getStudentId());
+        studentReport.setStudentName(firstData.getStudentName());
+        studentReport.setDocumentNumber(firstData.getDocumentNumber());
+        studentReport.setDocumentType(firstData.getDocumentType());
+        studentReport.setGroupName(firstData.getGroupName());
+        studentReport.setGroupCode(firstData.getGroupCode());
+        studentReport.setGroupId(firstData.getGroupId());
+        studentReport.setPeriodId(firstData.getPeriodId());
+        studentReport.setPeriodName(firstData.getPeriodName());
+        studentReport.setAcademicYear(firstData.getAcademicYear());
+        studentReport.setInasistencias(firstData.getInasistencias() != null ? firstData.getInasistencias() : 0);
 
-        try {
-            studentDetails = reportRepository.findStudentDetailsByIdAndGroupId(studentId, groupId, periodId);
+        // Obtener el número del periodo actual
+        int currentPeriodNumber = firstData.getPeriodNumber();
 
-            // Obtener información de los profesores si está disponible
-            List<Object[]> teachersInfo = reportRepository.findTeachersByGroupAndPeriod(groupId, periodId);
-            for (Object[] teacher : teachersInfo) {
-                teachersBySubject.put(((Number) teacher[0]).longValue(), (String) teacher[2]);
-            }
-        } catch (Exception e) {
-            log.warn("No se pudo obtener información detallada del estudiante o profesores: {}", e.getMessage());
+        // Extraer información adicional del grupo
+        String[] groupParts = studentReport.getGroupName().split(" ");
+        if (groupParts.length > 0) {
+            studentReport.setGrade(groupParts[0]);
+            studentReport.setJornada("Mañana"); // Por defecto
+        }
+        studentReport.setNivelEducacion("Primaria"); // Por defecto
+
+        // Procesar cada registro para crear las materias y conocimientos
+        for (GradeReportView data : reportData) {
+            processSubjectAndKnowledge(studentReport, data);
         }
 
-        if (studentDetails != null) {
-            return processStudentReportData(reportData, studentDetails, teachersBySubject);
-        } else {
-            // Usar el método anterior si no hay detalles adicionales
-            return processSimpleStudentReportData(reportData);
+        // Si estamos en un periodo > 1, recuperar notas de periodos anteriores
+        if (currentPeriodNumber > 1) {
+            loadPreviousPeriodsScores(groupId, studentId, periodId, currentPeriodNumber, studentReport);
         }
+
+        return studentReport;
     }
 
+    // Método para cargar notas de periodos anteriores
+// Método actualizado para cargar notas de periodos anteriores
+    private void loadPreviousPeriodsScores(Long groupId, Long studentId, Long currentPeriodId,
+                                           int currentPeriodNumber, StudentReportDTO studentReport) {
+
+        // Para cada periodo anterior
+        for (int prevPeriodNumber = 1; prevPeriodNumber < currentPeriodNumber; prevPeriodNumber++) {
+            // Crear una variable final para usar en lambda
+            final int currentPrevPeriodNumber = prevPeriodNumber;
+
+            // Consulta para obtener el ID del periodo anterior (corregida)
+            String periodIdQuery = "SELECT id FROM academic_period WHERE EXTRACT(year FROM start_date) = ? " +
+                    "ORDER BY start_date LIMIT 1 OFFSET ?";
+
+            Long prevPeriodId = null;
+            try {
+                prevPeriodId = jdbcTemplate.queryForObject(
+                        periodIdQuery,
+                        Long.class,
+                        studentReport.getAcademicYear(),
+                        currentPrevPeriodNumber - 1); // Restamos 1 porque el OFFSET comienza en 0
+            } catch (Exception e) {
+                log.warn("No se pudo obtener el periodo {} para el año {}: {}",
+                        currentPrevPeriodNumber, studentReport.getAcademicYear(), e.getMessage());
+                continue;
+            }
+
+            if (prevPeriodId == null) {
+                continue;
+            }
+
+            // Resto del código para obtener y mapear notas...
+            List<GradeReportView> prevPeriodData = getReportDataWithJdbc(groupId, studentId, prevPeriodId);
+
+            if (prevPeriodData == null || prevPeriodData.isEmpty()) {
+                continue;
+            }
+
+            // Mapear notas de periodo anterior a materias existentes
+            for (GradeReportView prevData : prevPeriodData) {
+                for (SubjectReportDTO subject : studentReport.getSubjects()) {
+                    if (subject.getSubjectId().equals(prevData.getSubjectId())) {
+                        // Crear la estructura si no existe
+                        if (subject.getPeriodScores() == null) {
+                            subject.setPeriodScores(new ArrayList<>());
+                        }
+
+                        // Crear el objeto de puntaje de periodo
+                        Map<String, Object> periodScore = new HashMap<>();
+                        periodScore.put("period_number", currentPrevPeriodNumber);
+                        periodScore.put("period_name", "Periodo " + currentPrevPeriodNumber);
+                        periodScore.put("score", prevData.getTotalScore());
+
+                        // Agregar a la lista si no existe ya
+                        boolean exists = false;
+                        for (Map<String, Object> ps : subject.getPeriodScores()) {
+                            if (ps.get("period_number").equals(currentPrevPeriodNumber)) {
+                                exists = true;
+                                break;
+                            }
+                        }
+
+                        if (!exists) {
+                            subject.getPeriodScores().add(periodScore);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
     // Método simple para procesar datos del estudiante (compatible con versiones anteriores)
     private StudentReportDTO processSimpleStudentReportData(List<GradeReportView> reportData) {
         if (reportData.isEmpty()) {
@@ -583,10 +767,12 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
             }
         }
         studentReport.setNivelEducacion("Primaria"); // Por defecto
-
+        log.info("Datos obtenidos de la BD: {}", reportData.size());
         // Procesar materias y conocimientos
         for (GradeReportView data : reportData) {
             // Buscar o crear la materia
+            log.info("Materia: {}, Saber: {}", data.getSubjectName(), data.getKnowledgeName());
+
             SubjectReportDTO subjectReport = studentReport.getSubjects().stream()
                     .filter(s -> s.getSubjectId().equals(data.getSubjectId()))
                     .findFirst()
@@ -618,26 +804,16 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
                 knowledgeReport.setPercentage(data.getKnowledgePercentage());
                 knowledgeReport.setAchievement(data.getAchievement());
 
-                // Asignar una nota (esto debería venir de la BD)
-                if ("SER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("HACER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("CONOCER".equals(data.getKnowledgeName()) || "SABER".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("5.0"));
-                } else if ("PENSAR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("INNOVAR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.8"));
-                } else if ("SENTIR".equals(data.getKnowledgeName())) {
-                    knowledgeReport.setScore(new BigDecimal("4.0"));
-                } else {
-                    knowledgeReport.setScore(new BigDecimal("4.0"));
-                }
+                // Usar la nota real que viene de la base de datos
+                knowledgeReport.setScore(data.getScore());
 
-                // Calcular nota definitiva
-                BigDecimal percentage = new BigDecimal(knowledgeReport.getPercentage()).divide(new BigDecimal("100"));
-                knowledgeReport.setDefinitivaScore(knowledgeReport.getScore().multiply(percentage));
+                // Usar la nota definitiva de la base de datos o calcularla
+                if (data.getDefinitivaScore() != null) {
+                    knowledgeReport.setDefinitivaScore(data.getDefinitivaScore());
+                } else {
+                    BigDecimal percentage = new BigDecimal(knowledgeReport.getPercentage()).divide(new BigDecimal("100"));
+                    knowledgeReport.setDefinitivaScore(knowledgeReport.getScore().multiply(percentage));
+                }
 
                 subjectReport.getKnowledges().add(knowledgeReport);
             }
@@ -788,6 +964,16 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
             // Agregar información del estudiante
             addStudentInfo(document, studentReport);
+
+
+            for (SubjectReportDTO subject : studentReport.getSubjects()) {
+                // Ordenamos los conocimientos por ID para mostrarlos en orden consistente
+                subject.setKnowledges(subject.getKnowledges().stream()
+                        .sorted(Comparator.comparing(KnowledgeReportDTO::getKnowledgeId))
+                        .collect(Collectors.toList()));
+
+                addSubjectInfo(document, subject, studentReport);
+            }
 
             // Para cada materia
             for (SubjectReportDTO subject : studentReport.getSubjects()) {
@@ -965,6 +1151,9 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
     // Método para agregar información de una materia
     private void addSubjectInfo(Document document, SubjectReportDTO subject, StudentReportDTO studentReport) throws DocumentException {
+        // Definir formato para números decimales (solo 1 decimal)
+        java.text.DecimalFormat df = new java.text.DecimalFormat("0.0");
+
         // Tabla para el docente
         PdfPTable teacherTable = new PdfPTable(1);
         teacherTable.setWidthPercentage(100);
@@ -975,6 +1164,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         teacherLabelCell.setPadding(5);
         teacherTable.addCell(teacherLabelCell);
 
+        // El docente nunca debería ser "No asignado"
         PdfPCell teacherNameCell = new PdfPCell(new Phrase(subject.getTeacherName(),
                 new Font(Font.HELVETICA, 10)));
         teacherNameCell.setBorder(Rectangle.BOX);
@@ -1044,24 +1234,96 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         inasistenciasValueCell.setPadding(5);
         areaTable.addCell(inasistenciasValueCell);
 
-        PdfPCell p1ValueCell = new PdfPCell(new Phrase(subject.getTotalScore().toString(),
-                new Font(Font.HELVETICA, 10)));
-        p1ValueCell.setBorder(Rectangle.BOX);
-        p1ValueCell.setPadding(5);
-        areaTable.addCell(p1ValueCell);
+        // Obtener el número de periodo actual
+        int currentPeriodNumber = 0;
+        try {
+            currentPeriodNumber = Integer.parseInt(studentReport.getPeriodName().replaceAll("[^0-9]", ""));
+        } catch (Exception e) {
+            log.warn("No se pudo extraer el número de periodo de {}", studentReport.getPeriodName());
+        }
 
-        PdfPCell p2ValueCell = new PdfPCell(new Phrase("",
-                new Font(Font.HELVETICA, 10)));
-        p2ValueCell.setBorder(Rectangle.BOX);
-        p2ValueCell.setPadding(5);
-        areaTable.addCell(p2ValueCell);
+        // Inicializar celdas para los 3 periodos
+        PdfPCell[] periodCells = new PdfPCell[3];
+        for (int i = 0; i < 3; i++) {
+            periodCells[i] = new PdfPCell(new Phrase("", new Font(Font.HELVETICA, 10)));
+            periodCells[i].setBorder(Rectangle.BOX);
+            periodCells[i].setPadding(5);
+        }
 
-        PdfPCell p3ValueCell = new PdfPCell(new Phrase("",
-                new Font(Font.HELVETICA, 10)));
-        p3ValueCell.setBorder(Rectangle.BOX);
-        p3ValueCell.setPadding(5);
-        areaTable.addCell(p3ValueCell);
+        // Para el periodo actual, siempre mostrar la nota actual
+        if (currentPeriodNumber >= 1 && currentPeriodNumber <= 3) {
+            periodCells[currentPeriodNumber - 1] = new PdfPCell(new Phrase(
+                    df.format(subject.getTotalScore()),
+                    new Font(Font.HELVETICA, 10)));
+            periodCells[currentPeriodNumber - 1].setBorder(Rectangle.BOX);
+            periodCells[currentPeriodNumber - 1].setPadding(5);
+        }
 
+        // Asignar notas de periodos anteriores si están disponibles
+        // Para periodos anteriores, usar la información de periodScores
+        if (subject.getPeriodScores() != null) {
+            for (Map<String, Object> periodScore : subject.getPeriodScores()) {
+                // Obtener número de periodo
+                int periodNumber;
+                Object periodNumberObj = periodScore.get("period_number");
+
+                if (periodNumberObj instanceof String) {
+                    String periodNumberStr = (String) periodNumberObj;
+                    // Si es algo como "P1", extraer solo el número
+                    if (periodNumberStr.startsWith("P")) {
+                        periodNumberStr = periodNumberStr.substring(1);
+                    }
+                    periodNumber = Integer.parseInt(periodNumberStr);
+                } else if (periodNumberObj instanceof Number) {
+                    periodNumber = ((Number) periodNumberObj).intValue();
+                } else {
+                    continue; // No podemos determinar el número de periodo
+                }
+
+                // Si es un periodo anterior al actual y está en el rango 1-3
+                if (periodNumber != currentPeriodNumber && periodNumber >= 1 && periodNumber <= 3) {
+                    // Obtener la nota
+                    Object scoreObj = periodScore.get("score");
+                    BigDecimal score = null;
+
+                    if (scoreObj instanceof BigDecimal) {
+                        score = (BigDecimal) scoreObj;
+                    } else if (scoreObj instanceof Number) {
+                        score = new BigDecimal(((Number) scoreObj).toString());
+                    } else if (scoreObj instanceof String) {
+                        try {
+                            score = new BigDecimal((String) scoreObj);
+                        } catch (Exception e) {
+                            continue;
+                        }
+                    }
+
+                    // Asignar la nota formateada a la celda correspondiente
+                    if (score != null) {
+                        periodCells[periodNumber - 1] = new PdfPCell(new Phrase(
+                                df.format(score), new Font(Font.HELVETICA, 10)));
+                        periodCells[periodNumber - 1].setBorder(Rectangle.BOX);
+                        periodCells[periodNumber - 1].setPadding(5);
+                    }
+                }
+            }
+        }
+
+        // Para el periodo actual, asignar la nota total
+        if (currentPeriodNumber >= 1 && currentPeriodNumber <= 3) {
+            periodCells[currentPeriodNumber - 1] = new PdfPCell(new Phrase(
+                    df.format(subject.getTotalScore()),
+                    new Font(Font.HELVETICA, 10)));
+            periodCells[currentPeriodNumber - 1].setBorder(Rectangle.BOX);
+            periodCells[currentPeriodNumber - 1].setPadding(5);
+        }
+
+        // Agregar las celdas a la tabla
+        areaTable.addCell(periodCells[0]); // 1P
+        areaTable.addCell(periodCells[1]); // 2P
+        areaTable.addCell(periodCells[2]); // 3P
+
+        // Desempeño
         PdfPCell desempenoCell = new PdfPCell();
         desempenoCell.setBorder(Rectangle.BOX);
         desempenoCell.setPadding(5);
@@ -1075,6 +1337,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
         document.add(areaTable);
 
+        // El resto del método permanece igual...
         // Tabla para conocimientos
         PdfPTable knowledgeTable = new PdfPTable(4);
         knowledgeTable.setWidthPercentage(100);
@@ -1101,8 +1364,9 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
             achievementCell.setPadding(5);
             knowledgeTable.addCell(achievementCell);
 
-            // Nota parcial
-            PdfPCell scoreCell = new PdfPCell(new Phrase(knowledge.getScore().toString(),
+            // Nota parcial - FORMATO CON UN DECIMAL
+            PdfPCell scoreCell = new PdfPCell(new Phrase(
+                    df.format(knowledge.getScore()),
                     new Font(Font.HELVETICA, 10)));
             scoreCell.setBorder(Rectangle.BOX);
             scoreCell.setPadding(5);
@@ -1134,7 +1398,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
                 new Font(Font.HELVETICA, 10, Font.BOLD)));
         evalLabelCell.setBorder(Rectangle.BOX);
         evalLabelCell.setPadding(5);
-        evaluationTable.addCell(evalLabelCell);
+        //evaluationTable.addCell(evalLabelCell);
 
         PdfPCell commentCell = new PdfPCell(new Phrase(subject.getComment() != null ? subject.getComment() : "Evaluación general.",
                 new Font(Font.HELVETICA, 10)));
@@ -1145,5 +1409,6 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         document.add(evaluationTable);
         document.add(new Paragraph(" ")); // Espacio entre materias
     }
+
 }
 
