@@ -49,7 +49,7 @@ public class JwtClaimsFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
 
         String path = exchange.getRequest().getURI().getPath();
-        if (path.startsWith("/eureka") || path.contains("/api/gtw/public")) {
+        if (path.startsWith("/eureka") || path.contains("/gtw/public") || path.contains("/actuator/health")) {
             return chain.filter(exchange);
         }
 

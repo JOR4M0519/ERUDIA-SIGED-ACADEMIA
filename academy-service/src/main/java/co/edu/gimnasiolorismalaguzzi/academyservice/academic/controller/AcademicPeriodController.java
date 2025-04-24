@@ -1,8 +1,12 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.controller;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicYearPercentageDTO;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicPeriodDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -73,15 +77,41 @@ public class AcademicPeriodController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<AcademicPeriodDomain> updateAcademicPeriod(@PathVariable Integer id, @RequestBody AcademicPeriodDomain AcademicPeriodDomain) {
-        AcademicPeriodDomain updatedAcademicPeriod = academicPeriodServicePort.update(id, AcademicPeriodDomain);
-        return ResponseEntity.ok(updatedAcademicPeriod);
+    public ResponseEntity<?> updateAcademicPeriod(@PathVariable Integer id, @RequestBody AcademicPeriodDomain academicPeriodDomain) {
+        try {
+            AcademicPeriodDomain updatedAcademicPeriod = academicPeriodServicePort.update(id, academicPeriodDomain);
+            return ResponseEntity.ok(updatedAcademicPeriod);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new AppException(e.getMessage(), HttpStatus.NOT_FOUND));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new AppException(e.getMessage(),HttpStatus.BAD_REQUEST));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AppException(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR));
+        }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAcademicPeriod(@PathVariable Integer id) {
         academicPeriodServicePort.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Agregar esto a AcademicPeriodController.java
+    @GetMapping("/years-percentages")
+    public ResponseEntity<List<AcademicYearPercentageDTO>> getAcademicYearsWithPercentages() {
+        List<AcademicYearPercentageDTO> yearPercentages = academicPeriodServicePort.getAcademicYearsWithPercentages();
+        return ResponseEntity.ok(yearPercentages);
+    }
+
+    @GetMapping("/verify-year/{year}")
+    public ResponseEntity<Boolean> verifyYearPercentages(@PathVariable Integer year) {
+        Boolean isComplete = academicPeriodServicePort.verifyYearPercentages(year);
+        return ResponseEntity.ok(isComplete);
+    }
+
 
 }

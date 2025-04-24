@@ -319,23 +319,25 @@ $$ LANGUAGE plpgsql
 
 CREATE OR REPLACE FUNCTION get_academic_periods(p_year TEXT)
 RETURNS TABLE (
-                  id INT,
-                  setting_id INT,
-                  start_date DATE,
-                  end_date DATE,
-                  name VARCHAR(8),
-                  status VARCHAR(1),
-                  percentage INT
-              ) AS $$
+    id INT,
+    setting_id INT,
+    start_date DATE,
+    end_date DATE,
+    name VARCHAR(8),
+    status VARCHAR(1),
+    percentage INT
+) AS $$
 BEGIN
 RETURN QUERY
 SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
 FROM academic_period ap
-WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- 🔹 Inicia antes o durante el año
-  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')  -- 🔹 Termina después o durante el año
-  AND ap.status IN ('A', 'F');
+WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- Inicia antes o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')    -- Termina después o durante el año
+  AND ap.status IN ('A', 'F')
+ORDER BY ap.start_date ASC;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION get_all_academic_periods(p_year TEXT)
 RETURNS TABLE (
@@ -352,7 +354,8 @@ RETURN QUERY
 SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
 FROM academic_period ap
 WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  --  Inicia antes o durante el año
-  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD');  --  Termina después o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')  --  Termina después o durante el año
+ORDER BY ap.start_date ASC;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -693,7 +696,7 @@ $$;
 alter function obtener_familias() owner to postgres;
 
 ---- v3
-create or replace function update_subject_grade_after_activity_grade() returns trigger
+/*create or replace function update_subject_grade_after_activity_grade() returns trigger
     language plpgsql
 as
 $$
@@ -778,8 +781,104 @@ END LOOP;
 
 RETURN NEW;
 END;
-$$;
+$$;*/
+CREATE OR REPLACE FUNCTION update_subject_grade_after_activity_grade()
+RETURNS trigger
+LANGUAGE plpgsql
+AS
+$$
+DECLARE
+student_id_val INT := NEW.student_id;
+  period_id_val  INT;
+  subject_id_val INT;
+  rec            RECORD;
+BEGIN
+  -- 1) Obtener el periodo y la materia de la actividad que acaba de cambiar
+SELECT
+    achg.period_id,
+    sk.id_subject
+INTO
+    period_id_val,
+    subject_id_val
+FROM activity_group agr
+         JOIN activity a              ON agr.activity_id          = a.id
+         JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+         JOIN subject_knowledge sk    ON achg.subject_knowledge_id = sk.id
+WHERE agr.id = NEW.activity_id;
 
+-- 2) Sólo recalcular para esa materia y ese periodo
+FOR rec IN (
+    WITH activity_scores AS (
+      SELECT
+        ag.score,
+        sk.id_subject,
+        achg.period_id,
+        sk.id_knowledge,
+        k.percentage
+      FROM activity_grade ag
+      JOIN activity_group agr      ON ag.activity_id            = agr.id
+      JOIN activity       a        ON agr.activity_id           = a.id
+      JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+      JOIN subject_knowledge   sk  ON achg.subject_knowledge_id = sk.id
+      JOIN knowledge           k   ON sk.id_knowledge           = k.id
+      WHERE ag.student_id  = student_id_val
+        AND achg.period_id = period_id_val
+        AND sk.id_subject  = subject_id_val      -- <— aquí filtramos la materia
+    ),
+    knowledge_averages AS (
+      SELECT
+        id_subject,
+        period_id,
+        id_knowledge,
+        percentage,
+        AVG(score) AS avg_knowledge_score
+      FROM activity_scores
+      GROUP BY id_subject, period_id, id_knowledge, percentage
+    ),
+    subject_scores AS (
+      SELECT
+        id_subject,
+        period_id,
+        SUM(avg_knowledge_score * percentage)   AS numerator,
+        SUM(percentage)                         AS total_percentage
+      FROM knowledge_averages
+      GROUP BY id_subject, period_id
+    )
+    SELECT
+      id_subject   AS subject_id,
+      period_id,
+      ROUND((numerator::numeric / NULLIF(total_percentage,0)), 2) AS final_score
+    FROM subject_scores
+  ) LOOP
+
+UPDATE subject_grade
+SET total_score = COALESCE(rec.final_score, 0)
+WHERE student_id = student_id_val
+  AND subject_id = rec.subject_id
+  AND period_id  = rec.period_id;
+
+IF NOT FOUND THEN
+      INSERT INTO subject_grade (
+        subject_id,
+        student_id,
+        period_id,
+        comment,
+        total_score,
+        recovered
+      ) VALUES (
+        rec.subject_id,
+        student_id_val,
+        rec.period_id,
+        'Calificación generada automática',
+        COALESCE(rec.final_score, 0),
+        'N'
+      );
+END IF;
+END LOOP;
+
+RETURN NEW;
+END;
+$$;
 
 ------
 --Ver para implementar reglas
@@ -880,6 +979,331 @@ CREATE TRIGGER after_insert_subject_group
     AFTER INSERT ON subject_groups
     FOR EACH ROW
     EXECUTE FUNCTION create_default_subject_schedule();
+
+
+CREATE OR REPLACE FUNCTION calculateknowledgesgradesbysubjectandgroupandperiod(
+    p_group_id       integer,
+    p_subject_id     integer,
+    p_period_id      integer
+)
+RETURNS TABLE(
+    student_id         integer,
+    knowledge_id       integer,
+    knowledge_name     varchar,
+    knowledge_percentage integer,
+    score              numeric,
+    definitiva_score   numeric
+)
+LANGUAGE plpgsql
+AS
+  $$
+DECLARE
+v_year INT;
+    v_is_last_period BOOLEAN;
+BEGIN
+    -- Obtener el año del periodo solicitado
+SELECT EXTRACT(YEAR FROM start_date) INTO v_year
+FROM academic_period
+WHERE id = p_period_id;
+
+-- Determinar si es el último periodo del año
+SELECT EXISTS (
+    SELECT 1
+    FROM academic_period ap1
+    WHERE EXTRACT(YEAR FROM ap1.start_date) = v_year
+      AND ap1.end_date > (SELECT end_date FROM academic_period WHERE id = p_period_id)
+      AND ap1.status = 'A'
+) = FALSE INTO v_is_last_period;
+
+-- Si es el primer periodo, simplemente devolvemos los datos de ese periodo
+IF p_period_id = (
+        SELECT MIN(id)
+        FROM academic_period
+        WHERE EXTRACT(YEAR FROM start_date) = v_year
+          AND status = 'A'
+    ) THEN
+        RETURN QUERY
+        WITH activity_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND achg.period_id = p_period_id
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage
+        )
+SELECT
+    as1.student_id,
+    as1.id_knowledge,
+    as1.knowledge_name,
+    as1.knowledge_percentage,
+    as1.avg_score,
+    ROUND((as1.avg_score * as1.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    activity_scores as1
+ORDER BY
+    as1.student_id, as1.id_knowledge;
+
+-- Si es el último periodo, calculamos el acumulado de todos los periodos
+ELSIF v_is_last_period THEN
+        RETURN QUERY
+        WITH period_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                achg.period_id,
+                ap.percentage AS period_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+                JOIN academic_period ap ON achg.period_id = ap.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND EXTRACT(YEAR FROM ap.start_date) = v_year
+                AND ap.status = 'A'
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage, achg.period_id, ap.percentage
+        ),
+        accumulated_scores AS (
+            SELECT
+                ps.student_id,
+                ps.id_knowledge,
+                ps.knowledge_name,
+                ps.knowledge_percentage,
+                SUM(ps.avg_score * ps.period_percentage / 100) AS final_score
+            FROM
+                period_scores ps
+            GROUP BY
+                ps.student_id, ps.id_knowledge, ps.knowledge_name, ps.knowledge_percentage
+        )
+SELECT
+    ac.student_id,
+    ac.id_knowledge,
+    ac.knowledge_name,
+    ac.knowledge_percentage,
+    ROUND(ac.final_score::numeric, 2) AS score,
+    ROUND((ac.final_score * ac.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    accumulated_scores ac
+ORDER BY
+    ac.student_id, ac.id_knowledge;
+
+-- Para cualquier otro periodo, calculamos el acumulado hasta ese periodo
+ELSE
+        RETURN QUERY
+        WITH period_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                achg.period_id,
+                ap.percentage AS period_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+                JOIN academic_period ap ON achg.period_id = ap.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND ap.id <= p_period_id
+                AND EXTRACT(YEAR FROM ap.start_date) = v_year
+                AND ap.status = 'A'
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage, achg.period_id, ap.percentage
+        ),
+        accumulated_scores AS (
+            SELECT
+                ps.student_id,
+                ps.id_knowledge,
+                ps.knowledge_name,
+                ps.knowledge_percentage,
+                SUM(ps.avg_score * ps.period_percentage / 100) /
+                (SELECT SUM(percentage) / 100 FROM academic_period WHERE id <= p_period_id AND EXTRACT(YEAR FROM start_date) = v_year AND status = 'A')
+                AS final_score
+            FROM
+                period_scores ps
+            GROUP BY
+                ps.student_id, ps.id_knowledge, ps.knowledge_name, ps.knowledge_percentage
+        )
+SELECT
+    ac.student_id,
+    ac.id_knowledge,
+    ac.knowledge_name,
+    ac.knowledge_percentage,
+    ROUND(ac.final_score::numeric, 2) AS score,
+    ROUND((ac.final_score * ac.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    accumulated_scores ac
+ORDER BY
+    ac.student_id, ac.id_knowledge;
+END IF;
+END;
+$$;
+
+
+CREATE OR REPLACE VIEW v_academic_report
+            (grade_id, student_id, student_name, document_number, document_type, subject_id, subject_name, period_id,
+             period_name, academic_year, total_score, recovered, comment, group_id, group_name, group_code,
+             subject_knowledge_id, knowledge_id, knowledge_name, knowledge_percentage, achievement_group_id,
+             achievement, score, definitiva_score, period_number, teacher_name, inasistencias, period_scores)
+AS
+WITH knowledge_scores AS (SELECT sg_1.id                                               AS grade_id,
+                                 gs.student_id,
+                                 g.id                                                  AS group_id,
+                                 g.group_name,
+                                 g.group_code,
+                                 sg_1.subject_id,
+                                 s.subject_name,
+                                 sg_1.period_id,
+                                 ap.name                                               AS period_name,
+                                 EXTRACT(year FROM ap.start_date)                      AS academic_year,
+                                 sg_1.total_score,
+                                 sg_1.recovered,
+                                 sg_1.comment,
+                                 k.id                                                  AS knowledge_id,
+                                 k.name                                                AS knowledge_name,
+                                 k.percentage                                          AS knowledge_percentage,
+                                 ag.id                                                 AS achievement_group_id,
+                                 ag.achievement,
+                                 COALESCE((SELECT kgs.score
+                                           FROM calculateknowledgesgradesbysubjectandgroupandperiod(g.id,
+                                                                                                    sg_1.subject_id,
+                                                                                                    sg_1.period_id) kgs(student_id,
+                                                                                                                        knowledge_id,
+                                                                                                                        knowledge_name,
+                                                                                                                        knowledge_percentage,
+                                                                                                                        score,
+                                                                                                                        definitiva_score)
+                                           WHERE kgs.student_id = gs.student_id
+                                             AND kgs.knowledge_id = k.id), 0::numeric) AS knowledge_score,
+                                 COALESCE((SELECT kgs.definitiva_score
+                                           FROM calculateknowledgesgradesbysubjectandgroupandperiod(g.id,
+                                                                                                    sg_1.subject_id,
+                                                                                                    sg_1.period_id) kgs(student_id,
+                                                                                                                        knowledge_id,
+                                                                                                                        knowledge_name,
+                                                                                                                        knowledge_percentage,
+                                                                                                                        score,
+                                                                                                                        definitiva_score)
+                                           WHERE kgs.student_id = gs.student_id
+                                             AND kgs.knowledge_id = k.id), 0::numeric) AS knowledge_definitiva_score
+                          FROM subject_grade sg_1
+                                   JOIN users u_1 ON sg_1.student_id = u_1.id
+                                   JOIN user_detail ud_1 ON u_1.id = ud_1.user_id
+                                   JOIN id_type it_1 ON ud_1.id_type_id = it_1.id
+                                   JOIN subject s ON sg_1.subject_id = s.id
+                                   JOIN academic_period ap ON sg_1.period_id = ap.id
+                                   JOIN group_students gs ON sg_1.student_id = gs.student_id
+                                   JOIN groups g ON gs.group_id = g.id
+                                   JOIN subject_groups sgr
+                                        ON sgr.group_students = g.id AND sgr.academic_period_id = sg_1.period_id
+                                   JOIN subject_knowledge sk_1 ON sk_1.id_subject = sg_1.subject_id
+                                   JOIN knowledge k ON sk_1.id_knowledge = k.id
+                                   JOIN achievement_groups ag
+                                        ON ag.subject_knowledge_id = sk_1.id AND ag.group_id = g.id AND
+                                           ag.period_id = sg_1.period_id
+                          WHERE gs.status::text = 'A'::text),
+     period_info AS (SELECT ap.id,
+                            ap.name,
+                            EXTRACT(year FROM ap.start_date)                                              AS year,
+                            row_number()
+                            OVER (PARTITION BY (EXTRACT(year FROM ap.start_date)) ORDER BY ap.start_date) AS period_number
+                     FROM academic_period ap
+                     WHERE ap.status::text = 'A'::text),
+     period_scores_data AS (SELECT sg_hist.student_id,
+                                   sg_hist.subject_id,
+                                   sg_hist.period_id,
+                                   ap_hist.name                                                                                                                                 AS period_name,
+                                   EXTRACT(year FROM ap_hist.start_date)                                                                                                        AS academic_year,
+                                   'P'::text || row_number()
+                                                OVER (PARTITION BY sg_hist.student_id, sg_hist.subject_id, (EXTRACT(year FROM ap_hist.start_date)) ORDER BY ap_hist.start_date) AS period_number,
+                                   sg_hist.total_score
+                            FROM subject_grade sg_hist
+                                     JOIN academic_period ap_hist ON sg_hist.period_id = ap_hist.id)
+-- Usar DISTINCT ON para eliminar duplicados
+SELECT DISTINCT ON (ks.student_id, ks.subject_id, ks.period_id, ks.knowledge_id)
+    sg.id                                                   AS grade_id,
+    ks.student_id,
+    ((((ud.first_name::text || ' '::text) || ud.middle_name::text) || ud.last_name::text) || ' '::text) ||
+    ud.second_last_name::text                               AS student_name,
+    ud.dni                                                  AS document_number,
+    it.name                                                 AS document_type,
+    ks.subject_id,
+    ks.subject_name,
+    ks.period_id,
+    ks.period_name,
+    ks.academic_year,
+    ks.total_score,
+    ks.recovered,
+    ks.comment,
+    ks.group_id,
+    ks.group_name,
+    ks.group_code,
+    sk.id                                                   AS subject_knowledge_id,
+    ks.knowledge_id,
+    ks.knowledge_name,
+    ks.knowledge_percentage,
+    ks.achievement_group_id,
+    ks.achievement,
+    ks.knowledge_score                                      AS score,
+    ks.knowledge_definitiva_score                           AS definitiva_score,
+    pi.period_number,
+    (SELECT ((((u_d2.first_name::text || ' '::text) || u_d2.middle_name::text) || u_d2.last_name::text) ||
+    ' '::text) || u_d2.second_last_name::text
+    FROM subject_groups sg2
+    JOIN users u2 ON sg2.subject_professor_id = u2.id
+    JOIN user_detail u_d2 ON u_d2.user_id = u2.id
+    JOIN subject_professors sp2 ON sg2.subject_professor_id = sp2.id
+    WHERE sg2.group_students = ks.group_id
+    AND sg2.academic_period_id = ks.period_id
+    AND sp2.subject_id = ks.subject_id
+    LIMIT 1)                                               AS teacher_name,
+    COALESCE((SELECT count(*) AS count
+    FROM attendance a
+    JOIN subject_schedule ss ON a.schedule_id = ss.id
+    WHERE a.student_id = ks.student_id
+    AND ss.subject_group_id = sg.id
+    AND a.status::text = 'A'::text), 0::bigint) AS inasistencias,
+    (SELECT jsonb_agg(jsonb_build_object('period_id', psd.period_id, 'period_name', psd.period_name, 'period_number',
+    psd.period_number, 'score', psd.total_score)) AS jsonb_agg
+    FROM period_scores_data psd
+    WHERE psd.student_id = ks.student_id
+    AND psd.subject_id = ks.subject_id
+    AND psd.academic_year = ks.academic_year)            AS period_scores
+FROM knowledge_scores ks
+    JOIN users u ON ks.student_id = u.id
+    JOIN user_detail ud ON u.id = ud.user_id
+    JOIN id_type it ON ud.id_type_id = it.id
+    JOIN subject_knowledge sk ON sk.id_subject = ks.subject_id AND sk.id_knowledge = ks.knowledge_id
+    JOIN subject_groups sg ON sg.group_students = ks.group_id AND sg.academic_period_id = ks.period_id
+    JOIN period_info pi ON pi.id = ks.period_id
+ORDER BY ks.student_id, ks.subject_id, ks.period_id, ks.knowledge_id, ks.grade_id;
 
 
 

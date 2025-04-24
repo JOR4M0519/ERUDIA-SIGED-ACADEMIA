@@ -9,7 +9,16 @@ import java.util.List;
 
 public interface SubjectKnowledgeCrudRepo extends JpaRepository<SubjectKnowledge, Integer> {
 
+    @Query(value = """
+    SELECT sub_know.* FROM subject_knowledge sub_know
+    FULL JOIN achievement_groups ach_grp ON sub_know.id = ach_grp.subject_knowledge_id
+    WHERE sub_know.id_subject = :subjectId
+    AND ach_grp.group_id = :groupId
+    """, nativeQuery = true)
+    List<SubjectKnowledge>  findByIdSubject_IdAndGroupId(@Param("subjectId") Integer subjectId,
+                                                         @Param("groupId") Integer groupId);
     List<SubjectKnowledge> findByIdSubject_Id(Integer id);
+
 
     @Query(value = """
     SELECT sub_know.* FROM subject_knowledge sub_know

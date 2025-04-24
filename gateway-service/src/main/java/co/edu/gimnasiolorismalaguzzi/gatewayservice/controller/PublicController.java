@@ -78,6 +78,11 @@ public class PublicController {
         }).subscribeOn(Schedulers.boundedElastic()); // Ejecuta en un hilo seguro para bloqueos
     }
 
+    @GetMapping("/hello")
+    public String getHelloGateway() {
+        return "Hello Gateway";
+    }
+
 
 /*    @GetMapping("/groups/{username}")
     public ResponseEntity<?> getGroupByUser(@PathVariable String username) {

@@ -29,4 +29,10 @@ public interface AcademicPeriodCrudRepo extends JpaRepository<AcademicPeriod, In
     List<AcademicPeriod> findByStatus(String status);
 
     List<AcademicPeriod> findBySetting_Id(Integer id);
+
+    @Query(value = "SELECT * FROM get_academic_years_with_percentages()", nativeQuery = true)
+    List<Object[]> getAcademicYearsWithPercentages();
+
+    @Query(value = "SELECT verify_year_percentages(:year)", nativeQuery = true)
+    Boolean verifyYearPercentages(@Param("year") Integer year);
 }

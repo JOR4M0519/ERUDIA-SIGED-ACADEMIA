@@ -1,5 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.academic.service;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.AcademicYearPercentageDTO;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceAcademicPeriodPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
@@ -13,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.commons.util.InetUtils;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -59,16 +63,42 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     public AcademicPeriodDomain update(Integer integer, AcademicPeriodDomain entity) {
         try {
             Optional<AcademicPeriod> existingPeriod = academicPeriodCrudRepo.findById(integer);
+
             if(existingPeriod.isPresent()){
-                existingPeriod.get().setStartDate(entity.getStartDate());
-                existingPeriod.get().setEndDate(entity.getEndDate());
-                existingPeriod.get().setName(entity.getName());
-                existingPeriod.get().setStatus(entity.getStatus());
-                existingPeriod.get().setPercentage(entity.getPercentage());
+                AcademicPeriod period = existingPeriod.get();
+
+                // Verificar si está cambiando el estado a Activo (A)
+                if ("A".equals(entity.getStatus()) && !"A".equals(period.getStatus())) {
+                    // Extraer el año de la fecha de inicio
+                    int year = LocalDate.parse(entity.getStartDate().toString()).getYear();
+
+                    // Verificar si el año tiene un porcentaje total del 100%
+                    Boolean isComplete = academicPeriodCrudRepo.verifyYearPercentages(year);
+
+                    // Si no está completo, lanzar una excepción
+                    if (Boolean.FALSE.equals(isComplete)) {
+                        throw new IllegalStateException("No se puede activar el periodo porque los periodos del año " +
+                                year + " no suman exactamente 100%");
+                    }
+                }
+
+                // Actualizar los campos
+                period.setStartDate(entity.getStartDate());
+                period.setEndDate(entity.getEndDate());
+                period.setName(entity.getName());
+                period.setStatus(entity.getStatus());
+                period.setPercentage(entity.getPercentage());
+
+                return academicPeriodMapper.toDomain(academicPeriodCrudRepo.save(period));
+            } else {
+                throw new EntityNotFoundException("Period with id " + integer + " not found");
             }
-            return academicPeriodMapper.toDomain(academicPeriodCrudRepo.save(existingPeriod.get()));
-        } catch (EntityNotFoundException e){
-            throw new EntityNotFoundException("Period with id " + integer + " not found");
+        } catch (EntityNotFoundException e) {
+            throw e;
+        } catch (IllegalStateException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new RuntimeException("Error updating academic period: " + e.getMessage(), e);
         }
     }
 
@@ -94,17 +124,43 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     }
 
     @Override
-    public HttpStatus delete(Integer integer) {
-        try {
-            if(this.academicPeriodCrudRepo.existsById(integer)){
-                academicPeriodCrudRepo.updateStatusById("I", integer);
-                return HttpStatus.OK;
-            } else {
-                throw new AppException("Period ID doesnt exist!", HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e){
-            throw new AppException("Intern Error!", HttpStatus.INTERNAL_SERVER_ERROR);
+    public HttpStatus delete(Integer id) {
+
+        AcademicPeriodDomain academicPeriodDomain = findById(id);
+
+        // Verificar si existe la dimension
+        if (academicPeriodDomain.equals(null)) {
+            throw new AppException("El periodo no existe", HttpStatus.NOT_FOUND);
         }
+
+        try {
+            academicPeriodCrudRepo.deleteById(id);
+            return HttpStatus.OK;
+        }catch (Exception e){
+            throw new AppException("Se tuvo un error al eliminar la relación", HttpStatus.CONFLICT);
+        }
+    }
+
+    // Agregar esto a AcademicPeriodAdapter.java
+    @Override
+    public List<AcademicYearPercentageDTO> getAcademicYearsWithPercentages() {
+        List<Object[]> results = academicPeriodCrudRepo.getAcademicYearsWithPercentages();
+        List<AcademicYearPercentageDTO> dtos = new ArrayList<>();
+
+        for (Object[] result : results) {
+            Integer year = ((Number) result[0]).intValue();
+            Integer percentage = ((Number) result[1]).intValue();
+            Boolean isComplete = percentage == 100;
+
+            dtos.add(new AcademicYearPercentageDTO(year, percentage, isComplete));
+        }
+
+        return dtos;
+    }
+
+    @Override
+    public Boolean verifyYearPercentages(Integer year) {
+        return academicPeriodCrudRepo.verifyYearPercentages(year);
     }
 
 

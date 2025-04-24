@@ -10,23 +10,25 @@ $$ LANGUAGE plpgsql
 
 CREATE OR REPLACE FUNCTION get_academic_periods(p_year TEXT)
 RETURNS TABLE (
-                  id INT,
-                  setting_id INT,
-                  start_date DATE,
-                  end_date DATE,
-                  name VARCHAR(8),
-                  status VARCHAR(1),
-                  percentage INT
-              ) AS $$
+    id INT,
+    setting_id INT,
+    start_date DATE,
+    end_date DATE,
+    name VARCHAR(8),
+    status VARCHAR(1),
+    percentage INT
+) AS $$
 BEGIN
 RETURN QUERY
 SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
 FROM academic_period ap
-WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- 🔹 Inicia antes o durante el año
-  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')  -- 🔹 Termina después o durante el año
-  AND ap.status IN ('A', 'F');
+WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- Inicia antes o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')    -- Termina después o durante el año
+  AND ap.status IN ('A', 'F')
+ORDER BY ap.start_date ASC;
 END;
 $$ LANGUAGE plpgsql;
+
 
 CREATE OR REPLACE FUNCTION get_all_academic_periods(p_year TEXT)
 RETURNS TABLE (
@@ -43,7 +45,102 @@ RETURN QUERY
 SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
 FROM academic_period ap
 WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  --  Inicia antes o durante el año
-  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD');  --  Termina después o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')  --  Termina después o durante el año
+ORDER BY ap.start_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+   -- Función 2: Verificar si los periodos de un año específico suman exactamente 100%
+CREATE OR REPLACE FUNCTION verify_year_percentages(p_year INTEGER)
+RETURNS BOOLEAN AS $$
+DECLARE
+total INTEGER;
+BEGIN
+SELECT SUM(percentage)::INTEGER INTO total
+FROM academic_period
+WHERE EXTRACT(YEAR FROM start_date) = p_year;
+
+-- Verificar si la suma es exactamente 100
+RETURN total = 100;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- Función 1: Obtener años con sus porcentajes totales
+CREATE OR REPLACE FUNCTION get_academic_years_with_percentages()
+RETURNS TABLE(
+    year_value INTEGER,
+    total_percentage INTEGER
+) AS $$
+BEGIN
+RETURN QUERY
+SELECT
+    EXTRACT(YEAR FROM start_date)::INTEGER AS year_value,
+        SUM(percentage)::INTEGER AS total_percentage
+FROM
+    academic_period
+GROUP BY
+    EXTRACT(YEAR FROM start_date)
+ORDER BY
+    year_value;
+END;
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION get_academic_periods(p_year TEXT)
+RETURNS TABLE (
+    id INT,
+    setting_id INT,
+    start_date DATE,
+    end_date DATE,
+    name VARCHAR(8),
+    status VARCHAR(1),
+    percentage INT
+) AS $$
+BEGIN
+RETURN QUERY
+SELECT ap.id, ap.setting_id, ap.start_date, ap.end_date, ap.name, ap.status, ap.percentage
+FROM academic_period ap
+WHERE ap.start_date <= TO_DATE(p_year || '-12-31', 'YYYY-MM-DD')  -- Inicia antes o durante el año
+  AND ap.end_date >= TO_DATE(p_year || '-01-01', 'YYYY-MM-DD')    -- Termina después o durante el año
+  AND ap.status IN ('A', 'F')
+ORDER BY ap.start_date ASC;
+END;
+$$ LANGUAGE plpgsql;
+
+   -- Función 2: Verificar si los periodos de un año específico suman exactamente 100%
+CREATE OR REPLACE FUNCTION verify_year_percentages(p_year INTEGER)
+RETURNS BOOLEAN AS $$
+DECLARE
+total INTEGER;
+BEGIN
+SELECT SUM(percentage)::INTEGER INTO total
+FROM academic_period
+WHERE EXTRACT(YEAR FROM start_date) = p_year;
+
+-- Verificar si la suma es exactamente 100
+RETURN total = 100;
+END;
+$$ LANGUAGE plpgsql;
+
+
+-- Función 1: Obtener años con sus porcentajes totales
+CREATE OR REPLACE FUNCTION get_academic_years_with_percentages()
+RETURNS TABLE(
+    year_value INTEGER,
+    total_percentage INTEGER
+) AS $$
+BEGIN
+RETURN QUERY
+SELECT
+    EXTRACT(YEAR FROM start_date)::INTEGER AS year_value,
+        SUM(percentage)::INTEGER AS total_percentage
+FROM
+    academic_period
+GROUP BY
+    EXTRACT(YEAR FROM start_date)
+ORDER BY
+    year_value;
 END;
 $$ LANGUAGE plpgsql;
 
@@ -564,6 +661,191 @@ $$;
 alter function update_subject_grade_after_activity_grade() owner to postgres;
 
 ------
+
+CREATE OR REPLACE FUNCTION calculateknowledgesgradesbysubjectandgroupandperiod(
+    p_group_id       integer,
+    p_subject_id     integer,
+    p_period_id      integer
+)
+RETURNS TABLE(
+    student_id         integer,
+    knowledge_id       integer,
+    knowledge_name     varchar,
+    knowledge_percentage integer,
+    score              numeric,
+    definitiva_score   numeric
+)
+LANGUAGE plpgsql
+AS
+  $$
+DECLARE
+v_year INT;
+    v_is_last_period BOOLEAN;
+BEGIN
+    -- Obtener el año del periodo solicitado
+SELECT EXTRACT(YEAR FROM start_date) INTO v_year
+FROM academic_period
+WHERE id = p_period_id;
+
+-- Determinar si es el último periodo del año
+SELECT EXISTS (
+    SELECT 1
+    FROM academic_period ap1
+    WHERE EXTRACT(YEAR FROM ap1.start_date) = v_year
+      AND ap1.end_date > (SELECT end_date FROM academic_period WHERE id = p_period_id)
+      AND ap1.status = 'A'
+) = FALSE INTO v_is_last_period;
+
+-- Si es el primer periodo, simplemente devolvemos los datos de ese periodo
+IF p_period_id = (
+        SELECT MIN(id)
+        FROM academic_period
+        WHERE EXTRACT(YEAR FROM start_date) = v_year
+          AND status = 'A'
+    ) THEN
+        RETURN QUERY
+        WITH activity_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND achg.period_id = p_period_id
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage
+        )
+SELECT
+    as1.student_id,
+    as1.id_knowledge,
+    as1.knowledge_name,
+    as1.knowledge_percentage,
+    as1.avg_score,
+    ROUND((as1.avg_score * as1.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    activity_scores as1
+ORDER BY
+    as1.student_id, as1.id_knowledge;
+
+-- Si es el último periodo, calculamos el acumulado de todos los periodos
+ELSIF v_is_last_period THEN
+        RETURN QUERY
+        WITH period_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                achg.period_id,
+                ap.percentage AS period_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+                JOIN academic_period ap ON achg.period_id = ap.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND EXTRACT(YEAR FROM ap.start_date) = v_year
+                AND ap.status = 'A'
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage, achg.period_id, ap.percentage
+        ),
+        accumulated_scores AS (
+            SELECT
+                ps.student_id,
+                ps.id_knowledge,
+                ps.knowledge_name,
+                ps.knowledge_percentage,
+                SUM(ps.avg_score * ps.period_percentage / 100) AS final_score
+            FROM
+                period_scores ps
+            GROUP BY
+                ps.student_id, ps.id_knowledge, ps.knowledge_name, ps.knowledge_percentage
+        )
+SELECT
+    ac.student_id,
+    ac.id_knowledge,
+    ac.knowledge_name,
+    ac.knowledge_percentage,
+    ROUND(ac.final_score::numeric, 2) AS score,
+    ROUND((ac.final_score * ac.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    accumulated_scores ac
+ORDER BY
+    ac.student_id, ac.id_knowledge;
+
+-- Para cualquier otro periodo, calculamos el acumulado hasta ese periodo
+ELSE
+        RETURN QUERY
+        WITH period_scores AS (
+            SELECT
+                ag.student_id,
+                sk.id_knowledge,
+                k.name AS knowledge_name,
+                k.percentage AS knowledge_percentage,
+                achg.period_id,
+                ap.percentage AS period_percentage,
+                AVG(ag.score) AS avg_score
+            FROM
+                activity_grade ag
+                JOIN activity_group agr ON ag.activity_id = agr.id
+                JOIN activity a ON agr.activity_id = a.id
+                JOIN achievement_groups achg ON a.achievement_groups_id = achg.id
+                JOIN subject_knowledge sk ON achg.subject_knowledge_id = sk.id
+                JOIN knowledge k ON sk.id_knowledge = k.id
+                JOIN academic_period ap ON achg.period_id = ap.id
+            WHERE
+                agr.group_id = p_group_id
+                AND sk.id_subject = p_subject_id
+                AND ap.id <= p_period_id
+                AND EXTRACT(YEAR FROM ap.start_date) = v_year
+                AND ap.status = 'A'
+            GROUP BY
+                ag.student_id, sk.id_knowledge, k.name, k.percentage, achg.period_id, ap.percentage
+        ),
+        accumulated_scores AS (
+            SELECT
+                ps.student_id,
+                ps.id_knowledge,
+                ps.knowledge_name,
+                ps.knowledge_percentage,
+                SUM(ps.avg_score * ps.period_percentage / 100) /
+                (SELECT SUM(percentage) / 100 FROM academic_period WHERE id <= p_period_id AND EXTRACT(YEAR FROM start_date) = v_year AND status = 'A')
+                AS final_score
+            FROM
+                period_scores ps
+            GROUP BY
+                ps.student_id, ps.id_knowledge, ps.knowledge_name, ps.knowledge_percentage
+        )
+SELECT
+    ac.student_id,
+    ac.id_knowledge,
+    ac.knowledge_name,
+    ac.knowledge_percentage,
+    ROUND(ac.final_score::numeric, 2) AS score,
+    ROUND((ac.final_score * ac.knowledge_percentage / 100)::numeric, 2) AS definitiva_score
+FROM
+    accumulated_scores ac
+ORDER BY
+    ac.student_id, ac.id_knowledge;
+END IF;
+END;
+$$;
 
 ----------------------
 --subject_schedule----

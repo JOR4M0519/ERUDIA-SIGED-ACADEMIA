@@ -1,5 +1,5 @@
 spring:
   application:
-    name: eureka-docker
+    name: eureka
   config:
-    import: optional:configserver:http://configuration-service:8888
+    import: optional:configserver:http://config-service:8888

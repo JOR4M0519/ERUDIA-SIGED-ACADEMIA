@@ -82,20 +82,30 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
 
         List<ActivityGroupDomain> activityGroupDomainListFinal = new ArrayList<>();
 
-        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+        //List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentId(userId,"2025");
+
+        List<SubjectGroupDomain> subjectGroupDomainList = persistenceSubjectGroupPort.getAllSubjectGroupsByStudentIdByPeriod(userId,periodId);
+
 
         for (SubjectGroupDomain domain :subjectGroupDomainList){
-            activityGroupDomainListFinal.addAll(getAllActivity_ByPeriodSubjectGroup(domain.getSubjectProfessor().getSubject().getId(),periodId,domain.getGroups().getId(),"I"));
+            activityGroupDomainListFinal.addAll(getAllActivityBySubjectAndPeriodAndGroupIdAndStatusNotLike(domain.getSubjectProfessor().getSubject().getId(),periodId,domain.getGroups().getId(),"I"));
         }
 
         return activityGroupDomainListFinal;
-       // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
+        // return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndGroup_Student_IdAndActivity_StatusNotLike(periodId,userId,i));
+    }
+
+    @Override
+    public List<ActivityGroupDomain> getAllActivityBySubjectAndPeriodAndGroupIdAndStatusNotLike(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.
+                findActivityBySubjectAndPeriodAndGroupIdAndStatusNotLike(periodId,subjectId,groupId,statusNotLike));
     }
 
 
     @Override
-    public List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectId, Integer periodId, Integer groupId, String statusNotLike) {
-        return activityGroupMapper.toDomains(activityGroupCrudRepo.findByActivity_AchievementGroup_Period_IdAndActivity_AchievementGroup_SubjectKnowledge_IdSubject_IdAndGroup_IdAndActivity_StatusNotLike(periodId,subjectId,groupId,statusNotLike));
+    public List<ActivityGroupDomain> getAllActivity_ByPeriodSubjectGroup(Integer subjectProfessorId, Integer periodId, Integer groupId, String statusNotLike) {
+        return activityGroupMapper.toDomains(activityGroupCrudRepo.
+                findActivityGroupsByFilters(periodId,subjectProfessorId,groupId,statusNotLike));
     }
 
 
@@ -103,6 +113,12 @@ public class ActivityGroupAdapter implements PersistenceActivityGroupPort {
     public ActivityGroupDomain getRangeDateActivityByActivityId(Integer activityId) {
         Optional<ActivityGroup> activityGroup = Optional.ofNullable(activityGroupCrudRepo.findFirstByActivity_Id(activityId));
         return activityGroup.map(activityGroupMapper::toDomain).orElse(null);
+    }
+
+    @Override
+    public Optional<ActivityGroup> findByActivity_IdAndGroup_Id(Integer activityId, Integer groupId) {
+        Optional<ActivityGroup> activityGroup = activityGroupCrudRepo.findByActivity_IdAndGroup_Id(activityId, groupId);
+        return activityGroup;
     }
 
 }

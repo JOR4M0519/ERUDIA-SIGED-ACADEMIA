@@ -1,0 +1,232 @@
+version: '3.8'
+
+services:
+  config-service:
+    build:
+      context: ./config-service
+      dockerfile: Dockerfile
+    container_name: config-service
+    ports:
+      - "8888:8888"
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8888/actuator/health || echo 'Health check failed but continuing...'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    environment:
+      - SPRING_PROFILES_ACTIVE=native
+      - JAVA_OPTS=-Xms128m -Xmx384m
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+    restart: on-failure
+
+  eureka-service:
+    build:
+      context: ./eureka-service
+      dockerfile: Dockerfile
+    container_name: eureka-service
+    ports:
+      - "8761:8761"
+    depends_on:
+      config-service:
+        condition: service_started  # Cambiado de service_healthy a service_started
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8761 || echo 'Health check failed but continuing...'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    environment:
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_INSTANCE_HOSTNAME=eureka-service
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@eureka-service:8761/eureka/
+      - SPRING_SECURITY_USER_NAME=eureka
+      - SPRING_SECURITY_USER_PASSWORD=password
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - JAVA_OPTS=-Xms128m -Xmx320m
+    restart: on-failure
+
+  keycloak:
+    image: keycloak_glm:latest
+    container_name: keycloak
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - JAVA_OPTS=-Xms256m -Xmx1024m
+    ports:
+      - "8181:8080"
+    command: /opt/keycloak/bin/kc.sh start-dev
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/realms/academy-glm-realm || echo 'Keycloak realm not ready yet'"]
+      interval: 20s
+      timeout: 15s
+      retries: 15
+      start_period: 120s
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: on-failure
+
+  gateway-service:
+    build:
+      context: ./gateway-service
+      dockerfile: Dockerfile
+    container_name: gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      config-service:
+        condition: service_started
+      eureka-service:
+        condition: service_started
+      keycloak:
+        condition: service_started  # Cambiado de service_healthy a service_started
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || echo 'Health check failed but continuing...'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@eureka-service:8761/eureka/
+      - KEYCLOAK_SERVER_URL=http://keycloak:8080
+      - KEYCLOAK_REALM=academy-glm-realm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI=http://keycloak:8080/realms/academy-glm-realm
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI=http://keycloak:8080/realms/academy-glm-realm/protocol/openid-connect/certs
+      - JWT_AUTH_CONVERTER_PRINCIPLE_ATTRIBUTE=preferred_username
+      - JWT_AUTH_CONVERTER_RESOURCE_ID=academy-client
+      - SPRING_CLOUD_LOADBALANCER_RETRY_ENABLED=true
+      - RIBBON_CONNECT_TIMEOUT=10000
+      - RIBBON_READ_TIMEOUT=20000
+      - RIBBON_MAX_AUTO_RETRIES=3
+      - RIBBON_MAX_AUTO_RETRIES_NEXT_SERVER=3
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_NETFLIX_RIBBON=DEBUG
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_CLOUD_LOADBALANCER=DEBUG
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: on-failure
+
+  academy-service-1:
+    build:
+      context: ./academy-service
+      dockerfile: Dockerfile
+    container_name: academy-service-1
+    depends_on:
+      config-service:
+        condition: service_started
+      eureka-service:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health || echo 'Health check failed but continuing...'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    command: >
+      sh -c "
+        echo 'Esperando que Keycloak esté completamente inicializado...'
+        sleep 30
+        java -jar /app.jar
+      "
+    environment:
+      - SPRING_APPLICATION_NAME=academy
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@eureka-service:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - "EUREKA_INSTANCE_INSTANCE_ID=academy:$${random.uuid}"
+      - DB_USERNAME=apiclient-erudia
+      - DB_PASSWORD=postgres
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - SECURITY_IGNORE_EMPTY_ROLES=true
+      - SECURITY_DEFAULT_ROLE=ROLE_USER
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI_REFRESH_INTERVAL=300
+      - SPRING_CLOUD_LOADBALANCER_RETRY_ENABLED=true
+      - RIBBON_CONNECT_TIMEOUT=10000
+      - RIBBON_READ_TIMEOUT=20000
+      - RIBBON_MAX_AUTO_RETRIES=3
+      - RIBBON_MAX_AUTO_RETRIES_NEXT_SERVER=3
+      - KEYCLOAK_CONNECTION_TIMEOUT=10000
+      - KEYCLOAK_READ_TIMEOUT=20000
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    restart: on-failure
+
+  academy-service-2:
+    build:
+      context: ./academy-service
+      dockerfile: Dockerfile
+    container_name: academy-service-2
+    depends_on:
+      config-service:
+        condition: service_started
+      eureka-service:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    networks:
+      - erudia-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O - http://localhost:8080/actuator/health || echo 'Health check failed but continuing...'"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 60s
+    command: >
+      sh -c "
+        echo 'Esperando que Keycloak esté completamente inicializado...'
+        sleep 45
+        java -jar /app.jar
+      "
+    environment:
+      - SPRING_APPLICATION_NAME=academy
+      - SPRING_CLOUD_CONFIG_URI=http://config-service:8888
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka:password@eureka-service:8761/eureka/
+      - SPRING_PROFILES_ACTIVE=docker
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - "EUREKA_INSTANCE_INSTANCE_ID=academy:$${random.uuid}"
+      - DB_USERNAME=apiclient-erudia
+      - DB_PASSWORD=postgres
+      - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info
+      - MANAGEMENT_ENDPOINT_HEALTH_SHOW_DETAILS=always
+      - SECURITY_IGNORE_EMPTY_ROLES=true
+      - SECURITY_DEFAULT_ROLE=ROLE_USER
+      - SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI_REFRESH_INTERVAL=300
+      - SPRING_CLOUD_LOADBALANCER_RETRY_ENABLED=true
+      - RIBBON_CONNECT_TIMEOUT=10000
+      - RIBBON_READ_TIMEOUT=20000
+      - RIBBON_MAX_AUTO_RETRIES=3
+      - RIBBON_MAX_AUTO_RETRIES_NEXT_SERVER=3
+      - KEYCLOAK_CONNECTION_TIMEOUT=10000
+      - KEYCLOAK_READ_TIMEOUT=20000
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    restart: on-failure
+
+volumes:
+  keycloak_data:
+    external: true
+
+networks:
+  erudia-network:
+    driver: bridge

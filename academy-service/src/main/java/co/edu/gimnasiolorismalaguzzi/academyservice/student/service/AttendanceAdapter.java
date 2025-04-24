@@ -4,6 +4,7 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectSched
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectScheduleCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.mapper.UserMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.PersistenceAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Attendance;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.AttendanceMapper;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 import java.time.DayOfWeek;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -197,8 +199,46 @@ public class AttendanceAdapter implements PersistenceAttendancePort {
                     groupId, subjectId, professorId, periodId);
         }
 
+        // Validar asistencias duplicadas (mismo estudiante, horario y fecha)
+        List<AttendanceDomain> duplicateAttendances = new ArrayList<>();
+        List<AttendanceDomain> validAttendances = new ArrayList<>();
+
+        for (AttendanceDomain attendance : attendances) {
+            if (attendance.getStudent() == null || attendance.getSchedule() == null || attendance.getAttendanceDate() == null) {
+                log.warn("Asistencia con datos incompletos: estudiante, horario o fecha son nulos");
+                continue;
+            }
+
+            // Verificar si ya existe una asistencia para este estudiante en este horario y fecha
+            boolean duplicateExists = attendanceCrudRepo.existsByStudentIdAndScheduleIdAndAttendanceDate(
+                    attendance.getStudent().getId(),
+                    attendance.getSchedule().getId(),
+                    attendance.getAttendanceDate()
+            );
+
+            if (duplicateExists) {
+                duplicateAttendances.add(attendance);
+                log.warn("El estudiante {} ya tiene asistencia registrada para el horario {} en la fecha {}",
+                        attendance.getStudent().getId(), attendance.getSchedule().getId(), attendance.getAttendanceDate());
+            } else {
+                validAttendances.add(attendance);
+            }
+        }
+
+        if (!duplicateAttendances.isEmpty()) {
+            log.error("Se encontraron {} registros de asistencia duplicados", duplicateAttendances.size());
+            throw new AppException("No se pueden guardar asistencias duplicadas. Hay " +
+                    duplicateAttendances.size() + " estudiantes que ya tienen asistencia registrada para la misma fecha y horario.",
+                    HttpStatus.CONFLICT);
+        }
+
+        if (validAttendances.isEmpty()) {
+            log.warn("No hay asistencias válidas para guardar después de la validación de duplicados");
+            return List.of();
+        }
+
         // Convertir a entidades y guardar
-        var attendanceEntities = attendances.stream()
+        var attendanceEntities = validAttendances.stream()
                 .map(attendanceMapper::toEntity)
                 .toList();
 

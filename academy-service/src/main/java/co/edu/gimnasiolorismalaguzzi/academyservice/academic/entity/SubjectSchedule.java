@@ -25,16 +25,13 @@ public class SubjectSchedule {
     private SubjectGroup subjectGroup;
 
     @Size(max = 10)
-    @NotNull
-    @Column(name = "day_of_week", nullable = false, length = 10)
+    @Column(name = "day_of_week", length = 10)
     private String dayOfWeek;
 
-    @NotNull
-    @Column(name = "start_time", nullable = false)
+    @Column(name = "start_time")
     private LocalTime startTime;
 
-    @NotNull
-    @Column(name = "end_time", nullable = false)
+    @Column(name = "end_time")
     private LocalTime endTime;
 
     @NotNull

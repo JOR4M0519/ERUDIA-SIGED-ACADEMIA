@@ -3,9 +3,12 @@ spring:
     name: academy
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/test_academy
-    username: postgres
-    password: root
+    url: jdbc:postgresql://34.72.214.106:5432/academy
+    username: apiclient-erudia
+    password: postgres
+    #url: jdbc:postgresql://localhost:5432/test_academy
+    #username: postgres
+    #password: root
   jpa:
     show-sql: false
     hibernate:
@@ -18,14 +21,12 @@ spring:
         jwt:
           issuer-uri: http://localhost:8181/realms/academy-glm-realm
           jwk-set-uri: http://localhost:8181/realms/academy-glm-realm/protocol/openid-connect/certs
-server:
-  port: 0
-
-
-
 
 eureka:
   instance.hostname: localhost
   client:
     serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka/
     # serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka
+
+server:
+  port: 0

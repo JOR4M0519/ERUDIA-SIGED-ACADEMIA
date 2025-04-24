@@ -21,4 +21,6 @@ public interface GroupStudentsCrudRepo extends JpaRepository<GroupStudent, Integ
     List<GroupStudent> findByGroupId(Integer groupId);
 
     List<GroupStudent> findByStatus(String status);
+
+    List<GroupStudent> findByStudent_Id(Integer id);
 }

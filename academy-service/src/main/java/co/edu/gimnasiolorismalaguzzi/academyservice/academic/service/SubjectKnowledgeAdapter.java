@@ -98,6 +98,11 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
     }
 
     @Override
+    public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectIdAndGroupId(Integer subjectId,Integer groupId) {
+        return this.mapper.toDomains(crudRepo.findByIdSubject_IdAndGroupId(subjectId,groupId));
+    }
+
+    @Override
     public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectId(Integer subjectId) {
         return this.mapper.toDomains(crudRepo.findByIdSubject_Id(subjectId));
     }

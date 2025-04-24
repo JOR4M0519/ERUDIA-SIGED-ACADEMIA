@@ -52,7 +52,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
                     continue;
                 }
 
-                Integer userId = userDetail.getId();
+                //Integer userId = userDetail.getId();
+                Integer userId = userDetail.getUser().getId();
                 boolean isStudent = false;
 
                 // Verificar si el usuario tiene roles
@@ -144,8 +145,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
             Integer studentId = familyDomain.getUser().getId();
             Integer relativeId = familyDomain.getRelativeUser().getId();
 
-            boolean isStudentValid =  userDetailPort.hasStudentRole(relativeId); // El familiar no debería tener rol de estudiante
-            boolean isRelativeValid =  userDetailPort.hasStudentRole(studentId);
+            boolean isStudentValid =  userDetailPort.hasStudentRole(studentId); // El familiar no debería tener rol de estudiante
+            boolean isRelativeValid =  userDetailPort.hasStudentRole(relativeId);
 
             if (!isStudentValid) {
                 throw new AppException("El usuario con ID " + studentId + " no tiene rol de estudiante", HttpStatus.BAD_REQUEST);
@@ -271,11 +272,11 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
         try {
             // Primero buscamos si el usuario es un estudiante y tiene familiares asociados
-            List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userDetailPort.findById(userId).getUser().getId());
+            List<Family> relativesOfStudent = familyCrudRepo.findByStudent_Id(userId);
             relativesOfStudent.forEach(relation -> uniqueFamilyRelations.put(relation.getId(), relation));
 
             // Luego buscamos si el usuario es un familiar y está asociado a estudiantes
-            List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userDetailPort.findById(userId).getUser().getId());
+            List<Family> studentsOfRelative = familyCrudRepo.findByUser_Id(userId);
             studentsOfRelative.forEach(relation -> uniqueFamilyRelations.put(relation.getId(), relation));
 
             // Si encontramos que el usuario es un familiar con estudiantes asociados,

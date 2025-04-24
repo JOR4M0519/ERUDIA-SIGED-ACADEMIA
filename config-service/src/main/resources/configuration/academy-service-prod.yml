@@ -1,0 +1,14 @@
+# Configuración específica para producción
+spring:
+  datasource:
+    # AQUÍ ES DONDE DEBES PONER LA URL DE LA BASE DE DATOS EN LA NUBE
+    url: jdbc:postgresql://34.72.214.106:5432/academy
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+logging:
+  level:
+    root: INFO

@@ -1,17 +1,26 @@
 spring:
+  application:
+    name: academy
   datasource:
     driver-class-name: org.postgresql.Driver
-    url:  jdbc:postgresql://postgres-academy:5432/academy
-    username: postgres
-    password: root
-  jpa:
-    show-sql: false
-    hibernate:
-    ddl-auto: update
-    database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    url: jdbc:postgresql://34.72.214.106:5432/academy
+    username: apiclient-erudia
+    password: postgres
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://host.docker.internal:8181/realms/academy-glm-realm
+          jwk-set-uri: http://host.docker.internal:8181/realms/academy-glm-realm/protocol/openid-connect/certs
 
-server.port: 8080
 
-eureka.client.serviceUrl.defaultZone: http://eureka-service:8761/eureka
-    # serviceUrl.defaultZone: http://eureka:password@localhost:8761/eureka
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${random.uuid}
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@eureka-service:8761/eureka/
+
+server:
+  port: 0

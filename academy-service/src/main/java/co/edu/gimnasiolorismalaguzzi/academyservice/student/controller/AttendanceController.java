@@ -1,6 +1,8 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.student.controller;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.ErrorDto;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceAttendancePort;
 import org.springframework.http.HttpStatus;
@@ -50,15 +52,27 @@ public class AttendanceController {
     }
 
     @PostMapping("/groups/{groupId}/subjects/{subjectId}/professors/{professorId}/periods/{periodId}/batch")
-    public ResponseEntity<List<AttendanceDomain>> saveAttendances(
+    public ResponseEntity<?> saveAttendances(
             @RequestBody List<AttendanceDomain> attendances,
             @PathVariable Integer groupId,
             @PathVariable Integer subjectId,
             @PathVariable Integer professorId,
             @PathVariable Integer periodId) {
 
-        List<AttendanceDomain> createdAttendances = attendancePort.saveAll(attendances, groupId, subjectId, professorId, periodId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAttendances);
+        try {
+            List<AttendanceDomain> createdAttendances = attendancePort.saveAll(attendances, groupId, subjectId, professorId, periodId);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdAttendances);
+        } catch (AppException e) {
+            // Si es una AppException, ya tiene el código de estado definido
+            return ResponseEntity.status(e.getCode()).body(ErrorDto.builder().message(e.getMessage()).build());
+        } catch (IllegalStateException e) {
+            // Para excepciones de duplicados (código 409 - Conflict)
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ErrorDto.builder().message(e.getMessage()).build());
+        } catch (Exception e) {
+            // Para otras excepciones no controladas
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ErrorDto.builder().message("Error al procesar las asistencias: " + e.getMessage()).build());
+        }
     }
 
     /*@PostMapping("/batch")
@@ -69,7 +83,7 @@ public class AttendanceController {
 
     @PutMapping("/batch")
     public ResponseEntity<List<AttendanceDomain>> updateAttendances(@RequestBody List<AttendanceDomain> attendances) {
-        List<AttendanceDomain> updatedAttendances = attendancePort.updateAll(attendances);
+       List<AttendanceDomain> updatedAttendances = attendancePort.updateAll(attendances);
         return ResponseEntity.ok(updatedAttendances);
     }
 
