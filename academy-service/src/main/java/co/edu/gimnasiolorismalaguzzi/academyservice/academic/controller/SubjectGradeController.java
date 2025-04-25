@@ -5,9 +5,6 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.RecoveryPeri
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectGradeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectGradePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.common.WebAdapter;
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain.GradeDistributionDTO;
-import co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.service.persistence.PersistenceGradeReportService;
-import jakarta.ws.rs.PathParam;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +17,10 @@ import java.util.List;
 public class SubjectGradeController {
     private final PersistenceSubjectGradePort subjectGradePort;
 
-    private PersistenceGradeReportService persistenceGradeReportService;
 
 
-    public SubjectGradeController(PersistenceSubjectGradePort subjectGradePort, PersistenceGradeReportService persistenceGradeReportService) {
+    public SubjectGradeController(PersistenceSubjectGradePort subjectGradePort) {
         this.subjectGradePort = subjectGradePort;
-        this.persistenceGradeReportService = persistenceGradeReportService;
     }
 
     @GetMapping
@@ -102,18 +97,6 @@ public class SubjectGradeController {
         return ResponseEntity.ok(updatedGrade);
     }
 
-    @GetMapping("/report/distribution")
-    public ResponseEntity<List<GradeDistributionDTO>> getGradeDistribution(
-            @RequestParam Integer year,
-            @RequestParam Integer periodId,
-            @RequestParam String levelId,
-            @RequestParam Integer subjectId) {
-
-        List<GradeDistributionDTO> distribution = persistenceGradeReportService.getGradeDistribution(
-                year, periodId, levelId, subjectId);
-
-        return ResponseEntity.ok(distribution);
-    }
     //No borrar notas
 
 }

@@ -25,9 +25,6 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
     @Autowired
     private SubjectKnowledgeMapper mapper;
 
-    @Autowired
-    private PersistenceAchievementGroups achievementGroupsPort;
-
     public SubjectKnowledgeAdapter(SubjectKnowledgeCrudRepo subjectKnowledgeCrudRepo, SubjectKnowledgeMapper subjectKnowledgeMapper){
         this.crudRepo = subjectKnowledgeCrudRepo;
         this.mapper = subjectKnowledgeMapper;
@@ -53,57 +50,29 @@ public class SubjectKnowledgeAdapter implements PersistenceSubjectKnowledgePort 
 
     @Override
     public SubjectKnowledgeDomain update(Integer integer, SubjectKnowledgeDomain entity) {
-        try{
-            Optional<SubjectKnowledge> existingSubjectKnowledge = crudRepo.findById(integer);
-            if(existingSubjectKnowledge.isPresent()){
-                existingSubjectKnowledge.get().setIdSubject(entity.getIdSubject());
-                existingSubjectKnowledge.get().setIdKnowledge(entity.getIdKnowledge());
-            }
-            return mapper.toDomain(crudRepo.save(existingSubjectKnowledge.get()));
-        } catch (EntityNotFoundException e){
-            throw new EntityNotFoundException("UserDetail with ID " + integer + " not found");
-        }
+      return null;
     }
 
     @Override
     public HttpStatus delete(Integer integer) {
 
-        if(this.crudRepo.existsById(integer)){
-            // Verificar si el saber está siendo utilizado en logros
-            boolean usedInAchievements = !achievementGroupsPort.getAllBySubjectKnowledgeId(integer).isEmpty();
-
-            // Si está siendo utilizado, lanzar excepción
-            if (usedInAchievements) {
-                throw new AppException(
-                        "No es posible eliminar el saber porque está siendo utilizado en logros o evaluaciones",
-                        HttpStatus.CONFLICT);
-            }
-
-            crudRepo.delete(this.crudRepo.getReferenceById(integer));
-            return HttpStatus.OK;
-        } else {
-            throw new AppException("Relation within Subject and Knowledge ID doesnt exist", HttpStatus.NOT_FOUND);
-        }
+        return null;
 
     }
 
     @Override
     public List<SubjectKnowledgeDomain> getAllKnowledgesBySubjectIdByPeriodId(Integer subjectId,Integer periodId) {
-        return this.mapper.toDomains(this.crudRepo.findKnowledgesBySubjectId(subjectId,periodId));
-    }
+        return null;    }
 
     @Override
     public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeByKnowledgeId(Integer knowledgeId) {
-        return this.mapper.toDomains(crudRepo.findByIdKnowledge_Id(knowledgeId));
-    }
+        return null;    }
 
     @Override
     public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectIdAndGroupId(Integer subjectId,Integer groupId) {
-        return this.mapper.toDomains(crudRepo.findByIdSubject_IdAndGroupId(subjectId,groupId));
-    }
+        return null;    }
 
     @Override
     public List<SubjectKnowledgeDomain> getAllSubjectKnowledgeBySubjectId(Integer subjectId) {
-        return this.mapper.toDomains(crudRepo.findByIdSubject_Id(subjectId));
-    }
+        return null;    }
 }
