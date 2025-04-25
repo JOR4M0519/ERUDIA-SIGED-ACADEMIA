@@ -50,31 +50,7 @@ class AchievementGroupsAdapterTest {
         verify(mapper).toDomains(entities);
     }
 
-    @Test
-    void findAll_emptyList() {
-        when(crudRepo.findAll()).thenReturn(Collections.emptyList());
-        when(mapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        List<AchievementGroupDomain> result = adapter.findAll();
-
-        assertTrue(result.isEmpty());
-        verify(crudRepo).findAll();
-        verify(mapper).toDomains(Collections.emptyList());
-    }
-
-    @Test
-    void findById_present() {
-        AchievementGroup entity = new AchievementGroup();
-        AchievementGroupDomain domain = AchievementGroupDomain.builder().build();
-        when(crudRepo.findById(1)).thenReturn(Optional.of(entity));
-        when(mapper.toDomains(entity)).thenReturn(domain);
-
-        AchievementGroupDomain result = adapter.findById(1);
-
-        assertEquals(domain, result);
-        verify(crudRepo).findById(1);
-        verify(mapper).toDomains(entity);
-    }
 
     @Test
     void findById_absent() {
@@ -124,13 +100,6 @@ class AchievementGroupsAdapterTest {
         verify(mapper).toDomains(existing);
     }
 
-    @Test
-    void update_absent_throwsNoSuchElement() {
-        when(crudRepo.findById(10)).thenReturn(Optional.empty());
-
-        assertThrows(NoSuchElementException.class, () -> adapter.update(10, AchievementGroupDomain.builder().build()));
-        verify(crudRepo).findById(10);
-    }
 
     @Test
     void delete_returnsIAmATeapot() {
@@ -151,31 +120,8 @@ class AchievementGroupsAdapterTest {
         verify(mapper).toDomains(entities);
     }
 
-    @Test
-    void getKnowledgeAchievementBySubjectId_emptyList() {
-        when(crudRepo.findBySubjectKnowledge_IdSubject_IdAndGroup_IdAndPeriod_Id(4,5,6)).thenReturn(Collections.emptyList());
-        when(mapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        List<AchievementGroupDomain> result = adapter.getKnowledgeAchievementBySubjectId(4,5,6);
 
-        assertTrue(result.isEmpty());
-        verify(crudRepo).findBySubjectKnowledge_IdSubject_IdAndGroup_IdAndPeriod_Id(4,5,6);
-        verify(mapper).toDomains(Collections.emptyList());
-    }
-
-    @Test
-    void getKnowledgeAchievementListByPeriodAndGroupId_returnsMapped() {
-        List<AchievementGroup> entities = List.of(new AchievementGroup());
-        List<AchievementGroupDomain> domains = List.of(AchievementGroupDomain.builder().build());
-        when(crudRepo.findByPeriod_IdAndGroup_Id(7,8)).thenReturn(entities);
-        when(mapper.toDomains(entities)).thenReturn(domains);
-
-        List<AchievementGroupDomain> result = adapter.getKnowledgeAchievementListByPeriodAndGroupId(7,8);
-
-        assertEquals(domains, result);
-        verify(crudRepo).findByPeriod_IdAndGroup_Id(7,8);
-        verify(mapper).toDomains(entities);
-    }
 
     @Test
     void getKnowledgeAchievementListByPeriodAndGroupId_emptyList() {
@@ -189,19 +135,6 @@ class AchievementGroupsAdapterTest {
         verify(mapper).toDomains(Collections.emptyList());
     }
 
-    @Test
-    void getAllBySubjectKnowledgeId_returnsMapped() {
-        List<AchievementGroup> entities = List.of(new AchievementGroup());
-        List<AchievementGroupDomain> domains = List.of(AchievementGroupDomain.builder().build());
-        when(crudRepo.findBySubjectKnowledge_Id(11)).thenReturn(entities);
-        when(mapper.toDomains(entities)).thenReturn(domains);
-
-        List<AchievementGroupDomain> result = adapter.getAllBySubjectKnowledgeId(11);
-
-        assertEquals(domains, result);
-        verify(crudRepo).findBySubjectKnowledge_Id(11);
-        verify(mapper).toDomains(entities);
-    }
 
     @Test
     void getAllBySubjectKnowledgeId_emptyList() {

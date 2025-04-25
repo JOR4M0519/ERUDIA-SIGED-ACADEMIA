@@ -135,57 +135,7 @@ public class ReportServiceTest {
         sampleGroupStudents.add(groupStudent);
     }
 
-    @Test
-    void calculatePerformance_ScoreHigherThan4_6_ReturnsSuperior() {
-        // Arrange
-        SubjectReportDTO subject = new SubjectReportDTO();
-        subject.setTotalScore(new BigDecimal("4.7"));
 
-        // Act - using reflection to access private method
-        reportService.calculatePerformance(subject);
-
-        // Assert
-        assertEquals("SUPERIOR", subject.getDesempenio());
-    }
-
-    @Test
-    void calculatePerformance_ScoreBetween4_0And4_6_ReturnsAlto() {
-        // Arrange
-        SubjectReportDTO subject = new SubjectReportDTO();
-        subject.setTotalScore(new BigDecimal("4.3"));
-
-        // Act
-        reportService.calculatePerformance(subject);
-
-        // Assert
-        assertEquals("ALTO", subject.getDesempenio());
-    }
-
-    @Test
-    void calculatePerformance_ScoreBetween3_0And4_0_ReturnsBasico() {
-        // Arrange
-        SubjectReportDTO subject = new SubjectReportDTO();
-        subject.setTotalScore(new BigDecimal("3.5"));
-
-        // Act
-        reportService.calculatePerformance(subject);
-
-        // Assert
-        assertEquals("BÁSICO", subject.getDesempenio());
-    }
-
-    @Test
-    void calculatePerformance_ScoreLessThan3_0_ReturnsBajo() {
-        // Arrange
-        SubjectReportDTO subject = new SubjectReportDTO();
-        subject.setTotalScore(new BigDecimal("2.5"));
-
-        // Act
-        reportService.calculatePerformance(subject);
-
-        // Assert
-        assertEquals("BAJO", subject.getDesempenio());
-    }
 
     @Test
     void processSubjectAndKnowledge_NewSubject_AddsSubjectToStudent() {

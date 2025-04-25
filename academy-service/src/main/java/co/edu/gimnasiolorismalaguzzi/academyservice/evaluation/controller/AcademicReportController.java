@@ -28,7 +28,6 @@ public class AcademicReportController {
         this.reportService = reportService;
     }
 
-/*
     @GetMapping("/group/{groupId}/period/{periodId}")
     public ResponseEntity<List<StudentReportDTO>> getGroupReport(
             @PathVariable Long groupId,
@@ -36,60 +35,15 @@ public class AcademicReportController {
         List<StudentReportDTO> report = reportService.generateGroupReport(groupId, periodId);
         return ResponseEntity.ok(report);
     }
-*/
 
-    @GetMapping("/group/{groupId}/student/{studentId}/period/{periodId}")
-    public ResponseEntity<StudentReportDTO> getStudentReport(
-            @PathVariable Long groupId,
-            @PathVariable Long studentId,
-            @PathVariable Long periodId) {
-        StudentReportDTO report = reportService.generateStudentReport(groupId, studentId, periodId);
-        if (report == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(report);
-    }
 
-/*    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
+    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
     public ResponseEntity<Resource> getGroupReportPdf(@PathVariable Long groupId, @PathVariable Long periodId) throws IOException {
         ByteArrayResource resource = reportService.generatePdfReport(groupId, periodId);
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=reporte_grupo.pdf")
                 .contentType(MediaType.APPLICATION_PDF)
-                .body(resource);
-    }*/
-
-    @GetMapping("/pdf/group/{groupId}/period/{periodId}")
-    public ResponseEntity<Resource> getGroupReportPdf(@PathVariable Long groupId, @PathVariable Long periodId) throws IOException {
-        // Obtener la lista de reportes por estudiante
-        Map<Long, ByteArrayResource> studentReports = reportService.generateMultipleStudentReports(groupId, periodId);
-
-        if (studentReports.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
-        // Crear un archivo ZIP con todos los PDFs
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ZipOutputStream zipOut = new ZipOutputStream(baos);
-
-        for (Map.Entry<Long, ByteArrayResource> entry : studentReports.entrySet()) {
-            Long studentId = entry.getKey();
-            ByteArrayResource pdfResource = entry.getValue();
-
-            ZipEntry zipEntry = new ZipEntry("boletin_estudiante_" + studentId + "_periodo_" + periodId + ".pdf");
-            zipOut.putNextEntry(zipEntry);
-            zipOut.write(pdfResource.getByteArray());
-            zipOut.closeEntry();
-        }
-
-        zipOut.close();
-
-        ByteArrayResource resource = new ByteArrayResource(baos.toByteArray());
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=boletines_grupo_" + groupId + "_periodo_" + periodId + ".zip")
                 .body(resource);
     }
 
