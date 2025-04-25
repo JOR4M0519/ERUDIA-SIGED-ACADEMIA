@@ -18,13 +18,14 @@ import java.util.Optional;
 @PersistenceAdapter
 public class AchievementGroupsAdapter implements PersistenceAchievementGroups {
 
+
     private final AchievementGroupsMapper achievementGroupsMapper;
 
-    @Autowired
     private AchievementGroupsCrudRepo achievementGroupsCrudRepo;
 
-    public AchievementGroupsAdapter(AchievementGroupsMapper achievementGroupsMapper) {
+    public AchievementGroupsAdapter(AchievementGroupsMapper achievementGroupsMapper, AchievementGroupsCrudRepo achievementGroupsCrudRepo) {
         this.achievementGroupsMapper = achievementGroupsMapper;
+        this.achievementGroupsCrudRepo = achievementGroupsCrudRepo;
     }
 
     @Override

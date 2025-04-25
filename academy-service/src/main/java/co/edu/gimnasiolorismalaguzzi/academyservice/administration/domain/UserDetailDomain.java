@@ -2,6 +2,7 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.Relationship;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -9,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@Builder
 public class UserDetailDomain implements Serializable {
     private Integer id;
     private UserDomain user;

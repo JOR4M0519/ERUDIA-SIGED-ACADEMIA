@@ -1,5 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.modules.knowledge;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.domain.SubjectKnowledgeDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectKnowledgePort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.KnowledgeDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Knowledge;
@@ -10,28 +12,28 @@ import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class KnowledgeAdapterTest {
+class KnowledgeAdapterTest {
 
-    @Mock
-    private KnowledgeCrudRepo knowledgeCrudRepo;
-
-    @Mock
-    private KnowledgeMapper knowledgeMapper;
-
-    private KnowledgeAdapter knowledgeAdapter;
+    @Mock private KnowledgeCrudRepo knowledgeCrudRepo;
+    @Mock private KnowledgeMapper knowledgeMapper;
+    @Mock private PersistenceSubjectKnowledgePort subjectKnowledgePort;
+    @InjectMocks private KnowledgeAdapter adapter;
 
     private Knowledge knowledge;
     private KnowledgeDomain knowledgeDomain;
@@ -40,127 +42,153 @@ public class KnowledgeAdapterTest {
 
     @BeforeEach
     void setUp() {
-        knowledgeAdapter = new KnowledgeAdapter(knowledgeCrudRepo, knowledgeMapper);
+        // inject autowired field
+        ReflectionTestUtils.setField(adapter, "subjectKnowledgePort", subjectKnowledgePort);
 
-        // Inicializar entidades para pruebas
         knowledge = Knowledge.builder()
                 .id(1)
                 .name("Conocimiento Test")
+                .status("A")
                 .percentage(20)
                 .build();
 
-        // Creamos un KnowledgeDomain simple ya que no tenemos todos los detalles
         knowledgeDomain = new KnowledgeDomain();
-        // Asumimos que tiene setters o builder basado en la convención
+        knowledgeDomain.setId(1);
+        knowledgeDomain.setName("Conocimiento Test");
+        knowledgeDomain.setStatus("A");
+        knowledgeDomain.setPercentage(20);
 
-        knowledgeList = Arrays.asList(knowledge);
-        knowledgeDomainList = Arrays.asList(knowledgeDomain);
+        knowledgeList = List.of(knowledge);
+        knowledgeDomainList = List.of(knowledgeDomain);
     }
 
     @Test
     void findAll_ShouldReturnAllKnowledge() {
-        // Arrange
         when(knowledgeCrudRepo.findAll()).thenReturn(knowledgeList);
         when(knowledgeMapper.toDomains(knowledgeList)).thenReturn(knowledgeDomainList);
 
-        // Act
-        List<KnowledgeDomain> result = knowledgeAdapter.findAll();
+        List<KnowledgeDomain> result = adapter.findAll();
 
-        // Assert
         assertEquals(knowledgeDomainList, result);
         verify(knowledgeCrudRepo).findAll();
         verify(knowledgeMapper).toDomains(knowledgeList);
     }
 
     @Test
+    void findAll_emptyList() {
+        when(knowledgeCrudRepo.findAll()).thenReturn(Collections.emptyList());
+        when(knowledgeMapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
+
+        List<KnowledgeDomain> result = adapter.findAll();
+
+        assertTrue(result.isEmpty());
+        verify(knowledgeCrudRepo).findAll();
+        verify(knowledgeMapper).toDomains(Collections.emptyList());
+    }
+
+    @Test
     void findById_WhenKnowledgeExists_ShouldReturnKnowledge() {
-        // Arrange
-        Integer id = 1;
-        when(knowledgeCrudRepo.findById(id)).thenReturn(Optional.of(knowledge));
+        when(knowledgeCrudRepo.findById(1)).thenReturn(Optional.of(knowledge));
         when(knowledgeMapper.toDomain(knowledge)).thenReturn(knowledgeDomain);
 
-        // Act
-        KnowledgeDomain result = knowledgeAdapter.findById(id);
+        KnowledgeDomain result = adapter.findById(1);
 
-        // Assert
         assertEquals(knowledgeDomain, result);
-        verify(knowledgeCrudRepo).findById(id);
+        verify(knowledgeCrudRepo).findById(1);
         verify(knowledgeMapper).toDomain(knowledge);
     }
 
     @Test
     void findById_WhenKnowledgeDoesNotExist_ShouldReturnNull() {
-        // Arrange
-        Integer id = 999;
-        when(knowledgeCrudRepo.findById(id)).thenReturn(Optional.empty());
+        when(knowledgeCrudRepo.findById(2)).thenReturn(Optional.empty());
 
-        // Act
-        KnowledgeDomain result = knowledgeAdapter.findById(id);
+        KnowledgeDomain result = adapter.findById(2);
 
-        // Assert
         assertNull(result);
-        verify(knowledgeCrudRepo).findById(id);
+        verify(knowledgeCrudRepo).findById(2);
         verify(knowledgeMapper, never()).toDomain(any());
     }
 
     @Test
     void save_ShouldSaveKnowledge() {
-        // Arrange
-        KnowledgeDomain domainToSave = new KnowledgeDomain();
-        Knowledge entityToSave = new Knowledge();
-        Knowledge savedEntity = Knowledge.builder()
-                .id(1)
-                .name("Nuevo Conocimiento")
-                .percentage(20)
-                .build();
-        KnowledgeDomain savedDomain = new KnowledgeDomain();
+        KnowledgeDomain input = new KnowledgeDomain();
+        input.setName("Nuevo"); input.setStatus("A"); input.setPercentage(10);
+        Knowledge toSave = new Knowledge();
+        Knowledge saved = Knowledge.builder().id(2).name("Nuevo").status("A").percentage(10).build();
+        KnowledgeDomain out = new KnowledgeDomain();
+        out.setId(2);
 
-        when(knowledgeMapper.toEntity(domainToSave)).thenReturn(entityToSave);
-        when(knowledgeCrudRepo.save(entityToSave)).thenReturn(savedEntity);
-        when(knowledgeMapper.toDomain(savedEntity)).thenReturn(savedDomain);
+        when(knowledgeMapper.toEntity(input)).thenReturn(toSave);
+        when(knowledgeCrudRepo.save(toSave)).thenReturn(saved);
+        when(knowledgeMapper.toDomain(saved)).thenReturn(out);
 
-        // Act
-        KnowledgeDomain result = knowledgeAdapter.save(domainToSave);
+        KnowledgeDomain result = adapter.save(input);
 
-        // Assert
-        assertEquals(savedDomain, result);
-        verify(knowledgeMapper).toEntity(domainToSave);
-        verify(knowledgeCrudRepo).save(entityToSave);
-        verify(knowledgeMapper).toDomain(savedEntity);
+        assertEquals(out, result);
+        verify(knowledgeMapper).toEntity(input);
+        verify(knowledgeCrudRepo).save(toSave);
+        verify(knowledgeMapper).toDomain(saved);
     }
 
     @Test
     void update_WhenKnowledgeExists_ShouldUpdateAndReturnKnowledge() {
-        // Arrange
-        Integer id = 1;
-        KnowledgeDomain domainToUpdate = new KnowledgeDomain();
+        KnowledgeDomain dto = new KnowledgeDomain(); dto.setName("Upd"); dto.setStatus("I"); dto.setPercentage(30);
+        when(knowledgeCrudRepo.findById(1)).thenReturn(Optional.of(knowledge));
+        Knowledge updated = Knowledge.builder().id(1).name("Upd").status("I").percentage(30).build();
+        when(knowledgeCrudRepo.save(knowledge)).thenReturn(updated);
+        KnowledgeDomain out = new KnowledgeDomain();
+        when(knowledgeMapper.toDomain(updated)).thenReturn(out);
 
-        Knowledge existingEntity = Knowledge.builder()
-                .id(1)
-                .name("Conocimiento Original")
-                .percentage(20)
-                .build();
-
-        Knowledge updatedEntity = Knowledge.builder()
-                .id(1)
-                .name("Conocimiento Actualizado")
-                .percentage(20)
-                .build();
-
-        KnowledgeDomain updatedDomain = new KnowledgeDomain();
-
-        when(knowledgeCrudRepo.findById(id)).thenReturn(Optional.of(existingEntity));
-        when(knowledgeCrudRepo.save(any(Knowledge.class))).thenReturn(updatedEntity);
-        when(knowledgeMapper.toDomain(updatedEntity)).thenReturn(updatedDomain);
-
-        // Act
-        KnowledgeDomain result = knowledgeAdapter.update(id, domainToUpdate);
-
-        // Assert
-        assertEquals(updatedDomain, result);
-        verify(knowledgeCrudRepo).findById(id);
-        verify(knowledgeCrudRepo).save(any(Knowledge.class));
-        verify(knowledgeMapper).toDomain(updatedEntity);
+        KnowledgeDomain result = adapter.update(1, dto);
+        assertEquals(out, result);
+        verify(knowledgeCrudRepo).findById(1);
+        verify(knowledgeCrudRepo).save(knowledge);
+        verify(knowledgeMapper).toDomain(updated);
     }
 
+    @Test
+    void update_WhenKnowledgeDoesNotExist_ShouldThrowNoSuchElementException() {
+        when(knowledgeCrudRepo.findById(3)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> adapter.update(3, knowledgeDomain));
+    }
+
+    @Test
+    void updateStatusById_WhenKnowledgeExists_ShouldUpdateStatus() {
+        KnowledgeDomain dto = new KnowledgeDomain(); dto.setName(knowledge.getName()); dto.setStatus("I");
+        when(knowledgeCrudRepo.findById(1)).thenReturn(Optional.of(knowledge));
+        Knowledge saved = Knowledge.builder().id(1).name(knowledge.getName()).status("I").percentage(20).build();
+        when(knowledgeCrudRepo.save(knowledge)).thenReturn(saved);
+        KnowledgeDomain out = new KnowledgeDomain();
+        when(knowledgeMapper.toDomain(saved)).thenReturn(out);
+
+        KnowledgeDomain result = adapter.updateStatusById(1, dto);
+        assertEquals(out, result);
+        verify(knowledgeCrudRepo).findById(1);
+        verify(knowledgeCrudRepo).save(knowledge);
+        verify(knowledgeMapper).toDomain(saved);
+    }
+
+    @Test
+    void updateStatusById_WhenKnowledgeDoesNotExist_ShouldThrowNoSuchElementException() {
+        when(knowledgeCrudRepo.findById(4)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> adapter.updateStatusById(4, knowledgeDomain));
+    }
+
+    @Test
+    void delete_WhenKnowledgeDoesNotExist_ShouldThrowNullPointerException() {
+        when(knowledgeCrudRepo.findById(5)).thenReturn(Optional.empty());
+        assertThrows(NullPointerException.class, () -> adapter.delete(5));
+    }
+
+
+    @Test
+    void delete_WhenNotUsed_ShouldDeleteAndReturnOk() {
+        when(knowledgeCrudRepo.findById(2)).thenReturn(Optional.of(knowledge));
+        when(adapter.findById(2)).thenReturn(knowledgeDomain);
+        when(subjectKnowledgePort.getAllSubjectKnowledgeByKnowledgeId(2)).thenReturn(Collections.emptyList());
+
+        HttpStatus status = adapter.delete(2);
+        assertEquals(HttpStatus.OK, status);
+        verify(knowledgeCrudRepo).deleteById(2);
+    }
 }

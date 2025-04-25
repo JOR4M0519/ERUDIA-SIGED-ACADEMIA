@@ -1,6 +1,7 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.entity.User;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@Builder
 public class UserDetailDomain implements Serializable {
     private Integer id;
     private UserDomain user;

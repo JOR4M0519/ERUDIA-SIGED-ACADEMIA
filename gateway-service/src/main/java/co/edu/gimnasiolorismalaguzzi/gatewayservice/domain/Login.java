@@ -1,11 +1,13 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Set;
 
 @Data
+@Builder
 public class Login implements Serializable {
     private Integer id;
     private String uuid;

@@ -7,7 +7,9 @@ import co.edu.gimnasiolorismalaguzzi.academyservice.academic.mapper.SubjectKnowl
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.repository.SubjectKnowledgeCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.SubjectKnowledgeAdapter;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Knowledge;
+import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.service.persistence.PersistenceAchievementGroups;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,46 +17,46 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class SubjectKnowledgeAdapterTest {
+class SubjectKnowledgeAdapterTest {
 
-    @Mock
-    private SubjectKnowledgeCrudRepo subjectKnowledgeCrudRepo;
+    @Mock private SubjectKnowledgeCrudRepo crudRepo;
+    @Mock private SubjectKnowledgeMapper mapper;
+    @Mock private PersistenceAchievementGroups achievementGroupsPort;
 
-    @Mock
-    private SubjectKnowledgeMapper subjectKnowledgeMapper;
+    private SubjectKnowledgeAdapter adapter;
 
-    private SubjectKnowledgeAdapter subjectKnowledgeAdapter;
-
-    private SubjectKnowledge subjectKnowledge;
-    private SubjectKnowledgeDomain subjectKnowledgeDomain;
-    private List<SubjectKnowledge> subjectKnowledges;
-    private List<SubjectKnowledgeDomain> subjectKnowledgeDomains;
     private Subject subject;
     private Knowledge knowledge;
+    private SubjectKnowledge subjectKnowledge;
+    private SubjectKnowledgeDomain subjectKnowledgeDomain;
+    private List<SubjectKnowledge>  subjectKnowledges;
+    private List<SubjectKnowledgeDomain> subjectKnowledgeDomains;
 
     @BeforeEach
     void setUp() {
-        // Crear la instancia con el constructor
-        subjectKnowledgeAdapter = new SubjectKnowledgeAdapter(subjectKnowledgeCrudRepo, subjectKnowledgeMapper);
+        // Construye el adapter e inyecta el mock de achievementGroupsPort
+        adapter = new SubjectKnowledgeAdapter(crudRepo, mapper);
+        ReflectionTestUtils.setField(adapter, "achievementGroupsPort", achievementGroupsPort);
+        ReflectionTestUtils.setField(adapter, "mapper", mapper);
 
-        // Inicializar entidades
+        // Datos de ejemplo
         subject = Subject.builder()
                 .id(1)
                 .subjectName("Mathematics")
                 .status("A")
                 .build();
-
         knowledge = Knowledge.builder()
                 .id(1)
                 .name("Algebra")
@@ -66,244 +68,177 @@ public class SubjectKnowledgeAdapterTest {
                 .idKnowledge(knowledge)
                 .build();
 
-        // Inicializar dominio
         subjectKnowledgeDomain = SubjectKnowledgeDomain.builder()
                 .id(1)
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
 
-        // Inicializar listas
         subjectKnowledges = Arrays.asList(subjectKnowledge);
         subjectKnowledgeDomains = Arrays.asList(subjectKnowledgeDomain);
     }
 
     @Test
     void findAll_ShouldReturnAllSubjectKnowledges() {
-        // Arrange
-        when(subjectKnowledgeCrudRepo.findAll()).thenReturn(subjectKnowledges);
-        when(subjectKnowledgeMapper.toDomains(subjectKnowledges)).thenReturn(subjectKnowledgeDomains);
+        when(crudRepo.findAll()).thenReturn(subjectKnowledges);
+        when(mapper.toDomains(subjectKnowledges)).thenReturn(subjectKnowledgeDomains);
 
-        // Act
-        List<SubjectKnowledgeDomain> result = subjectKnowledgeAdapter.findAll();
+        List<SubjectKnowledgeDomain> result = adapter.findAll();
 
-        // Assert
         assertEquals(subjectKnowledgeDomains, result);
-        verify(subjectKnowledgeCrudRepo).findAll();
-        verify(subjectKnowledgeMapper).toDomains(subjectKnowledges);
+        verify(crudRepo).findAll();
+        verify(mapper).toDomains(subjectKnowledges);
     }
 
     @Test
     void findById_WhenSubjectKnowledgeExists_ShouldReturnSubjectKnowledge() {
-        // Arrange
-        Integer id = 1;
-        when(subjectKnowledgeCrudRepo.findById(id)).thenReturn(Optional.of(subjectKnowledge));
-        when(subjectKnowledgeMapper.toDomain(subjectKnowledge)).thenReturn(subjectKnowledgeDomain);
+        when(crudRepo.findById(1)).thenReturn(Optional.of(subjectKnowledge));
+        when(mapper.toDomain(subjectKnowledge)).thenReturn(subjectKnowledgeDomain);
 
-        // Act
-        SubjectKnowledgeDomain result = subjectKnowledgeAdapter.findById(id);
+        SubjectKnowledgeDomain result = adapter.findById(1);
 
-        // Assert
         assertEquals(subjectKnowledgeDomain, result);
-        verify(subjectKnowledgeCrudRepo).findById(id);
-        verify(subjectKnowledgeMapper).toDomain(subjectKnowledge);
+        verify(crudRepo).findById(1);
+        verify(mapper).toDomain(subjectKnowledge);
     }
 
     @Test
     void findById_WhenSubjectKnowledgeDoesNotExist_ShouldReturnNull() {
-        // Arrange
-        Integer id = 999;
-        when(subjectKnowledgeCrudRepo.findById(id)).thenReturn(Optional.empty());
+        when(crudRepo.findById(999)).thenReturn(Optional.empty());
 
-        // Act
-        SubjectKnowledgeDomain result = subjectKnowledgeAdapter.findById(id);
+        SubjectKnowledgeDomain result = adapter.findById(999);
 
-        // Assert
         assertNull(result);
-        verify(subjectKnowledgeCrudRepo).findById(id);
-        verify(subjectKnowledgeMapper, never()).toDomain(any());
+        verify(crudRepo).findById(999);
+        verify(mapper, never()).toDomain(any());
     }
 
     @Test
     void save_ShouldSaveSubjectKnowledge() {
-        // Arrange
-        SubjectKnowledgeDomain domainToSave = SubjectKnowledgeDomain.builder()
+        SubjectKnowledgeDomain dto = SubjectKnowledgeDomain.builder()
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
-
         SubjectKnowledge entityToSave = SubjectKnowledge.builder()
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
-
         SubjectKnowledge savedEntity = SubjectKnowledge.builder()
                 .id(1)
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
-
-        SubjectKnowledgeDomain savedDomain = SubjectKnowledgeDomain.builder()
+        SubjectKnowledgeDomain savedDto = SubjectKnowledgeDomain.builder()
                 .id(1)
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
 
-        when(subjectKnowledgeMapper.toEntity(domainToSave)).thenReturn(entityToSave);
-        when(subjectKnowledgeCrudRepo.save(entityToSave)).thenReturn(savedEntity);
-        when(subjectKnowledgeMapper.toDomain(savedEntity)).thenReturn(savedDomain);
+        when(mapper.toEntity(dto)).thenReturn(entityToSave);
+        when(crudRepo.save(entityToSave)).thenReturn(savedEntity);
+        when(mapper.toDomain(savedEntity)).thenReturn(savedDto);
 
-        // Act
-        SubjectKnowledgeDomain result = subjectKnowledgeAdapter.save(domainToSave);
+        SubjectKnowledgeDomain result = adapter.save(dto);
 
-        // Assert
-        assertEquals(savedDomain, result);
-        verify(subjectKnowledgeMapper).toEntity(domainToSave);
-        verify(subjectKnowledgeCrudRepo).save(entityToSave);
-        verify(subjectKnowledgeMapper).toDomain(savedEntity);
+        assertEquals(savedDto, result);
+        verify(mapper).toEntity(dto);
+        verify(crudRepo).save(entityToSave);
+        verify(mapper).toDomain(savedEntity);
     }
 
     @Test
     void update_WhenSubjectKnowledgeExists_ShouldUpdateAndReturnSubjectKnowledge() {
-        // Arrange
-        Integer id = 1;
-
-        // Crear nuevos objetos para la actualización
-        Subject newSubject = Subject.builder()
-                .id(2)
-                .subjectName("Physics")
-                .status("A")
-                .build();
-
-        Knowledge newKnowledge = Knowledge.builder()
-                .id(2)
-                .name("Mechanics")
-                .build();
-
-        SubjectKnowledgeDomain domainToUpdate = SubjectKnowledgeDomain.builder()
+        SubjectKnowledgeDomain dto = SubjectKnowledgeDomain.builder()
                 .id(1)
-                .idSubject(newSubject)
-                .idKnowledge(newKnowledge)
+                .idSubject(subject)
+                .idKnowledge(knowledge)
                 .build();
-
-        SubjectKnowledge existingEntity = SubjectKnowledge.builder()
+        SubjectKnowledge existing = SubjectKnowledge.builder()
+                .id(1)
+                .idSubject(subject)
+                .idKnowledge(knowledge)
+                .build();
+        SubjectKnowledge updatedEntity = SubjectKnowledge.builder()
                 .id(1)
                 .idSubject(subject)
                 .idKnowledge(knowledge)
                 .build();
 
-        SubjectKnowledge updatedEntity = SubjectKnowledge.builder()
-                .id(1)
-                .idSubject(newSubject)
-                .idKnowledge(newKnowledge)
-                .build();
+        when(crudRepo.findById(1)).thenReturn(Optional.of(existing));
+        when(crudRepo.save(existing)).thenReturn(updatedEntity);
+        when(mapper.toDomain(updatedEntity)).thenReturn(dto);
 
-        when(subjectKnowledgeCrudRepo.findById(id)).thenReturn(Optional.of(existingEntity));
-        when(subjectKnowledgeCrudRepo.save(any(SubjectKnowledge.class))).thenReturn(updatedEntity);
-        when(subjectKnowledgeMapper.toDomain(updatedEntity)).thenReturn(domainToUpdate);
+        SubjectKnowledgeDomain result = adapter.update(1, dto);
 
-        // Act
-        SubjectKnowledgeDomain result = subjectKnowledgeAdapter.update(id, domainToUpdate);
-
-        // Assert
-        assertEquals(domainToUpdate, result);
-        verify(subjectKnowledgeCrudRepo).findById(id);
-        verify(subjectKnowledgeCrudRepo).save(any(SubjectKnowledge.class));
-        verify(subjectKnowledgeMapper).toDomain(updatedEntity);
+        assertEquals(dto, result);
+        verify(crudRepo).findById(1);
+        verify(crudRepo).save(existing);
+        verify(mapper).toDomain(updatedEntity);
     }
 
     @Test
-    void update_WhenSubjectKnowledgeDoesNotExist_ShouldThrowEntityNotFoundException() {
-        // Arrange
-        Integer id = 999;
-        SubjectKnowledgeDomain domainToUpdate = SubjectKnowledgeDomain.builder()
-                .id(999)
-                .idSubject(subject)
-                .idKnowledge(knowledge)
-                .build();
+    void update_WhenSubjectKnowledgeDoesNotExist_ShouldThrowNoSuchElement() {
+        when(crudRepo.findById(999)).thenReturn(Optional.empty());
 
-        when(subjectKnowledgeCrudRepo.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> {
-            subjectKnowledgeAdapter.update(id, domainToUpdate);
-        });
-
-        verify(subjectKnowledgeCrudRepo).findById(id);
-        verify(subjectKnowledgeCrudRepo, never()).save(any(SubjectKnowledge.class));
+        assertThrows(NoSuchElementException.class, () -> adapter.update(999, subjectKnowledgeDomain));
+        verify(crudRepo).findById(999);
+        verify(crudRepo, never()).save(any());
     }
+
+    // -------------------- DELETE SCENARIOS --------------------
 
     @Test
     void delete_WhenSubjectKnowledgeExists_ShouldDeleteAndReturnOkStatus() {
-        // Arrange
-        Integer id = 1;
+        when(crudRepo.existsById(1)).thenReturn(true);
+        when(achievementGroupsPort.getAllBySubjectKnowledgeId(1)).thenReturn(Collections.emptyList());
+        when(crudRepo.getReferenceById(1)).thenReturn(subjectKnowledge);
+        doNothing().when(crudRepo).delete(subjectKnowledge);
 
-        when(subjectKnowledgeCrudRepo.existsById(id)).thenReturn(true);
-        when(subjectKnowledgeCrudRepo.getReferenceById(id)).thenReturn(subjectKnowledge);
-        doNothing().when(subjectKnowledgeCrudRepo).delete(subjectKnowledge);
+        HttpStatus result = adapter.delete(1);
 
-        // Act
-        HttpStatus result = subjectKnowledgeAdapter.delete(id);
-
-        // Assert
         assertEquals(HttpStatus.OK, result);
-        verify(subjectKnowledgeCrudRepo).existsById(id);
-        verify(subjectKnowledgeCrudRepo).getReferenceById(id);
-        verify(subjectKnowledgeCrudRepo).delete(subjectKnowledge);
+        verify(crudRepo).delete(subjectKnowledge);
     }
 
     @Test
-    void delete_WhenSubjectKnowledgeDoesNotExist_ShouldThrowAppException() {
-        // Arrange
-        Integer id = 999;
+    void delete_WhenSubjectKnowledgeUsedInAchievements_ShouldThrowConflict() {
+        when(crudRepo.existsById(1)).thenReturn(true);
+        when(achievementGroupsPort.getAllBySubjectKnowledgeId(1))
+                .thenReturn(Collections.singletonList(AchievementGroupDomain.builder().build()));
 
-        when(subjectKnowledgeCrudRepo.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            subjectKnowledgeAdapter.delete(id);
-        });
-
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-        verify(subjectKnowledgeCrudRepo).existsById(id);
-        verify(subjectKnowledgeCrudRepo, never()).getReferenceById(any());
-        verify(subjectKnowledgeCrudRepo, never()).delete(any());
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(1));
+        assertEquals(HttpStatus.CONFLICT, ex.getCode());
+        assertTrue(ex.getMessage().contains("No es posible eliminar"));
     }
 
     @Test
-    void delete_WhenExceptionOccurs_ShouldThrowAppExceptionWithInternalServerError() {
-        // Arrange
-        Integer id = 1;
+    void delete_WhenSubjectKnowledgeDoesNotExist_ShouldThrowNotFound() {
+        when(crudRepo.existsById(999)).thenReturn(false);
 
-        when(subjectKnowledgeCrudRepo.existsById(id)).thenThrow(new RuntimeException("Database error"));
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(999));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getCode());
+        assertTrue(ex.getMessage().contains("Relation within Subject"));
+    }
 
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            subjectKnowledgeAdapter.delete(id);
-        });
+    @Test
+    void delete_WhenGetAllByThrowsRuntimeException_ShouldPropagate() {
+        when(crudRepo.existsById(1)).thenReturn(true);
+        when(achievementGroupsPort.getAllBySubjectKnowledgeId(1))
+                .thenThrow(new RuntimeException("DB error"));
 
-        assertEquals("INTERN ERROR", exception.getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-        verify(subjectKnowledgeCrudRepo).existsById(id);
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> adapter.delete(1));
+        assertEquals("DB error", ex.getMessage());
     }
 
     @Test
     void getAllKnowledgesBySubjectIdByPeriodId_ShouldReturnMatchingSubjectKnowledges() {
-        // Arrange
-        Integer subjectId = 1;
-        Integer periodId = 1;
+        when(crudRepo.findKnowledgesBySubjectId(1, 1)).thenReturn(subjectKnowledges);
+        when(mapper.toDomains(subjectKnowledges)).thenReturn(subjectKnowledgeDomains);
 
-        when(subjectKnowledgeCrudRepo.findKnowledgesBySubjectId(subjectId, periodId))
-                .thenReturn(subjectKnowledges);
-        when(subjectKnowledgeMapper.toDomains(subjectKnowledges)).thenReturn(subjectKnowledgeDomains);
+        List<SubjectKnowledgeDomain> result = adapter.getAllKnowledgesBySubjectIdByPeriodId(1, 1);
 
-        // Act
-        List<SubjectKnowledgeDomain> result = subjectKnowledgeAdapter.getAllKnowledgesBySubjectIdByPeriodId(subjectId, periodId);
-
-        // Assert
         assertEquals(subjectKnowledgeDomains, result);
-        verify(subjectKnowledgeCrudRepo).findKnowledgesBySubjectId(subjectId, periodId);
-        verify(subjectKnowledgeMapper).toDomains(subjectKnowledges);
+        verify(crudRepo).findKnowledgesBySubjectId(1, 1);
+        verify(mapper).toDomains(subjectKnowledges);
     }
 }
