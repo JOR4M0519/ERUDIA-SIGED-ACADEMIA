@@ -1,14 +1,20 @@
 package co.edu.gimnasiolorismalaguzzi.gatewayservice.domain;
 
 import co.edu.gimnasiolorismalaguzzi.gatewayservice.entity.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Builder
 public class UserDetailDomain implements Serializable {
     private Integer id;
