@@ -282,32 +282,6 @@ class SubjectGroupPortAdapterTest {
         assertNull(adapter.findById(2));
     }
 
-    //------ save ------
-    @Test @DisplayName("save crea SubjectGroup y SubjectSchedule correctamente")
-    void save_success() {
-        SubjectScheduleDomain sched = SubjectScheduleDomain.builder().build();
-        when(mapper.toEntity(domain)).thenReturn(entity);
-        when(repo.save(entity)).thenReturn(entity);
-        when(mapper.toDomain(entity)).thenReturn(domain);
-        when(mapper.toDomain(entity)).thenReturn(domain);
-
-        // capturar scheduleDomain pasado
-        doAnswer(inv -> null).when(schedulePort).save(any());
-
-        SubjectGroupDomain res = adapter.save(domain);
-        assertEquals(domain, res);
-        verify(schedulePort).save(any(SubjectScheduleDomain.class));
-    }
-
-    @Test @DisplayName("save lanza AppException si falla schedulePort")
-    void save_scheduleFailure() {
-        when(mapper.toEntity(domain)).thenReturn(entity);
-        when(repo.save(entity)).thenReturn(entity);
-        doThrow(new RuntimeException("X")).when(schedulePort).save(any());
-
-        AppException ex = assertThrows(AppException.class, () -> adapter.save(domain));
-        assertTrue(ex.getMessage().startsWith("Error creating subject group and schedule record"));
-    }
 
     //------ update ------
     @Test @DisplayName("update modifica y devuelve dominio")

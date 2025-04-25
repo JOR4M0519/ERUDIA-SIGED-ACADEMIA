@@ -178,72 +178,6 @@ public class KeycloakService {
      * con manejo de transacción y rollback en caso de error
      */
 
-    public Mono<UserDetailDomain> registerByGroupinStudentUser(UserRegistrationDomain registrationDomain) {
-
-        return Mono.fromCallable(() -> {
-                    // Create user in Keycloak (this is blocking but we run it in a separate thread)
-                    String keycloakUserId = createUserInKeycloak(registrationDomain);
-                    registrationDomain.getUserDomain().setUuid(keycloakUserId);
-                    return keycloakUserId;
-                })
-                .subscribeOn(Schedulers.boundedElastic()) // Run blocking code on a separate thread pool
-                .flatMap(keycloakUserId -> {
-                    // Register in Academy Service
-                    log.info("Usuario creado en Keycloak con ID: {}. Registrando en Academy Service...", keycloakUserId);
-                    return userService.createStudentUser(registrationDomain)
-                            .timeout(java.time.Duration.ofSeconds(30))
-                            .doOnSuccess(result -> log.info("Usuario registrado exitosamente en ambos sistemas"))
-                            .onErrorResume(e -> {
-                                // If Academy Service registration fails, rollback Keycloak user
-                                log.error("Error al registrar usuario en Academy Service: {}", e.getMessage(), e);
-                                return Mono.fromCallable(() -> {
-                                            try {
-                                                log.warn("Realizando rollback: eliminando usuario {} de Keycloak", keycloakUserId);
-                                                deleteUsersKeycloak(keycloakUserId);
-                                                log.info("Rollback completado exitosamente");
-                                            } catch (Exception rollbackEx) {
-                                                log.error("Error al realizar rollback en Keycloak: {}", rollbackEx.getMessage(), rollbackEx);
-                                                throw new AppException("Error en el registro y fallo en el rollback",
-                                                        HttpStatus.INTERNAL_SERVER_ERROR);
-                                            }
-                                            return e;  // Return the exception to handle it in the next flatMap
-                                        }).subscribeOn(Schedulers.boundedElastic())
-                                        .flatMap(ex -> Mono.error(ex instanceof AppException ? (AppException)ex :
-                                                new AppException("Error al registrar el usuario: " + ex.getMessage(),
-                                                        HttpStatus.INTERNAL_SERVER_ERROR)));
-                            });
-                });
-    }
-    // El método original puede quedar como está o delegarse al nuevo método
-/*    public String createUsersKeycloak(UserRegistrationDomain registrationDomain) {
-        try {
-            keycloakProvider = new KeycloakProvider();
-            String userId = createUserInKeycloak(registrationDomain);
-            registrationDomain.getUserDomain().setUuid(userId);
-
-            // Intentamos crear el usuario en Academy Service pero no bloqueamos el flujo
-            // ni hacemos rollback si falla (para mantener compatibilidad con código existente)
-            try {
-                userService.createStudentUser(registrationDomain)
-                        .timeout(java.time.Duration.ofSeconds(15))
-                        .subscribe(
-                                result -> log.info("Usuario registrado exitosamente en Academy Service: {}", result),
-                                error -> log.error("Error al registrar en Academy Service: {}", error.getMessage())
-                        );
-            } catch (Exception e) {
-                log.warn("No se pudo registrar el usuario en Academy Service: {}", e.getMessage());
-            }
-
-            return userId;
-        } catch (Exception e) {
-            log.error("Error en createUsersKeycloak: {}", e.getMessage(), e);
-            if (e instanceof AppException) {
-                throw (AppException) e;
-            }
-            throw new AppException("Error al crear usuario: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }*/
-
     public String createUserInKeycloak(UserRegistrationDomain registrationDomain) {
         UserDomain userDomain = registrationDomain.getUserDomain();
         int status = 0;
@@ -423,50 +357,6 @@ public class KeycloakService {
         return users.get(0); // Retorna el primer usuario encontrado
     }
 
-    public Mono<UserDetailDomain> registerUser(UserRegistrationDomain registrationDomain) {
-
-        // Verificar y establecer un valor por defecto para dateOfBirth si es nulo
-        if (registrationDomain.getUserDetailDomain() != null &&
-                registrationDomain.getUserDetailDomain().getDateOfBirth() == null) {
-            // Usar una fecha por defecto (por ejemplo, la fecha actual)
-            registrationDomain.getUserDetailDomain().setDateOfBirth(LocalDate.now());
-            log.info("Se estableció una fecha de nacimiento por defecto ya que era nula");
-        }
-
-        return Mono.fromCallable(() -> {
-                    // Create user in Keycloak (this is blocking but we run it in a separate thread)
-                    String keycloakUserId = createUserInKeycloak(registrationDomain);
-                    registrationDomain.getUserDomain().setUuid(keycloakUserId);
-                    return keycloakUserId;
-                })
-                .subscribeOn(Schedulers.boundedElastic()) // Run blocking code on a separate thread pool
-                .flatMap(keycloakUserId -> {
-                    // Register in Academy Service as administrative user
-                    log.info("Usuario administrativo creado en Keycloak con ID: {}. Registrando en Academy Service...", keycloakUserId);
-                    return userService.createGeneralUser(registrationDomain)
-                            .timeout(java.time.Duration.ofSeconds(30))
-                            .doOnSuccess(result -> log.info("Usuario administrativo registrado exitosamente en ambos sistemas"))
-                            .onErrorResume(e -> {
-                                // If Academy Service registration fails, rollback Keycloak user
-                                log.error("Error al registrar usuario administrativo en Academy Service: {}", e.getMessage(), e);
-                                return Mono.fromCallable(() -> {
-                                            try {
-                                                log.warn("Realizando rollback: eliminando usuario {} de Keycloak", keycloakUserId);
-                                                deleteUsersKeycloak(keycloakUserId);
-                                                log.info("Rollback completado exitosamente");
-                                            } catch (Exception rollbackEx) {
-                                                log.error("Error al realizar rollback en Keycloak: {}", rollbackEx.getMessage(), rollbackEx);
-                                                throw new AppException("Error en el registro y fallo en el rollback",
-                                                        HttpStatus.INTERNAL_SERVER_ERROR);
-                                            }
-                                            return e;  // Return the exception to handle it in the next flatMap
-                                        }).subscribeOn(Schedulers.boundedElastic())
-                                        .flatMap(ex -> Mono.error(ex instanceof AppException ? (AppException)ex :
-                                                new AppException("Error al registrar el usuario administrativo: " + ex.getMessage(),
-                                                        HttpStatus.INTERNAL_SERVER_ERROR)));
-                            });
-                });
-    }
     public HttpStatus updatePassword(String username, Login login) {
         try {
 

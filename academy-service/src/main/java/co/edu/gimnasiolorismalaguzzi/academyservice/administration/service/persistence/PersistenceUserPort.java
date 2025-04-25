@@ -21,12 +21,4 @@ public interface PersistenceUserPort  {
     @Transactional
     void updateBulkPromotionStatus(List<UserDomain> users);
 
-    @Transactional
-    UserDetailDomain registerByGroupinStudentUser(UserRegistrationDomain registrationDomain);
-
-    @Transactional
-    UserDetailDomain registerAdministrativeUsers(UserRegistrationDomain registrationDomain);
-
-    @Transactional
-    void patchGeneralUser(Integer id, UserRegistrationDomain registrationDomain);
 }

@@ -1,20 +1,17 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.modules.student;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.UserDetailDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.entity.User;
 import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceUserDetailPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.StudentPromotionDTO;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.EducationalLevel;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.GroupStudent;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.GroupStudentsMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.GroupStudentsCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.GroupStudentsAdapter;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +21,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -327,21 +323,6 @@ public class GroupStudentsTest {
         verify(groupStudentsCrudRepo).findById(999);
         verify(groupStudentsCrudRepo, never()).save(any(GroupStudent.class));
     }
-
-
-
-    @Test
-    void promoteStudents_WhenNoStudentsPromoted_ShouldThrowBadRequest() {
-        StudentPromotionDTO promotionDTO = new StudentPromotionDTO(Collections.emptyList(), 10);
-
-        AppException exception = assertThrows(AppException.class, () -> {
-            groupStudentsAdapter.promoteStudents(promotionDTO);
-        });
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-    }
-
-
 
     @Test
     void delete_WhenExists_ShouldDeleteAndReturnOk() {

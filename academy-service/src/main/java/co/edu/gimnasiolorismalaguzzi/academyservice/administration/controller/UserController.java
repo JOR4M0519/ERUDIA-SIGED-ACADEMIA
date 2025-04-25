@@ -42,13 +42,6 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping()
-    public ResponseEntity<UserDetailDomain> createUser(@RequestBody UserRegistrationDomain registrationDomain) {
-        UserDetailDomain result = persistenceUserPort.registerAdministrativeUsers(registrationDomain);
-        return ResponseEntity.ok(result);
-    }
-
-
     @GetMapping("/family")
     public ResponseEntity<List<UserFamilyRelationDomain>> getAllUsersWithFamily() {
         List<UserFamilyRelationDomain> users = persistenceFamilyPort.findAllWithRelatives();
@@ -94,34 +87,6 @@ public class UserController {
         persistenceUserDetailPort.delete(id);
         return ResponseEntity.noContent().build();
     }
-
-    @PatchMapping("/{id}/all")
-    public ResponseEntity<?> patchGeneralUser(@PathVariable Integer id,
-                                              @RequestBody(required = false) UserRegistrationDomain registrationDomain) {
-        // Validate input parameters
-        if (id == null) {
-            throw new AppException("User ID is required", HttpStatus.BAD_REQUEST);
-        }
-
-        if (registrationDomain == null) {
-            throw new AppException("Request body cannot be null", HttpStatus.BAD_REQUEST);
-        }
-
-        // Check if both userDomain and userDetailDomain are null - this would be a no-op request
-        if (registrationDomain.getUserDomain() == null && registrationDomain.getUserDetailDomain() == null) {
-            throw new AppException("Request must include either user or user detail data", HttpStatus.BAD_REQUEST);
-        }
-
-        persistenceUserPort.patchGeneralUser(id, registrationDomain);
-        return ResponseEntity.ok("User updated successfully");
-    }
-
-    @PostMapping("/students/register")
-    public ResponseEntity<?> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
-        UserDetailDomain result = persistenceUserPort.registerByGroupinStudentUser(registrationDomain);
-        return ResponseEntity.ok(result);
-    }
-
 
     @PatchMapping("/{id}/promotion-status")
     public ResponseEntity<?> updatePromotionStatus(

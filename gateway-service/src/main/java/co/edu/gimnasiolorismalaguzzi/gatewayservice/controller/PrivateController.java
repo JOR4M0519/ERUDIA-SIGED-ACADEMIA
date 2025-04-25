@@ -31,38 +31,6 @@ public class PrivateController {
         return ResponseEntity.ok(keycloakService.getUsersByGroup(id));
     }
 
-    @PostMapping("/users/students/register")
-    public Mono<ResponseEntity<UserDetailDomain>> registerStudent(@RequestBody UserRegistrationDomain registrationDomain) {
-        return keycloakService.registerByGroupinStudentUser(registrationDomain)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    if (e instanceof AppException) {
-                        return Mono.just(ResponseEntity
-                                .status(((AppException) e).getCode())
-                                .body(null));
-                    }
-                    return Mono.just(ResponseEntity
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(null));
-                });
-    }
-
-    @PostMapping("/users/register")
-    public Mono<ResponseEntity<UserDetailDomain>> registerUser(@RequestBody UserRegistrationDomain registrationDomain) {
-        return keycloakService.registerUser(registrationDomain)
-                .map(ResponseEntity::ok)
-                .onErrorResume(e -> {
-                    if (e instanceof AppException) {
-                        return Mono.just(ResponseEntity
-                                .status(((AppException) e).getCode())
-                                .body(null));
-                    }
-                    return Mono.just(ResponseEntity
-                            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(null));
-                });
-    }
-
     @PutMapping("/users/password")
     public ResponseEntity<?> updatePasswordCredentials(
             @RequestBody Login login) {

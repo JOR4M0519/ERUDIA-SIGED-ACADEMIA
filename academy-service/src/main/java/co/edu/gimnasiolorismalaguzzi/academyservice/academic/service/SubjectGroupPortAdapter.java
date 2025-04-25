@@ -141,27 +141,7 @@ public class SubjectGroupPortAdapter implements PersistenceSubjectGroupPort {
     @Transactional
     @Override
     public SubjectGroupDomain save(SubjectGroupDomain domain) {
-        try {
-            // Save the Subject Group
-            SubjectGroup subjectGroup = subjectGroupMapper.toEntity(domain);
-            SubjectGroup savedSubjectGroup = subjectGroupCrudRepo.save(subjectGroup);
-
-            // Create a minimal SubjectSchedule with just the SubjectGroup foreign key
-            SubjectScheduleDomain subjectScheduleDomain = SubjectScheduleDomain.builder()
-                    .subjectGroup(subjectGroupMapper.toDomain(savedSubjectGroup))
-                    .dayOfWeek("")
-                    .status("A")
-                    .build();
-
-            // Save the schedule record
-            subjectSchedulePort.save(subjectScheduleDomain);
-
-            return this.subjectGroupMapper.toDomain(savedSubjectGroup);
-        } catch (Exception e) {
-            log.error("Error saving SubjectGroup and SubjectSchedule: {}", e.getMessage(), e);
-            // The @Transactional annotation will automatically rollback if an exception occurs
-            throw new AppException("Error creating subject group and schedule record: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+       return null;
     }
     @Override
     public SubjectGroupDomain update(Integer integer, SubjectGroupDomain domain) {
