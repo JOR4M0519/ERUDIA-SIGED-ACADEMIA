@@ -2,331 +2,201 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.modules.student;
 
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.AttendanceReportDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.RepeatingStudentsGroupReportDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.ReportGroupsStatusDomain;
-import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.StudentPromotionDTO;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.Groups;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.GroupsMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.GroupsCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.GroupsAdapter;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class GroupsAdapterTest {
+class GroupsAdapterTest {
 
-    @Mock
-    private GroupsCrudRepo groupsCrudRepo;
+    @Mock private GroupsCrudRepo crudRepo;
+    @Mock private GroupsMapper mapper;
+    @Mock private JdbcTemplate jdbcTemplate;
+    @InjectMocks private GroupsAdapter adapter;
 
-    @Mock
-    private GroupsMapper groupsMapper;
-
-    @Mock
-    private JdbcTemplate jdbcTemplate;
-
-    private GroupsAdapter groupsAdapter;
-
-    private Groups group;
-    private GroupsDomain groupDomain;
-    private List<Groups> groups;
-    private List<GroupsDomain> groupDomains;
+    private Groups entity;
+    private GroupsDomain domain;
+    private List<Groups> entities;
+    private List<GroupsDomain> domains;
 
     @BeforeEach
     void setUp() {
-        // Crear la instancia con el constructor e inyectar manualmente las dependencias
-        groupsAdapter = new GroupsAdapter(groupsCrudRepo,jdbcTemplate,groupsMapper);
-
-        // Inicializar entidades
-        group = Groups.builder()
-                .id(1)
-                .groupName("Grupo A")
-                .status("A")
-                .build();
-
-        // Inicializar dominio
-        groupDomain = GroupsDomain.builder()
-                .id(1)
-                .groupName("Grupo A")
-                .status("A")
-                .build();
-
-        // Inicializar listas
-        groups = Arrays.asList(group);
-        groupDomains = Arrays.asList(groupDomain);
+        entity = Groups.builder().id(1).groupName("G1").status("A").build();
+        domain = GroupsDomain.builder().id(1).groupName("G1").status("A").build();
+        entities = Arrays.asList(entity);
+        domains = Arrays.asList(domain);
     }
 
     @Test
-    void findAll_ShouldReturnAllGroups() {
-        // Arrange
-        when(groupsCrudRepo.findAll()).thenReturn(groups);
-        when(groupsMapper.toDomains(groups)).thenReturn(groupDomains);
+    void findAll_returnsMapped() {
+        when(crudRepo.findAll()).thenReturn(entities);
+        when(mapper.toDomains(entities)).thenReturn(domains);
 
-        // Act
-        List<GroupsDomain> result = groupsAdapter.findAll();
-
-        // Assert
-        assertEquals(groupDomains, result);
-        verify(groupsCrudRepo).findAll();
-        verify(groupsMapper).toDomains(groups);
+        List<GroupsDomain> result = adapter.findAll();
+        assertEquals(domains, result);
+        verify(crudRepo).findAll();
+        verify(mapper).toDomains(entities);
     }
 
     @Test
-    void findById_WhenGroupExists_ShouldReturnGroup() {
-        // Arrange
-        Integer id = 1;
-        when(groupsCrudRepo.findById(id)).thenReturn(Optional.of(group));
-        when(groupsMapper.toDomain(group)).thenReturn(groupDomain);
+    void findAll_emptyList() {
+        when(crudRepo.findAll()).thenReturn(Collections.emptyList());
+        when(mapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        // Act
-        GroupsDomain result = groupsAdapter.findById(id);
-
-        // Assert
-        assertEquals(groupDomain, result);
-        verify(groupsCrudRepo).findById(id);
-        verify(groupsMapper).toDomain(group);
+        List<GroupsDomain> result = adapter.findAll();
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void findById_WhenGroupDoesNotExist_ShouldReturnNull() {
-        // Arrange
-        Integer id = 999;
-        when(groupsCrudRepo.findById(id)).thenReturn(Optional.empty());
+    void findById_present() {
+        when(crudRepo.findById(1)).thenReturn(Optional.of(entity));
+        when(mapper.toDomain(entity)).thenReturn(domain);
 
-        // Act
-        GroupsDomain result = groupsAdapter.findById(id);
+        GroupsDomain result = adapter.findById(1);
+        assertEquals(domain, result);
+    }
 
-        // Assert
+    @Test
+    void findById_absent() {
+        when(crudRepo.findById(2)).thenReturn(Optional.empty());
+        GroupsDomain result = adapter.findById(2);
         assertNull(result);
-        verify(groupsCrudRepo).findById(id);
-        verify(groupsMapper, never()).toDomain(any());
     }
 
     @Test
-    void save_ShouldSaveGroup() {
-        // Arrange
-        GroupsDomain domainToSave = GroupsDomain.builder()
-                .groupName("Grupo B")
-                .status("A")
-                .build();
+    void findByLevelId_returnsMapped() {
+        when(crudRepo.findByLevel_Id(5)).thenReturn(entities);
+        when(mapper.toDomains(entities)).thenReturn(domains);
 
-        Groups entityToSave = Groups.builder()
-                .groupName("Grupo B")
-                .status("A")
-                .build();
-
-        Groups savedEntity = Groups.builder()
-                .id(2)
-                .groupName("Grupo B")
-                .status("A")
-                .build();
-
-        GroupsDomain savedDomain = GroupsDomain.builder()
-                .id(2)
-                .groupName("Grupo B")
-                .status("A")
-                .build();
-
-        when(groupsMapper.toEntity(domainToSave)).thenReturn(entityToSave);
-        when(groupsCrudRepo.save(entityToSave)).thenReturn(savedEntity);
-        when(groupsMapper.toDomain(savedEntity)).thenReturn(savedDomain);
-
-        // Act
-        GroupsDomain result = groupsAdapter.save(domainToSave);
-
-        // Assert
-        assertEquals(savedDomain, result);
-        verify(groupsMapper).toEntity(domainToSave);
-        verify(groupsCrudRepo).save(entityToSave);
-        verify(groupsMapper).toDomain(savedEntity);
-    }
-/*
-    @Test
-    void update_WhenGroupExists_ShouldUpdateAndReturnGroup() {
-        // Arrange
-        Integer id = 1;
-
-        GroupsDomain domainToUpdate = GroupsDomain.builder()
-                .id(1)
-                .groupName("Grupo A Actualizado")
-                .status("A")
-                .build();
-
-        Groups existingEntity = Groups.builder()
-                .id(1)
-                .groupName("Grupo A")
-                .status("A")
-                .build();
-
-        Groups updatedEntity = Groups.builder()
-                .id(1)
-                .groupName("Grupo A Actualizado")
-                .status("A")
-                .build();
-
-        when(groupsCrudRepo.findById(id)).thenReturn(Optional.of(existingEntity));
-        when(groupsCrudRepo.save(any(Groups.class))).thenReturn(updatedEntity);
-        when(groupsMapper.toDomain(updatedEntity)).thenReturn(domainToUpdate);
-
-        // Act
-        GroupsDomain result = groupsAdapter.update(id, domainToUpdate);
-
-        // Assert
-        assertEquals(domainToUpdate, result);
-        verify(groupsCrudRepo).findById(id);
-        verify(groupsCrudRepo).save(any(Groups.class));
-        verify(groupsMapper).toDomain(updatedEntity);
+        List<GroupsDomain> result = adapter.findByLevelId(5);
+        assertEquals(domains, result);
+        verify(crudRepo).findByLevel_Id(5);
     }
 
     @Test
-    void update_WhenGroupDoesNotExist_ShouldThrowEntityNotFoundException() {
-        // Arrange
-        Integer id = 999;
-        GroupsDomain domainToUpdate = GroupsDomain.builder()
-                .id(999)
-                .groupName("Grupo Inexistente")
-                .status("A")
-                .build();
+    void findByLevelId_emptyList() {
+        when(crudRepo.findByLevel_Id(6)).thenReturn(Collections.emptyList());
+        when(mapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        when(groupsCrudRepo.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(EntityNotFoundException.class, () -> {
-            groupsAdapter.update(id, domainToUpdate);
-        });
-
-        verify(groupsCrudRepo).findById(id);
-        verify(groupsCrudRepo, never()).save(any(Groups.class));
+        List<GroupsDomain> result = adapter.findByLevelId(6);
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void delete_WhenGroupExists_ShouldDeleteAndReturnOkStatus() {
-        // Arrange
-        Integer id = 1;
+    void save_persistsEntity() {
+        GroupsDomain toSave = GroupsDomain.builder().groupName("X").status("A").build();
+        Groups entToSave = Groups.builder().groupName("X").status("A").build();
+        Groups saved = Groups.builder().id(2).groupName("X").status("A").build();
+        GroupsDomain out = GroupsDomain.builder().id(2).groupName("X").status("A").build();
 
-        when(groupsCrudRepo.existsById(id)).thenReturn(true);
-        doNothing().when(groupsCrudRepo).updateStatusById("I", id);
+        when(mapper.toEntity(toSave)).thenReturn(entToSave);
+        when(crudRepo.save(entToSave)).thenReturn(saved);
+        when(mapper.toDomain(saved)).thenReturn(out);
 
-        // Act
-        HttpStatus result = groupsAdapter.delete(id);
-
-        // Assert
-        assertEquals(HttpStatus.OK, result);
-        verify(groupsCrudRepo).existsById(id);
-        verify(groupsCrudRepo).updateStatusById("I", id);
+        GroupsDomain result = adapter.save(toSave);
+        assertEquals(out, result);
+        verify(crudRepo).save(entToSave);
     }
-
-    @Test
-    void delete_WhenGroupDoesNotExist_ShouldThrowAppException() {
-        // Arrange
-        Integer id = 999;
-
-        when(groupsCrudRepo.existsById(id)).thenReturn(false);
-
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            groupsAdapter.delete(id);
-        });
-
-        assertEquals("Group ID doesnt exist", exception.getMessage());
-        assertEquals(HttpStatus.NOT_FOUND, exception.getCode());
-        verify(groupsCrudRepo).existsById(id);
-        verify(groupsCrudRepo, never()).updateStatusById(anyString(), anyInt());
-    }
-
-    @Test
-    void delete_WhenExceptionOccurs_ShouldThrowAppExceptionWithInternalServerError() {
-        // Arrange
-        Integer id = 1;
-
-        when(groupsCrudRepo.existsById(id)).thenThrow(new RuntimeException("Database error"));
-
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            groupsAdapter.delete(id);
-        });
-
-        assertEquals("INTERN ERROR", exception.getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-        verify(groupsCrudRepo).existsById(id);
-    }*/
-
-    @Test
-    void findByStatus_ShouldReturnGroupsByStatus() {
-        // Arrange
-        String status = "A";
-
-        when(groupsCrudRepo.findByStatus(status)).thenReturn(groups);
-        when(groupsMapper.toDomains(groups)).thenReturn(groupDomains);
-
-        // Act
-        List<GroupsDomain> result = groupsAdapter.findByStatus(status);
-
-        // Assert
-        assertEquals(groupDomains, result);
-        verify(groupsCrudRepo).findByStatus(status);
-        verify(groupsMapper).toDomains(groups);
-    }
-/*
 
 
     @Test
-    void getRepeatingStudentsReport_ShouldReturnRepeatingStudentsReport() {
-        // Arrange
-        Integer academicPeriodId = 1;
-
-        List<RepeatingStudentsGroupReportDomain> reportDomains = Arrays.asList(
-                new RepeatingStudentsGroupReportDomain(1, "Grupo A", 5)
-        );
-
-        when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
-                .thenReturn(reportDomains);
-
-        // Act
-        List<RepeatingStudentsGroupReportDomain> result = groupsAdapter.getRepeatingStudentsByGroupReport();
-
-        // Assert
-        assertEquals(reportDomains, result);
-        verify(jdbcTemplate).query(anyString(), any(Object[].class), any(RowMapper.class));
+    void update_absent_throwsNoSuchElement() {
+        when(crudRepo.findById(9)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> adapter.update(9, domain));
     }
 
     @Test
-    void getAttendanceReport_ShouldReturnAttendanceReport() {
-        // Arrange
-        Integer groupId = 1;
-        Integer subjectId = 1;
-        Integer periodId = 1;
-
-        List<AttendanceReportDomain> reportDomains = Arrays.asList(
-                new AttendanceReportDomain(1, "John Doe", 20, 18, 2)
-        );
-
-        when(jdbcTemplate.query(anyString(), any(Object[].class), any(RowMapper.class)))
-                .thenReturn(reportDomains);
-
-        // Act
-        List<AttendanceReportDomain> result = groupsAdapter.getAttendanceReport(groupId, subjectId, periodId);
-
-        // Assert
-        assertEquals(reportDomains, result);
-        verify(jdbcTemplate).query(anyString(), any(Object[].class), any(RowMapper.class));
+    void delete_existing_deletesAndReturnsOk() {
+        when(crudRepo.existsById(1)).thenReturn(true);
+        HttpStatus status = adapter.delete(1);
+        assertEquals(HttpStatus.OK, status);
+        verify(crudRepo).deleteById(1);
     }
-*/
 
+    @Test
+    void delete_nonexistent_throwsNotFound() {
+        when(crudRepo.existsById(2)).thenReturn(false);
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(2));
+        assertEquals(HttpStatus.CONFLICT, ex.getCode());
+    }
+
+    @Test
+    void delete_deleteThrowsException_updatesStatusAndThrowsConflict() {
+        when(crudRepo.existsById(3)).thenReturn(true);
+        doThrow(new RuntimeException("fail")).when(crudRepo).deleteById(3);
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(3));
+        assertEquals(HttpStatus.CONFLICT, ex.getCode());
+        verify(crudRepo).updateStatusById("I", 3);
+    }
+
+    @Test
+    void getAcademicLevelReport_mapsRows() {
+        Object[] row = {1, "L1", "G1", "S1", 10L};
+        when(crudRepo.getAcademicLevelReport()).thenReturn(Arrays.<Object[]>asList(row));
+
+        List<ReportGroupsStatusDomain> res = adapter.getAcademicLevelReport();
+        assertEquals(1, res.size());
+        ReportGroupsStatusDomain r = res.get(0);
+        assertEquals(1, r.getGroupId());
+        assertEquals("L1", r.getLevelName());
+    }
+
+    @Test
+    void getAttendanceReport_returnsMapped() {
+        AttendanceReportDomain rep = new AttendanceReportDomain(1, "L", "G", "Sec", 5L, 4L, 1L, 0L, null);
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(List.of(rep));
+
+        List<AttendanceReportDomain> res = adapter.getAttendanceReport();
+        assertEquals(1, res.size());
+    }
+
+    @Test
+    void getRepeatingStudentsByGroupReport_returnsMapped() {
+        RepeatingStudentsGroupReportDomain rep = new RepeatingStudentsGroupReportDomain(1, "G1", "L1", 2L);
+        when(jdbcTemplate.query(anyString(), any(RowMapper.class))).thenReturn(List.of(rep));
+
+        List<RepeatingStudentsGroupReportDomain> res = adapter.getRepeatingStudentsByGroupReport();
+        assertEquals(1, res.size());
+    }
+
+    @Test
+    void getGroupsByLevelAndStatus_valid_returnsMapped() {
+        when(crudRepo.findByLevelIdAndStatus(10, "A")).thenReturn(entities);
+        when(mapper.toDomains(entities)).thenReturn(domains);
+
+        List<GroupsDomain> res = adapter.getGroupsByLevelAndStatus("10", "A");
+        assertEquals(domains, res);
+    }
+
+    @Test
+    void getGroupsByLevelAndStatus_invalidNumber_throwsBadRequest() {
+        AppException ex = assertThrows(AppException.class, () -> adapter.getGroupsByLevelAndStatus("x", "A"));
+        assertEquals(HttpStatus.BAD_REQUEST, ex.getCode());
+    }
+
+    @Test
+    void getGroupsByLevelAndStatus_repoError_throwsInternalServerError() {
+        when(crudRepo.findByLevelIdAndStatus(1, "A")).thenThrow(new RuntimeException("err"));
+        AppException ex = assertThrows(AppException.class, () -> adapter.getGroupsByLevelAndStatus("1", "A"));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getCode());
+    }
 }

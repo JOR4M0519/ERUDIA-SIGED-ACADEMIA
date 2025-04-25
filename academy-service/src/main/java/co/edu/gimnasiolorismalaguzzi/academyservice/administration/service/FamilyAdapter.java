@@ -20,15 +20,16 @@ import java.util.*;
 public class FamilyAdapter implements PersistenceFamilyPort {
 
     private final FamilyCrudRepo familyCrudRepo;
+    private final FamilyMapper familyMapper;
+    private final PersistenceUserDetailPort userDetailPort;
 
     @Autowired
-    private FamilyMapper familyMapper;
-
-    @Autowired
-    private PersistenceUserDetailPort userDetailPort;
-
-    public FamilyAdapter(FamilyCrudRepo familyCrudRepo) {
+    public FamilyAdapter(FamilyCrudRepo familyCrudRepo,
+                         FamilyMapper familyMapper,
+                         PersistenceUserDetailPort userDetailPort) {
         this.familyCrudRepo = familyCrudRepo;
+        this.familyMapper = familyMapper;
+        this.userDetailPort = userDetailPort;
     }
 
     @Override
@@ -108,9 +109,6 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     }
 
 
-
-
-
     @Override
     public List<FamilyDomain> saveFamilyRelations(UserFamilyRelationDomain userFamilyRelationDomain) {
         log.info("Creando relaciones familiares para usuario");
@@ -145,8 +143,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
             Integer studentId = familyDomain.getUser().getId();
             Integer relativeId = familyDomain.getRelativeUser().getId();
 
-            boolean isStudentValid =  userDetailPort.hasStudentRole(studentId); // El familiar no debería tener rol de estudiante
-            boolean isRelativeValid =  userDetailPort.hasStudentRole(relativeId);
+            boolean isStudentValid = userDetailPort.hasStudentRole(studentId); // El familiar no debería tener rol de estudiante
+            boolean isRelativeValid = userDetailPort.hasStudentRole(relativeId);
 
             if (!isStudentValid) {
                 throw new AppException("El usuario con ID " + studentId + " no tiene rol de estudiante", HttpStatus.BAD_REQUEST);
@@ -174,18 +172,19 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
     /**
      * Verifica si ya existe una relación entre un estudiante y un familiar
-     * @param studentId ID del estudiante
+     *
+     * @param studentId  ID del estudiante
      * @param relativeId ID del familiar
      * @return true si la relación existe, false en caso contrario
      */
     @Override
     public boolean existsRelation(Integer studentId, Integer relativeId) {
-        return familyCrudRepo.existsByStudent_IdAndUser_Id(studentId,relativeId);
+        return familyCrudRepo.existsByStudent_IdAndUser_Id(studentId, relativeId);
     }
 
     @Override
     public FamilyDomain update(Integer integer, FamilyDomain domain) {
-        try{
+        try {
             Optional<Family> existingFamily = familyCrudRepo.findById(integer);
 
             /*if(existingFamily.isPresent()){
@@ -201,8 +200,8 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
     @Override
     public HttpStatus delete(Integer integer) {
-        try{
-            if(this.familyCrudRepo.existsById(integer)){
+        try {
+            if (this.familyCrudRepo.existsById(integer)) {
                 familyCrudRepo.delete(this.familyCrudRepo.getReferenceById(integer));
                 return HttpStatus.OK;
             } else {
@@ -308,6 +307,7 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
     /**
      * Devuelve la información del usuario de los estudiantes del familiar
+     *
      * @param relativeId
      * @return
      */
@@ -331,23 +331,23 @@ public class FamilyAdapter implements PersistenceFamilyPort {
 
                 // Convertir a Long si es necesario
                 report.setTotalMembers(result[2] instanceof Long ?
-                    (Long) result[2] :
-                    Long.valueOf(((Number) result[2]).longValue()));
+                        (Long) result[2] :
+                        Long.valueOf(((Number) result[2]).longValue()));
                 report.setActiveStudents(result[3] instanceof Long ?
-                    (Long) result[3] :
-                    Long.valueOf(((Number) result[3]).longValue()));
+                        (Long) result[3] :
+                        Long.valueOf(((Number) result[3]).longValue()));
 
                 // Manejar el array de IDs de estudiantes
                 if (result[4] instanceof java.sql.Array) {
                     try {
-                    java.sql.Array sqlArray = (java.sql.Array) result[4];
-                    Integer[] studentIdsArray = (Integer[]) sqlArray.getArray();
-                    report.setStudentIds(Arrays.asList(studentIdsArray));
-        } catch (Exception e) {
+                        java.sql.Array sqlArray = (java.sql.Array) result[4];
+                        Integer[] studentIdsArray = (Integer[]) sqlArray.getArray();
+                        report.setStudentIds(Arrays.asList(studentIdsArray));
+                    } catch (Exception e) {
                         log.error("Error al convertir array de IDs de estudiantes: {}", e.getMessage());
                         report.setStudentIds(new ArrayList<>());
-        }
-    }
+                    }
+                }
 
                 reports.add(report);
             }
@@ -363,9 +363,9 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     public FamilyDomain saveById(Integer id, FamilyDomain familyDomain) {
 
         UserDomain user = new UserDomain(id);
-        FamilyDomain familyToSave = new FamilyDomain(null,user,familyDomain.getUser(),familyDomain.getRelationship());
+        FamilyDomain familyToSave = new FamilyDomain(null, user, familyDomain.getUser(), familyDomain.getRelationship());
 
-        Family familyEntity = familyMapper.toEntity( familyToSave);
+        Family familyEntity = familyMapper.toEntity(familyToSave);
         Family savedFamily = this.familyCrudRepo.save(familyEntity);
         return familyMapper.toDomain(savedFamily);
     }

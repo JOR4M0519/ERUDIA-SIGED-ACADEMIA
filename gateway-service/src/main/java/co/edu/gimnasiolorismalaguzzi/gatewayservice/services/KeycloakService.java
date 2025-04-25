@@ -24,16 +24,23 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor
+
 @Service
 @Slf4j
 public class KeycloakService {
 
+    protected KeycloakProvider createProvider() {
+        return new KeycloakProvider();
+    }
 
-    private KeycloakProvider keycloakProvider;
+    private final KeycloakProvider keycloakProvider;
+    private final UserService userService;
 
     @Autowired
-    private UserService userService;
+    public KeycloakService(KeycloakProvider keycloakProvider, UserService userService) {
+        this.keycloakProvider = keycloakProvider;
+        this.userService = userService;
+    }
 
     /*public String getToken(String username, String password) {
         try {
@@ -52,7 +59,7 @@ public class KeycloakService {
     public Mono<String> getToken(String username, String password) {
         return Mono.fromCallable(() -> {
             try {
-                keycloakProvider = new KeycloakProvider();
+
                 return keycloakProvider.getToken(username, password); //  Obtiene el token
             } catch (Exception e) {
                 log.error("Error obtaining token from Keycloak: ", e);
@@ -64,7 +71,6 @@ public class KeycloakService {
     public Mono<Map<String, String>> getTokens(String username, String password) {
         return Mono.fromCallable(() -> {
             try {
-                keycloakProvider = new KeycloakProvider();
                 return keycloakProvider.getTokens(username, password); // Obtiene los tokens
             } catch (Exception e) {
                 log.error("Error obtaining tokens from Keycloak: ", e);
@@ -75,12 +81,10 @@ public class KeycloakService {
 
     // Actualizar el método refreshToken para que use directamente el refresh token
     public String refreshToken(String refreshToken) {
-        keycloakProvider = new KeycloakProvider();
         return keycloakProvider.refreshToken(refreshToken);
     }
 
     public List<String> getUserGroupsByUsername(String username) {
-        keycloakProvider = new KeycloakProvider();
         UsersResource usersResource = keycloakProvider.getUserResource();
 
         //  Buscar usuario por username
@@ -104,7 +108,6 @@ public class KeycloakService {
 
 
     public List<Map<String, String>> getUsersByGroup(String groupId) {
-        keycloakProvider = new KeycloakProvider();
         UsersResource usersResource = keycloakProvider.getUserResource();
 
         try {
@@ -160,7 +163,6 @@ public class KeycloakService {
 
 
     public List<GroupRepresentation> getGroups() {
-        keycloakProvider = new KeycloakProvider();
         try {
             List<GroupRepresentation> groupList = keycloakProvider.getRealmResource().groups().groups();
             return groupList;
@@ -177,7 +179,6 @@ public class KeycloakService {
      */
 
     public Mono<UserDetailDomain> registerByGroupinStudentUser(UserRegistrationDomain registrationDomain) {
-        keycloakProvider = new KeycloakProvider();
 
         return Mono.fromCallable(() -> {
                     // Create user in Keycloak (this is blocking but we run it in a separate thread)
@@ -277,7 +278,7 @@ public class KeycloakService {
 
             usersResource.get(userId).resetPassword(credentialRepresentation);
 
-            RealmResource realmResource = KeycloakProvider.getRealmResource();
+            RealmResource realmResource = keycloakProvider.getRealmResource();
 
             List<RoleRepresentation> rolesRepresentation = null;
 
@@ -412,7 +413,6 @@ public class KeycloakService {
     }*/
 
     public UserRepresentation getUsersByUsername(String username) {
-        keycloakProvider = new KeycloakProvider();
         List<UserRepresentation> users = keycloakProvider.getRealmResource()
                 .users()
                 .searchByUsername(username, true); // true -> búsqueda exacta
@@ -424,7 +424,6 @@ public class KeycloakService {
     }
 
     public Mono<UserDetailDomain> registerUser(UserRegistrationDomain registrationDomain) {
-        keycloakProvider = new KeycloakProvider();
 
         // Verificar y establecer un valor por defecto para dateOfBirth si es nulo
         if (registrationDomain.getUserDetailDomain() != null &&
@@ -470,7 +469,6 @@ public class KeycloakService {
     }
     public HttpStatus updatePassword(String username, Login login) {
         try {
-            keycloakProvider = new KeycloakProvider();
 
             // Buscar el usuario por su nombre de usuario
             UserRepresentation user = getUsersByUsername(username);

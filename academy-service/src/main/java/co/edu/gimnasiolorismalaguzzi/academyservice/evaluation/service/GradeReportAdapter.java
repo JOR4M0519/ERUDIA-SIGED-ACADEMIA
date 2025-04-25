@@ -305,7 +305,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         return new ArrayList<>(studentReportsMap.values());
     }
 
-    private void processSubjectAndKnowledge(StudentReportDTO studentReport, GradeReportView data) {
+    public void processSubjectAndKnowledge(StudentReportDTO studentReport, GradeReportView data) {
         // Buscar o crear la materia
         SubjectReportDTO subjectReport = studentReport.getSubjects().stream()
                 .filter(s -> s.getSubjectId().equals(data.getSubjectId()))
@@ -400,7 +400,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         }
     }
     // Método para calcular el desempeño
-    private void calculatePerformance(SubjectReportDTO subject) {
+    public void calculatePerformance(SubjectReportDTO subject) {
         BigDecimal totalScore = subject.getTotalScore();
 
         if (totalScore.compareTo(new BigDecimal("4.6")) >= 0) {
@@ -432,7 +432,7 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
         return createExcelReport(reportList);
     }
 
-    private ByteArrayResource createExcelReport(List<StudentReportDTO> reportData) throws IOException {
+    public ByteArrayResource createExcelReport(List<StudentReportDTO> reportData) throws IOException {
         try (Workbook workbook = new XSSFWorkbook()) {
             Sheet sheet = workbook.createSheet("Reporte Académico");
 
@@ -641,8 +641,8 @@ public class GradeReportAdapter implements PersistenceGradeReportService, Persis
 
     // Método para cargar notas de periodos anteriores
 // Método actualizado para cargar notas de periodos anteriores
-    private void loadPreviousPeriodsScores(Long groupId, Long studentId, Long currentPeriodId,
-                                           int currentPeriodNumber, StudentReportDTO studentReport) {
+    public void loadPreviousPeriodsScores(Long groupId, Long studentId, Long currentPeriodId,
+                                          int currentPeriodNumber, StudentReportDTO studentReport) {
 
         // Para cada periodo anterior
         for (int prevPeriodNumber = 1; prevPeriodNumber < currentPeriodNumber; prevPeriodNumber++) {

@@ -82,7 +82,7 @@ public class StudentTrackingAdapter implements PersistenceStudentTrackingPort {
                 throw new AppException("Tracking with ID does exist! ", HttpStatus.NOT_FOUND);
             }
         } catch (Exception e){
-            throw new AppException("Interal Error! ", HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new AppException("Internal Error! ", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

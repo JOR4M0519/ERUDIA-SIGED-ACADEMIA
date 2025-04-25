@@ -1,5 +1,6 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.modules.knowledge;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.academic.service.persistence.PersistenceSubjectDimensionPort;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.DimensionDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.entity.Dimension;
@@ -14,13 +15,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,8 +33,10 @@ public class DimensionAdapterTest {
     @Mock
     private DimensionMapper dimensionMapper;
 
-    private DimensionAdapter dimensionAdapter;
+    @Mock
+    private PersistenceSubjectDimensionPort subjectDimensionPort;
 
+    private DimensionAdapter dimensionAdapter;
     private Dimension dimension;
     private DimensionDomain dimensionDomain;
     private List<Dimension> dimensions;
@@ -41,9 +44,8 @@ public class DimensionAdapterTest {
 
     @BeforeEach
     void setUp() {
-        dimensionAdapter = new DimensionAdapter(dimensionCrudRepo, dimensionMapper);
+        dimensionAdapter = new DimensionAdapter(dimensionCrudRepo, dimensionMapper, subjectDimensionPort);
 
-        // Inicializar entidades para pruebas
         dimension = Dimension.builder()
                 .id(1)
                 .name("Dimensión Test")
@@ -56,20 +58,17 @@ public class DimensionAdapterTest {
                 .description("Descripción de prueba")
                 .build();
 
-        dimensions = Arrays.asList(dimension);
-        dimensionDomains = Arrays.asList(dimensionDomain);
+        dimensions = List.of(dimension);
+        dimensionDomains = List.of(dimensionDomain);
     }
 
     @Test
     void findAll_ShouldReturnAllDimensions() {
-        // Arrange
         when(dimensionCrudRepo.findAll()).thenReturn(dimensions);
         when(dimensionMapper.toDomains(dimensions)).thenReturn(dimensionDomains);
 
-        // Act
         List<DimensionDomain> result = dimensionAdapter.findAll();
 
-        // Assert
         assertEquals(dimensionDomains, result);
         verify(dimensionCrudRepo).findAll();
         verify(dimensionMapper).toDomains(dimensions);
@@ -77,38 +76,29 @@ public class DimensionAdapterTest {
 
     @Test
     void findById_WhenDimensionExists_ShouldReturnDimension() {
-        // Arrange
-        Integer id = 1;
-        when(dimensionCrudRepo.findById(id)).thenReturn(Optional.of(dimension));
+        when(dimensionCrudRepo.findById(1)).thenReturn(Optional.of(dimension));
         when(dimensionMapper.toDomain(dimension)).thenReturn(dimensionDomain);
 
-        // Act
-        DimensionDomain result = dimensionAdapter.findById(id);
+        DimensionDomain result = dimensionAdapter.findById(1);
 
-        // Assert
         assertEquals(dimensionDomain, result);
-        verify(dimensionCrudRepo).findById(id);
+        verify(dimensionCrudRepo).findById(1);
         verify(dimensionMapper).toDomain(dimension);
     }
 
     @Test
     void findById_WhenDimensionDoesNotExist_ShouldReturnNull() {
-        // Arrange
-        Integer id = 999;
-        when(dimensionCrudRepo.findById(id)).thenReturn(Optional.empty());
+        when(dimensionCrudRepo.findById(999)).thenReturn(Optional.empty());
 
-        // Act
-        DimensionDomain result = dimensionAdapter.findById(id);
+        DimensionDomain result = dimensionAdapter.findById(999);
 
-        // Assert
         assertNull(result);
-        verify(dimensionCrudRepo).findById(id);
+        verify(dimensionCrudRepo).findById(999);
         verify(dimensionMapper, never()).toDomain(any());
     }
 
     @Test
     void save_ShouldSaveDimension() {
-        // Arrange
         DimensionDomain domainToSave = DimensionDomain.builder()
                 .name("Nueva Dimensión")
                 .description("Nueva descripción")
@@ -135,10 +125,8 @@ public class DimensionAdapterTest {
         when(dimensionCrudRepo.save(entityToSave)).thenReturn(savedEntity);
         when(dimensionMapper.toDomain(savedEntity)).thenReturn(savedDomain);
 
-        // Act
         DimensionDomain result = dimensionAdapter.save(domainToSave);
 
-        // Assert
         assertEquals(savedDomain, result);
         verify(dimensionMapper).toEntity(domainToSave);
         verify(dimensionCrudRepo).save(entityToSave);
@@ -147,8 +135,6 @@ public class DimensionAdapterTest {
 
     @Test
     void update_WhenDimensionExists_ShouldUpdateAndReturnDimension() {
-        // Arrange
-        Integer id = 1;
         DimensionDomain domainToUpdate = DimensionDomain.builder()
                 .id(1)
                 .name("Dimensión Actualizada")
@@ -173,39 +159,57 @@ public class DimensionAdapterTest {
                 .description("Descripción actualizada")
                 .build();
 
-        when(dimensionCrudRepo.findById(id)).thenReturn(Optional.of(existingEntity));
-        when(dimensionCrudRepo.save(any(Dimension.class))).thenReturn(updatedEntity);
+        when(dimensionCrudRepo.findById(1)).thenReturn(Optional.of(existingEntity));
+        when(dimensionCrudRepo.save(existingEntity)).thenReturn(updatedEntity);
         when(dimensionMapper.toDomain(updatedEntity)).thenReturn(updatedDomain);
 
-        // Act
-        DimensionDomain result = dimensionAdapter.update(id, domainToUpdate);
+        DimensionDomain result = dimensionAdapter.update(1, domainToUpdate);
 
-        // Assert
         assertEquals(updatedDomain, result);
-        verify(dimensionCrudRepo).findById(id);
-        verify(dimensionCrudRepo).save(any(Dimension.class));
+        verify(dimensionCrudRepo).findById(1);
+        verify(dimensionCrudRepo).save(existingEntity);
         verify(dimensionMapper).toDomain(updatedEntity);
     }
 
     @Test
-    void update_WhenDimensionDoesNotExist_ShouldThrowEntityNotFoundException() {
-        // Arrange
-        Integer id = 999;
-        DimensionDomain domainToUpdate = DimensionDomain.builder()
-                .id(999)
-                .name("Dimensión Actualizada")
-                .description("Descripción actualizada")
-                .build();
+    void update_WhenDimensionDoesNotExist_ShouldThrowNoSuchElementException() {
+        when(dimensionCrudRepo.findById(999)).thenReturn(Optional.empty());
 
-        when(dimensionCrudRepo.findById(id)).thenReturn(Optional.empty());
-
-        // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> {
-            dimensionAdapter.update(id, domainToUpdate);
-        });
-
-        verify(dimensionCrudRepo).findById(id);
+        assertThrows(NoSuchElementException.class, () -> dimensionAdapter.update(999, dimensionDomain));
+        verify(dimensionCrudRepo).findById(999);
         verify(dimensionCrudRepo, never()).save(any(Dimension.class));
     }
 
+    // --- delete ---
+
+    @Test
+    void delete_WhenDimensionNotExist_ShouldThrowAppExceptionNotFound() {
+        // findById returns null
+        when(dimensionCrudRepo.findById(2)).thenReturn(Optional.empty());
+
+        AppException ex = assertThrows(AppException.class, () -> dimensionAdapter.delete(2));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getCode());
+    }
+
+    @Test
+    void delete_WhenDimensionDoesNotExist_ShouldThrowAppExceptionNotFound() {
+        // Arrange
+        when(dimensionCrudRepo.findById(1)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        AppException ex = assertThrows(AppException.class, () -> dimensionAdapter.delete(1));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getCode());
+        assertEquals("La dimension no existe", ex.getMessage());
+    }
+
+    @Test
+    void delete_WhenNotUsed_ShouldDeleteAndReturnOk() {
+        when(dimensionCrudRepo.findById(1)).thenReturn(Optional.of(dimension));
+        when(dimensionMapper.toDomain(dimension)).thenReturn(dimensionDomain);
+        when(subjectDimensionPort.getAllByDimensionId(1)).thenReturn(Collections.emptyList());
+
+        HttpStatus status = dimensionAdapter.delete(1);
+        assertEquals(HttpStatus.OK, status);
+        verify(dimensionCrudRepo).deleteById(1);
+    }
 }

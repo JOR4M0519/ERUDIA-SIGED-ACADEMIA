@@ -74,7 +74,7 @@ public class DimensionAdapter implements PersistenceDimensionPort {
         DimensionDomain dimension = findById(id);
 
         // Verificar si existe la dimension
-        if (dimension.equals(null)) {
+        if (dimension == null) {
             throw new AppException("La dimension no existe", HttpStatus.NOT_FOUND);
         }
 

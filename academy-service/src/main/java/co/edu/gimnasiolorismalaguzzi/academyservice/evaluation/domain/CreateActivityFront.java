@@ -3,11 +3,13 @@ package co.edu.gimnasiolorismalaguzzi.academyservice.evaluation.domain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.knowledge.domain.AchievementGroupDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupStudentsDomain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class CreateActivityFront {
     private Integer id;
     private GroupStudentsDomain group;

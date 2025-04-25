@@ -1,11 +1,13 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 
 @Data
+@Builder
 public class InstitutionDomain implements Serializable {
     private Integer id;
     private String name;

@@ -1,242 +1,181 @@
 package co.edu.gimnasiolorismalaguzzi.academyservice.modules.student;
 
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.domain.GradeSettingDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.infrastructure.exception.AppException;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.EducationalLevelDomain;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.domain.GroupsDomain;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.entity.EducationalLevel;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.mapper.EducationalLevelMapper;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.repository.EduLevelCrudRepo;
 import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.EducationalLevelAdapter;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceEducationalLevelPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.student.service.persistence.PersistenceGroupsPort;
+import co.edu.gimnasiolorismalaguzzi.academyservice.administration.service.persistence.PersistenceGradeSettingPort;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class EducationalLevelAdapterTest {
+class EducationalLevelAdapterTest {
 
-    @Mock
-    private EduLevelCrudRepo eduLevelCrudRepo;
+    @Mock private EduLevelCrudRepo eduLevelCrudRepo;
+    @Mock private EducationalLevelMapper educationalLevelMapper;
+    @Mock private PersistenceGroupsPort groupsPort;
+    @Mock private PersistenceGradeSettingPort gradeSettingPort;
+    @InjectMocks private EducationalLevelAdapter adapter;
 
-    @Mock
-    private EducationalLevelMapper educationalLevelMapper;
-
-    private EducationalLevelAdapter educationalLevelAdapter;
-
-    private EducationalLevel educationalLevel;
-    private EducationalLevelDomain educationalLevelDomain;
-    private List<EducationalLevel> educationalLevels;
-    private List<EducationalLevelDomain> educationalLevelDomains;
+    private EducationalLevel entity;
+    private EducationalLevelDomain domain;
+    private List<EducationalLevel> entities;
+    private List<EducationalLevelDomain> domains;
 
     @BeforeEach
     void setUp() {
-        // Crear la instancia con el constructor e inyectar manualmente el mapper
-        educationalLevelAdapter = new EducationalLevelAdapter(eduLevelCrudRepo,educationalLevelMapper);
+        // inject autowired ports
+        ReflectionTestUtils.setField(adapter, "groupsPort", groupsPort);
+        ReflectionTestUtils.setField(adapter, "gradeSettingPort", gradeSettingPort);
 
-        // Inicializar entidades
-        educationalLevel = EducationalLevel.builder()
+        entity = EducationalLevel.builder()
                 .id(1)
                 .levelName("Primaria")
                 .status("A")
                 .build();
-
-        // Inicializar dominio
-        educationalLevelDomain = EducationalLevelDomain.builder()
+        domain = EducationalLevelDomain.builder()
                 .id(1)
                 .levelName("Primaria")
                 .status("A")
                 .build();
-
-        // Inicializar listas
-        educationalLevels = Arrays.asList(educationalLevel);
-        educationalLevelDomains = Arrays.asList(educationalLevelDomain);
+        entities = Arrays.asList(entity);
+        domains = Arrays.asList(domain);
     }
 
     @Test
-    void findAll_ShouldReturnAllEducationalLevels() {
-        // Arrange
-        when(eduLevelCrudRepo.findAll()).thenReturn(educationalLevels);
-        when(educationalLevelMapper.toDomains(educationalLevels)).thenReturn(educationalLevelDomains);
+    void findAll_returnsMappedDomains() {
+        when(eduLevelCrudRepo.findAll()).thenReturn(entities);
+        when(educationalLevelMapper.toDomains(entities)).thenReturn(domains);
 
-        // Act
-        List<EducationalLevelDomain> result = educationalLevelAdapter.findAll();
+        List<EducationalLevelDomain> result = adapter.findAll();
 
-        // Assert
-        assertEquals(educationalLevelDomains, result);
+        assertEquals(domains, result);
         verify(eduLevelCrudRepo).findAll();
-        verify(educationalLevelMapper).toDomains(educationalLevels);
+        verify(educationalLevelMapper).toDomains(entities);
     }
 
     @Test
-    void findById_WhenEducationalLevelExists_ShouldReturnEducationalLevel() {
-        // Arrange
-        Integer id = 1;
-        when(eduLevelCrudRepo.findById(id)).thenReturn(Optional.of(educationalLevel));
-        when(educationalLevelMapper.toDomain(educationalLevel)).thenReturn(educationalLevelDomain);
+    void findAll_emptyList() {
+        when(eduLevelCrudRepo.findAll()).thenReturn(Collections.emptyList());
+        when(educationalLevelMapper.toDomains(Collections.emptyList())).thenReturn(Collections.emptyList());
 
-        // Act
-        EducationalLevelDomain result = educationalLevelAdapter.findById(id);
-
-        // Assert
-        assertEquals(educationalLevelDomain, result);
-        verify(eduLevelCrudRepo).findById(id);
-        verify(educationalLevelMapper).toDomain(educationalLevel);
+        List<EducationalLevelDomain> result = adapter.findAll();
+        assertTrue(result.isEmpty());
     }
 
     @Test
-    void findById_WhenEducationalLevelDoesNotExist_ShouldReturnNull() {
-        // Arrange
-        Integer id = 999;
-        when(eduLevelCrudRepo.findById(id)).thenReturn(Optional.empty());
+    void findById_present() {
+        when(eduLevelCrudRepo.findById(1)).thenReturn(Optional.of(entity));
+        when(educationalLevelMapper.toDomain(entity)).thenReturn(domain);
 
-        // Act
-        EducationalLevelDomain result = educationalLevelAdapter.findById(id);
-
-        // Assert
-        assertNull(result);
-        verify(eduLevelCrudRepo).findById(id);
-        verify(educationalLevelMapper, never()).toDomain(any());
+        EducationalLevelDomain result = adapter.findById(1);
+        assertEquals(domain, result);
     }
 
     @Test
-    void save_ShouldSaveEducationalLevel() {
-        // Arrange
-        EducationalLevelDomain domainToSave = EducationalLevelDomain.builder()
-                .levelName("Secundaria")
-                .build();
-
-        EducationalLevel entityToSave = EducationalLevel.builder()
-                .levelName("Secundaria")
-                .status("A")
-                .build();
-
-        EducationalLevel savedEntity = EducationalLevel.builder()
-                .id(2)
-                .levelName("Secundaria")
-                .status("A")
-                .build();
-
-        EducationalLevelDomain savedDomain = EducationalLevelDomain.builder()
-                .id(2)
-                .levelName("Secundaria")
-                .status("A")
-                .build();
-
-        when(educationalLevelMapper.toEntity(domainToSave)).thenReturn(entityToSave);
-        when(eduLevelCrudRepo.save(entityToSave)).thenReturn(savedEntity);
-        when(educationalLevelMapper.toDomain(savedEntity)).thenReturn(savedDomain);
-
-        // Act
-        EducationalLevelDomain result = educationalLevelAdapter.save(domainToSave);
-
-        // Assert
-        assertEquals(savedDomain, result);
-        assertEquals("A", domainToSave.getStatus()); // Verificar que se estableció el status a "A"
-        verify(educationalLevelMapper).toEntity(domainToSave);
-        verify(eduLevelCrudRepo).save(entityToSave);
-        verify(educationalLevelMapper).toDomain(savedEntity);
+    void findById_absent() {
+        when(eduLevelCrudRepo.findById(2)).thenReturn(Optional.empty());
+        assertNull(adapter.findById(2));
     }
 
     @Test
-    void update_WhenEducationalLevelExists_ShouldUpdateAndReturnEducationalLevel() {
-        // Arrange
-        Integer id = 1;
+    void save_setsStatusAndPersists() {
+        EducationalLevelDomain toSave = EducationalLevelDomain.builder().levelName("Secundaria").build();
+        EducationalLevel entToSave = EducationalLevel.builder().levelName("Secundaria").status("A").build();
+        EducationalLevel savedEnt = EducationalLevel.builder().id(2).levelName("Secundaria").status("A").build();
+        EducationalLevelDomain savedDom = EducationalLevelDomain.builder().id(2).levelName("Secundaria").status("A").build();
 
-        EducationalLevelDomain domainToUpdate = EducationalLevelDomain.builder()
-                .id(1)
-                .levelName("Bachillerato")
-                .status("A")
-                .build();
+        when(educationalLevelMapper.toEntity(toSave)).thenReturn(entToSave);
+        when(eduLevelCrudRepo.save(entToSave)).thenReturn(savedEnt);
+        when(educationalLevelMapper.toDomain(savedEnt)).thenReturn(savedDom);
 
-        EducationalLevel existingEntity = EducationalLevel.builder()
-                .id(1)
-                .levelName("Primaria")
-                .status("A")
-                .build();
+        EducationalLevelDomain result = adapter.save(toSave);
 
-        EducationalLevel updatedEntity = EducationalLevel.builder()
-                .id(1)
-                .levelName("Bachillerato")
-                .status("A")
-                .build();
-
-        when(eduLevelCrudRepo.findById(id)).thenReturn(Optional.of(existingEntity));
-        when(eduLevelCrudRepo.save(any(EducationalLevel.class))).thenReturn(updatedEntity);
-        when(educationalLevelMapper.toDomain(updatedEntity)).thenReturn(domainToUpdate);
-
-        // Act
-        EducationalLevelDomain result = educationalLevelAdapter.update(id, domainToUpdate);
-
-        // Assert
-        assertEquals(domainToUpdate, result);
-        verify(eduLevelCrudRepo).findById(id);
-        verify(eduLevelCrudRepo).save(any(EducationalLevel.class));
-        verify(educationalLevelMapper).toDomain(updatedEntity);
+        assertEquals("A", toSave.getStatus());
+        assertEquals(savedDom, result);
+        verify(eduLevelCrudRepo).save(entToSave);
     }
 
     @Test
-    void update_WhenEducationalLevelDoesNotExist_ShouldThrowNoSuchElementException() {
-        // Arrange
-        Integer id = 999;
-        EducationalLevelDomain domainToUpdate = EducationalLevelDomain.builder()
-                .id(999)
-                .levelName("Bachillerato")
-                .status("A")
-                .build();
+    void update_present_updatesAndReturns() {
+        EducationalLevelDomain updateDom = EducationalLevelDomain.builder().id(1).levelName("Secundaria").status("I").build();
+        EducationalLevel existing = EducationalLevel.builder().id(1).levelName("Primaria").status("A").build();
+        EducationalLevel updated = EducationalLevel.builder().id(1).levelName("Secundaria").status("I").build();
 
-        when(eduLevelCrudRepo.findById(id)).thenReturn(Optional.empty());
+        when(eduLevelCrudRepo.findById(1)).thenReturn(Optional.of(existing));
+        when(eduLevelCrudRepo.save(existing)).thenReturn(updated);
+        when(educationalLevelMapper.toDomain(updated)).thenReturn(updateDom);
 
-        // Act & Assert
-        assertThrows(NoSuchElementException.class, () -> {
-            educationalLevelAdapter.update(id, domainToUpdate);
-        });
-
-        verify(eduLevelCrudRepo).findById(id);
-        verify(eduLevelCrudRepo, never()).save(any(EducationalLevel.class));
+        EducationalLevelDomain result = adapter.update(1, updateDom);
+        assertEquals(updateDom, result);
     }
 
     @Test
-    void delete_WhenEducationalLevelDoesNotExist_ShouldThrowAppException() {
-        // Arrange
-        Integer id = 999;
+    void update_absent_throwsNoSuchElement() {
+        when(eduLevelCrudRepo.findById(99)).thenReturn(Optional.empty());
+        assertThrows(NoSuchElementException.class, () -> adapter.update(99, domain));
+    }
 
-        when(eduLevelCrudRepo.existsById(id)).thenReturn(false);
+    // --- delete ---
 
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            educationalLevelAdapter.delete(id);
-        });
-
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-        verify(eduLevelCrudRepo).existsById(id);
-        verify(eduLevelCrudRepo, never()).updateStatusById(anyString(), anyInt());
+    @Test
+    void delete_nonExistent_throwsNotFound() {
+        when(eduLevelCrudRepo.existsById(3)).thenReturn(false);
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(3));
+        assertEquals(HttpStatus.NOT_FOUND, ex.getCode());
     }
 
     @Test
-    void delete_WhenExceptionOccurs_ShouldThrowAppExceptionWithInternalServerError() {
-        // Arrange
-        Integer id = 1;
+    void delete_withAssociations_throwsConflict() {
+        when(eduLevelCrudRepo.existsById(1)).thenReturn(true);
+        when(groupsPort.findByLevelId(1)).thenReturn(List.of(GroupsDomain.builder().build()));
+        when(gradeSettingPort.findByLevelId(1)).thenReturn(List.of(GradeSettingDomain.builder().build()));
 
-        when(eduLevelCrudRepo.existsById(id)).thenThrow(new RuntimeException("Database error"));
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(1));
+        assertEquals(HttpStatus.IM_USED, ex.getCode());
+    }
 
-        // Act & Assert
-        AppException exception = assertThrows(AppException.class, () -> {
-            educationalLevelAdapter.delete(id);
-        });
+    @Test
+    void delete_noAssociations_updatesStatusAndReturnsOk() {
+        when(eduLevelCrudRepo.existsById(1)).thenReturn(true);
+        when(groupsPort.findByLevelId(1)).thenReturn(Collections.emptyList());
+        when(gradeSettingPort.findByLevelId(1)).thenReturn(Collections.emptyList());
 
-        assertEquals("INTERN ERROR", exception.getMessage());
-        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, exception.getCode());
-        verify(eduLevelCrudRepo).existsById(id);
+        HttpStatus status = adapter.delete(1);
+        assertEquals(HttpStatus.OK, status);
+        verify(eduLevelCrudRepo).updateStatusById("I", 1);
+    }
+
+    @Test
+    void delete_updateThrows_exceptionMapsToInternalError() {
+        when(eduLevelCrudRepo.existsById(1)).thenReturn(true);
+        when(groupsPort.findByLevelId(1)).thenReturn(Collections.emptyList());
+        when(gradeSettingPort.findByLevelId(1)).thenReturn(Collections.emptyList());
+        doThrow(new RuntimeException("fail")).when(eduLevelCrudRepo).updateStatusById(anyString(), anyInt());
+
+        AppException ex = assertThrows(AppException.class, () -> adapter.delete(1));
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, ex.getCode());
     }
 }

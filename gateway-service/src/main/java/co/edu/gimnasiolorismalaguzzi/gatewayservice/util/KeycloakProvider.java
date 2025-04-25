@@ -22,11 +22,12 @@ import java.util.Map;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 
 
-
+@Component
 public class KeycloakProvider {
 
     private static final String SERVER_URL = System.getenv("KEYCLOAK_SERVER_URL") != null ?

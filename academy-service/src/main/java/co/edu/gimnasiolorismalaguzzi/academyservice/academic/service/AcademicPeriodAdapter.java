@@ -102,10 +102,11 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
         }
     }
 
+
     @Override
-    public List<AcademicPeriodDomain> getActivePeriodsByYear(String year){
-        List<AcademicPeriodDomain> academicPeriodDomain = this.academicPeriodMapper.toDomains(academicPeriodCrudRepo.getActivePeriodsByYear(year));
-        return academicPeriodDomain;
+    public List<AcademicPeriodDomain> getActivePeriodsByYear(String year) {
+        List<AcademicPeriod> entities = academicPeriodCrudRepo.getPeriodsByYear(year);
+        return academicPeriodMapper.toDomains(entities);
     }
 
     @Override
@@ -126,20 +127,21 @@ public class AcademicPeriodAdapter implements PersistenceAcademicPeriodPort {
     @Override
     public HttpStatus delete(Integer id) {
 
-        AcademicPeriodDomain academicPeriodDomain = findById(id);
 
-        // Verificar si existe la dimension
-        if (academicPeriodDomain.equals(null)) {
+        if (!academicPeriodCrudRepo.existsById(id)) {
             throw new AppException("El periodo no existe", HttpStatus.NOT_FOUND);
         }
 
         try {
             academicPeriodCrudRepo.deleteById(id);
             return HttpStatus.OK;
-        }catch (Exception e){
-            throw new AppException("Se tuvo un error al eliminar la relación", HttpStatus.CONFLICT);
+        } catch (AppException ae) {
+            throw ae;
+        } catch (Exception e) {
+            throw new AppException("Intern Error!", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     // Agregar esto a AcademicPeriodAdapter.java
     @Override
