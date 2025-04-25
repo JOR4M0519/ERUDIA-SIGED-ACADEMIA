@@ -28,14 +28,6 @@ public class AcademicReportController {
         this.reportService = reportService;
     }
 
-    @GetMapping("/group/{groupId}/period/{periodId}")
-    public ResponseEntity<List<StudentReportDTO>> getGroupReport(
-            @PathVariable Long groupId,
-            @PathVariable Long periodId) {
-        List<StudentReportDTO> report = reportService.generateGroupReport(groupId, periodId);
-        return ResponseEntity.ok(report);
-    }
-
 
     @GetMapping("/pdf/group/{groupId}/period/{periodId}")
     public ResponseEntity<Resource> getGroupReportPdf(@PathVariable Long groupId, @PathVariable Long periodId) throws IOException {
