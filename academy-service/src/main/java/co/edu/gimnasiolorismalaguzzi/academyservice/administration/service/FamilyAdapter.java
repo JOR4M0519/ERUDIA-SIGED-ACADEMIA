@@ -98,7 +98,7 @@ public class FamilyAdapter implements PersistenceFamilyPort {
     @Override
     public FamilyDomain saveById(Integer id, FamilyDomain familyDomain) {
 
-        UserDomain user = new UserDomain(id);
+        UserDomain user = UserDomain.builder().id(id).build();
         FamilyDomain familyToSave = new FamilyDomain(null,user,familyDomain.getUser(),familyDomain.getRelationship());
 
         Family familyEntity = familyMapper.toEntity( familyToSave);

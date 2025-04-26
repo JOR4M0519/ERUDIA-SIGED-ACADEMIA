@@ -69,7 +69,7 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
         if (subjectDomain.getProfessor() != null && !subjectDomain.getProfessor().isEmpty()) {
             for (User professor : subjectDomain.getProfessor()) {
-                SubjectProfessorDomain professorDomain = new SubjectProfessorDomain();
+                SubjectProfessorDomain professorDomain = SubjectProfessorDomain.builder().build();
                 professorDomain.setSubject(savedSubject);
                 professorDomain.setProfessor(professor);
                 subjectProfessorAdapter.save(professorDomain);
@@ -107,7 +107,7 @@ public class SubjectAdapter implements PersistenceSubjectPort {
 
                 newProfessorIds.forEach(professorId -> {
                     if (existingRelations.stream().noneMatch(r -> r.getProfessor().getId().equals(professorId))) {
-                        SubjectProfessorDomain newRelation = new SubjectProfessorDomain();
+                        SubjectProfessorDomain newRelation = SubjectProfessorDomain.builder().build();
                         newRelation.setSubject(existingSubject);
                         newRelation.setProfessor(User.builder().id(professorId).build());
                         subjectProfessorAdapter.save(newRelation);
